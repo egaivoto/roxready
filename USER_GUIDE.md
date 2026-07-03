@@ -44,6 +44,8 @@ The plan **adapts by itself**: miss a key session → it's rescheduled within th
 - Always tap **RPE** (1 = stroll, 10 = collapse) — it drives the adaptive coach.
 - Everything is editable/deletable later from History.
 
+**Train at a fitness studio (HIIT / circuit / functional classes)?** Set how many classes a week during onboarding or in Settings. The plan then **reserves those days as class days and trims the overlapping conditioning**, so you're not doubling up. Log a class under the 🔥 **Studio Class** type — pick a focus (cardio / resistance / hybrid), quick-fill a common format, and optionally note the movements. You can **save your studio's regular workout as a reusable format** to log it in seconds next time. Classes count toward your streak and adherence like any other session.
+
 **◔ Progress**
 - **Split consistency (CV%)** — headline number. Under 5% = metronome. Over 9% = pacing or engine problem.
 - **Radar** — strengths vs weaknesses against your goal pace, with a concrete "focus" suggestion.

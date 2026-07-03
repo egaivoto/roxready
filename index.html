@@ -63,8 +63,14 @@ button{font-family:inherit;cursor:pointer;border:none;border-radius:12px;font-si
 input,select,textarea{
   font-family:inherit;font-size:16px;color:var(--txt);
   background:var(--card2);border:1px solid var(--line);border-radius:12px;
-  padding:12px 12px;width:100%;outline:none;
+  padding:12px 12px;width:100%;min-width:0;outline:none;box-sizing:border-box;
+  -webkit-appearance:none;appearance:none;
 }
+/* date/time inputs: force the same box as text inputs (webkit sizes them taller/wider) */
+input[type=date],input[type=time]{height:47px;line-height:21px;min-height:47px}
+input[type=date]::-webkit-date-and-time-value{text-align:left;margin:0}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.7);opacity:.65;cursor:pointer;margin:0;padding:0}
+select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' stroke='%239a9da6' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px}
 input:focus,select:focus,textarea:focus{border-color:var(--yellow-dim)}
 input[type=number]{-moz-appearance:textfield}
 label.fld{display:block;margin-bottom:12px}
@@ -140,8 +146,10 @@ a{color:var(--yellow)}
 /* tutorial spotlight */
 #tut{position:fixed;inset:0;z-index:300;display:none}
 #tut.on{display:block}
-#tutHole{position:absolute;border-radius:16px;box-shadow:0 0 0 9999px rgba(0,0,0,.74);border:2px solid var(--yellow);transition:all .3s ease;pointer-events:none}
-#tutCard{position:absolute;left:16px;right:16px;max-width:488px;margin:0 auto;background:var(--card);border:1px solid var(--yellow-dim);border-radius:16px;padding:16px;transition:top .3s ease;box-shadow:0 8px 30px rgba(0,0,0,.6)}
+#tutHole{position:fixed;border-radius:16px;box-shadow:0 0 0 9999px rgba(0,0,0,.74);border:2px solid var(--yellow);pointer-events:none;
+  transition:top .4s cubic-bezier(.22,1,.36,1),left .4s cubic-bezier(.22,1,.36,1),width .4s cubic-bezier(.22,1,.36,1),height .4s cubic-bezier(.22,1,.36,1)}
+#tutCard{position:fixed;left:16px;right:16px;max-width:488px;margin:0 auto;background:var(--card);border:1px solid var(--yellow-dim);border-radius:16px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,.6);
+  transition:top .4s cubic-bezier(.22,1,.36,1),opacity .28s ease}
 #tutCard h3{margin-bottom:4px;color:var(--yellow)}
 #tutCard .small{margin-bottom:12px}
 .pill.missed{background:#3a1620;color:var(--red)}
@@ -311,9 +319,27 @@ const WTYPES = [
   {id:"erg",     name:"Erg (Ski / Row)", icon:"🚣", desc:"Interval or steady"},
   {id:"strength",name:"Strength",        icon:"🏋️", desc:"Sets, reps, load"},
   {id:"stations",name:"Station Practice",icon:"🎯", desc:"Hyrox stations, timed"},
+  {id:"class",   name:"Studio Class",    icon:"🔥", desc:"HIIT / circuit / functional class"},
   {id:"sim",     name:"Race Simulation", icon:"🏁", desc:"Full or half, with splits"},
 ];
 const wtype = id => WTYPES.find(w=>w.id===id) || WTYPES[0];
+
+// generic (unbranded) studio-class formats — inspired by common circuit-class structures
+const CLASS_FOCUS = {
+  cardio:   {label:"Cardio / conditioning", tag:"cardio",  emoji:"❤️‍🔥"},
+  resistance:{label:"Resistance / strength", tag:"strength", emoji:"💪"},
+  hybrid:   {label:"Hybrid (cardio + strength)", tag:"hybrid", emoji:"🔀"},
+};
+const CLASS_TEMPLATES = [
+  {name:"Cardio circuit", focus:"cardio",
+   format:"~45 min. Timed stations (e.g. 45s work / 15s rest), 2–3 rounds. Rower, bike, sled, jumps, carries."},
+  {name:"Resistance circuit", focus:"resistance",
+   format:"~45 min. Strength stations in pairs, 2–4 rounds. Squats, presses, rows, lunges, hinge."},
+  {name:"Hybrid / functional", focus:"hybrid",
+   format:"~45 min. Alternating cardio + resistance stations. Full-body, high heart-rate."},
+  {name:"HIIT / AMRAP", focus:"cardio",
+   format:"20–30 min. As many rounds as possible of a short movement set. All-out effort."},
+];
 
 /* ---------- state ---------- */
 let S = load();
@@ -397,6 +423,11 @@ const OB_STEPS = [
   {key:"equipment", q:"What equipment can you access?", sub:"Sessions adapt — no sled, no problem.", type:"multi", opts:[
     ["ski","SkiErg"],["row","Rower"],["sled","Sled"],["wb","Wall ball"],
     ["kb","Kettlebells / dumbbells"],["sandbag","Sandbag"],["run","Somewhere to run"]]},
+  {key:"classes", q:"Do you train at a fitness studio?", sub:"HIIT, circuit or functional classes (e.g. a 45-min studio session). We'll build your plan around them instead of double-booking your body.", type:"opts", opts:[
+    ["0","No / rarely","Just my own training"],
+    ["1","~1 a week","The odd class"],
+    ["2","~2 a week","A regular thing"],
+    ["3","3+ a week","Classes are my main training"]]},
   {key:"fiveK", q:"Recent 5K time?", sub:"Best guess is fine — running is ~half your race, so this anchors your paces. (mm:ss)", type:"text", ph:"e.g. 25:00", optional:true},
   {key:"wallballs", q:"Wall balls unbroken?", sub:"Roughly how many can you do without stopping? Helps spot your limiter.", type:"opts", opts:[
     ["10","Under 15",""],["25","15–35",""],["50","35–60",""],["75","60+",""]], optional:true},
@@ -462,7 +493,7 @@ function finishOnboarding(){
     raceDate: obData.raceDate, division: obData.division||"open", sex: obData.sex||"m",
     experience: obData.experience||"new", days: Number(obData.days||4),
     equipment: obData.equipment||["run","kb"], fiveK: fiveKSec||null,
-    wallballs: wb||null, limiter, createdAt: todayISO(),
+    wallballs: wb||null, limiter, classes: Number(obData.classes||0), createdAt: todayISO(),
   };
   S.plan = generatePlan(S.profile);
   save();
@@ -561,20 +592,30 @@ function weekSessions(p, ph, deload, sim, wkIdx, totalWeeks){
     return L;
   }
 
+  // prio = how Hyrox-specific / protected a session is (higher = keep). Studio classes
+  // replace the lowest-prio slots so classes never crowd out running or race-pace work.
   const picks = [];
-  picks.push({type:"intervals", ...IV[ph2]});
-  picks.push({type:"strength", ...ST[ph2]});
-  if(days>=4) picks.push(BR[ph2] ? {type:"brick", ...BR[ph2]} : {type:"erg", ...ERG});
-  picks.push({type:"run", ...LR[ph2]});
-  if(days>=5) picks.splice(2,0,{type:"run", ...EZ});
-  if(days>=6) picks.push({type:"erg", ...ERG});
+  picks.push({type:"intervals", prio:5, ...IV[ph2]});
+  picks.push({type:"strength", prio:3, ...ST[ph2]});
+  if(days>=4) picks.push(BR[ph2] ? {type:"brick", prio:4, ...BR[ph2]} : {type:"erg", prio:2, ...ERG});
+  picks.push({type:"run", prio:4, ...LR[ph2]});
+  if(days>=5) picks.splice(2,0,{type:"run", prio:1, ...EZ});
+  if(days>=6) picks.push({type:"erg", prio:2, ...ERG});
   const layout = DAY_LAYOUT[Math.min(6,Math.max(2,days))];
-  let out = picks.slice(0, days).map((s,i)=>({day:layout[i], type:s.type, t:s.t, d:s.d}));
+  let out = picks.slice(0, days).map((s,i)=>({day:layout[i], type:s.type, t:s.t, d:s.d, prio:s.prio}));
 
   if(sim==="full"){
-    out[out.length-1] = {day:5, type:"sim", t:"🏁 FULL RACE SIMULATION", d:`The dress rehearsal. Full format at race standards (scale loads only if you must):\n8 × (1 km run + station), in race order.\nRecord every split, station time and Roxzone. Go 90–95% — save 100% for race day.`};
+    out[out.length-1] = {day:5, type:"sim", prio:9, t:"🏁 FULL RACE SIMULATION", d:`The dress rehearsal. Full format at race standards (scale loads only if you must):\n8 × (1 km run + station), in race order.\nRecord every split, station time and Roxzone. Go 90–95% — save 100% for race day.`};
   } else if(sim==="half"){
-    out[out.length-1] = {day:5, type:"sim", t:"Half Simulation", d:`4 × 1 km run alternating with:\nSkiErg 500 m → sled push 25 m → row 500 m → 50 wall balls.\nRace effort. Record splits — this sets your pacing baseline.`};
+    out[out.length-1] = {day:5, type:"sim", prio:9, t:"Half Simulation", d:`4 × 1 km run alternating with:\nSkiErg 500 m → sled push 25 m → row 500 m → 50 wall balls.\nRace effort. Record splits — this sets your pacing baseline.`};
+  }
+  // fold in studio classes: convert the lowest-prio non-sim slots, keeping >=2 Hyrox-specific
+  const nClasses = Math.max(0, Math.min(p.classes||0, out.length-2));
+  if(nClasses>0){
+    out.map((s,i)=>({i,prio:s.prio||0,type:s.type})).filter(x=>x.type!=="sim")
+      .sort((a,b)=>a.prio-b.prio).slice(0,nClasses)
+      .forEach(x=>{ out[x.i]={...out[x.i], type:"class", t:"Studio Class",
+        d:`Your studio / HIIT class slots in here as conditioning — go hard, then log it (focus + RPE) so it feeds your progress and adaptivity.\nTip: on class days, add 10–15 min of easy running before or after to protect race-specific volume.`}; });
   }
   if(deload){
     out = out.map(s=>({...s, t:"Deload: "+s.t, d:"Deload week — cut volume ~40%, keep movement quality.\n"+s.d}));
@@ -907,6 +948,21 @@ function openLog(type, planSessionId, editId){
       <div class="grid2"><label class="fld"><span class="lbl">Duration (min, opt.)</span><input id="lg_min" inputmode="numeric" value="${edit&&edit.durationSec?Math.round(edit.durationSec/60):""}"></label>
       <div style="padding-top:22px"><button class="btn sec" onclick="toggleTimer()" id="rtBtn">Rest timer ▶ 90s</button></div></div>`;
   }
+  if(type==="class"){
+    h += `<div class="spread" style="margin-bottom:6px"><span class="lbl" style="font-size:12.5px;color:var(--dim);font-weight:600;text-transform:uppercase">Focus</span></div>
+      <div class="segctl" id="classSeg">${Object.entries(CLASS_FOCUS).map(([k,v],i)=>
+        `<button class="${(edit?edit.classFocus===k:i===0)?'on':''}" onclick="segPick(this)" data-v="${k}">${v.emoji} ${k[0].toUpperCase()+k.slice(1)}</button>`).join("")}</div>
+      <div class="grid2">
+        <label class="fld"><span class="lbl">Duration (min)</span><input id="lg_min" inputmode="numeric" value="${edit&&edit.durationSec?Math.round(edit.durationSec/60):'45'}"></label>
+        <label class="fld"><span class="lbl">Class / studio (opt.)</span><input id="lg_classname" placeholder="e.g. Friday HIIT" value="${edit?esc(edit.className||''):''}"></label>
+      </div>
+      <div style="margin:2px 0 6px"><span class="tiny">Quick-fill a format:</span>
+        <div class="chips" style="margin-top:6px">${classTemplates().map((t,i)=>`<button class="chip" onclick="applyClassTemplate(${i})">${esc(t.name)}</button>`).join("")}</div></div>
+      <div class="spread" style="margin:12px 0 8px"><span class="lbl" style="font-size:12.5px;color:var(--dim);font-weight:600;text-transform:uppercase">Movements (optional)</span>
+        <button class="btn sec mini" onclick="addExRow()">+ movement</button></div>
+      <div id="exRows"></div>
+      <button class="btn sec mini" style="margin-bottom:4px" onclick="saveClassTemplate()">☆ Save format for reuse</button>`;
+  }
   if(type==="stations"||type==="sim"){
     if(type==="sim") h += `<div class="segctl" id="simSeg">
       <button class="${(!edit||edit.simKind!=="half")?"on":""}" onclick="segPick(this)" data-v="full">Full</button>
@@ -1050,6 +1106,18 @@ function saveLog(){
     })).filter(e=>e.name);
     if(!w.exercises.length && !w.durationSec){ toast("Add at least one exercise"); return; }
   }
+  if(type==="class"){
+    const minEl=$("lg_min"); if(minEl&&minEl.value) w.durationSec=Number(minEl.value)*60;
+    w.classFocus = document.querySelector("#classSeg button.on")?.dataset.v || "hybrid";
+    const cn=$("lg_classname"); if(cn&&cn.value.trim()) w.className=cn.value.trim();
+    w.exercises = [...document.querySelectorAll("#exRows [data-ex]")].map(d=>({
+      name: d.querySelector(".exName").value.trim(),
+      sets: Number(d.querySelector(".exSets").value)||null,
+      reps: Number(d.querySelector(".exReps").value)||null,
+      kg: d.querySelector(".exKg").value? parseFloat(d.querySelector(".exKg").value.replace(",",".")):null,
+    })).filter(e=>e.name);
+    if(!w.durationSec){ toast("Add a duration"); return; }
+  }
   if(type==="stations"||type==="sim"){
     w.stations = [...document.querySelectorAll("#stRows .stitem")].map(d=>({
       id: d.dataset.st, time: parseTime(d.querySelector(".stTime").value)
@@ -1103,7 +1171,25 @@ function lastSummary(w){
   if(w.type==="run"||w.type==="intervals") return [w.distanceKm?w.distanceKm+" km":null, w.durationSec?fmtSec(w.durationSec):null, (w.durationSec&&w.distanceKm)?fmtPace(w.durationSec/w.distanceKm):null].filter(Boolean).join(" · ");
   if(w.type==="erg"&&w.erg) return w.erg.machine+" "+w.erg.meters+"m in "+fmtSec(w.erg.seconds);
   if(w.type==="strength") return (w.exercises||[]).slice(0,3).map(e=>e.name).join(", ");
+  if(w.type==="class") return [(CLASS_FOCUS[w.classFocus]||{}).label||"class", w.durationSec?fmtSec(w.durationSec):null].filter(Boolean).join(" · ");
   return w.durationSec?fmtSec(w.durationSec):"logged";
+}
+/* class templates: built-in + user-saved */
+function classTemplates(){ return [...CLASS_TEMPLATES, ...(S.classTemplates||[])]; }
+function applyClassTemplate(i){
+  const t=classTemplates()[i]; if(!t) return;
+  const seg=document.querySelector(`#classSeg button[data-v="${t.focus}"]`); if(seg) segPick(seg);
+  const notes=$("lg_notes"); if(notes) notes.value = t.format + (notes.value?("\n"+notes.value):"");
+  toast("Filled: "+t.name);
+}
+function saveClassTemplate(){
+  const name=(($("lg_classname")||{}).value||"").trim() || "My class";
+  const focus=(document.querySelector("#classSeg button.on")||{}).dataset?.v || "hybrid";
+  const format=(($("lg_notes")||{}).value||"").trim();
+  if(!format){ toast("Add a note describing the format first, then save it"); return; }
+  (S.classTemplates=S.classTemplates||[]).push({name, focus, format});
+  save(); toast("Saved “"+name+"” — reuse it any time 💛");
+  openLog("class", logCtx.planSessionId, logCtx.editId); // refresh chips
 }
 
 /* ---------- history ---------- */
@@ -1140,6 +1226,7 @@ function openDetail(id){
       const st=STATIONS.find(x=>x.id===s.id);
       return `<tr><td>${st.icon} ${st.name}</td><td class="r">${fmtSec(s.time)}</td></tr>`;}).join("")+`</table><div style="height:10px"></div>`;
   }
+  if(w.type==="class") h+=`<div class="small" style="margin-bottom:10px">${(CLASS_FOCUS[w.classFocus]||{}).emoji||"🔥"} <b>${(CLASS_FOCUS[w.classFocus]||{}).label||"Studio class"}</b>${w.className?` · ${esc(w.className)}`:""}</div>`;
   if(w.roxzone) h+=`<div class="small" style="margin-bottom:10px">Roxzone total: <b>${fmtSec(w.roxzone)}</b></div>`;
   if(w.erg) h+=`<div class="small" style="margin-bottom:10px">${w.erg.machine==="ski"?"SkiErg":"Row"}: <b>${w.erg.meters} m</b> in <b>${fmtSec(w.erg.seconds)}</b> (${fmtSec(w.erg.seconds/w.erg.meters*500)}/500m)</div>`;
   if(w.exercises&&w.exercises.length){
@@ -1376,7 +1463,11 @@ function renderSettings(){
       <label class="fld"><span class="lbl">Days / week</span><select id="set_days">
         ${[3,4,5,6].map(d=>`<option ${p.days===d?"selected":""}>${d}</option>`).join("")}</select></label>
     </div>
-    <label class="fld"><span class="lbl">Recent 5K (mm:ss)</span><input id="set_5k" inputmode="numeric" class="timefld" value="${p.fiveK?fmtSec(p.fiveK):""}" placeholder="25:00"></label>
+    <div class="grid2">
+      <label class="fld"><span class="lbl">Recent 5K (mm:ss)</span><input id="set_5k" inputmode="numeric" class="timefld" value="${p.fiveK?fmtSec(p.fiveK):""}" placeholder="25:00"></label>
+      <label class="fld"><span class="lbl">Studio classes / wk</span><select id="set_classes">
+        ${[0,1,2,3].map(d=>`<option value="${d}" ${(p.classes||0)===d?"selected":""}>${d===0?"None":d===3?"3+":d}</option>`).join("")}</select></label>
+    </div>
     <button class="btn" onclick="saveSettings()">Save profile</button>
     <div class="tiny" style="margin-top:8px">Changing race date or days/week? Hit "Regenerate" on the Plan tab afterwards to rebuild around them.</div>
   </div>
@@ -1410,7 +1501,8 @@ function saveSettings(){
   p.division=$("set_div").value; p.sex=$("set_sex").value;
   p.days=Number($("set_days").value);
   p.fiveK=parseTime($("set_5k").value)||null;
-  save(); toast("Saved ✓"); go("home");
+  p.classes=Number($("set_classes").value)||0;
+  save(); toast("Saved ✓ — hit Regenerate on the Plan tab to apply"); go("home");
 }
 function toggleReminders(){
   if(!S.settings.remindersOn){
@@ -1749,6 +1841,7 @@ function renderGuide(){
     <p><b>Run splits matter most.</b> Whenever you run 1 km repeats or a simulation, enter each split. Split consistency is the single best predictor of a good Hyrox, and it's the headline number on your Progress tab.</p>
     <p><b>Station times:</b> log them at full race distance when you can (e.g. full 50 m sled push, 100 wall balls) so comparisons stay honest. Your division's loads are shown on each station.</p>
     <p><b>RPE</b> (1 = stroll, 10 = collapse) takes one tap and powers the adaptive coach — always tap it.</p>
+    <p><b>Studio classes count.</b> Train at a HIIT / circuit / functional studio? Tell us how many classes a week in onboarding or Settings, and the plan reserves those days and trims the overlapping conditioning — no double-booking your body. Log a class under the 🔥 <b>Studio Class</b> type: pick a focus, quick-fill a format, and optionally note the movements. You can save your studio's regular workout as a reusable format.</p>
   </div>
   <div class="card guide">
     <h2>◔ Progress</h2>
@@ -1812,21 +1905,22 @@ function tutShow(){
   go(st.v); // renders synchronously
   const el=document.querySelector(st.sel);
   if(!el || el.getBoundingClientRect().width<10){ tutNext(); return; }
+  const card=$("tutCard"), hole=$("tutHole");
+  card.style.opacity="0"; // fade the card out while we reposition
   const inset=parseInt(getComputedStyle($("topbar")).paddingTop)||0;
-  const barBottom=53+inset;
+  const barBottom=53+inset, pad=6;
   const isFixed = !!el.closest("#nav") || el.id==="topbar" || getComputedStyle(el).position==="fixed";
   setTimeout(()=>{
-    // scroll AFTER the view switch settles (avoids the browser's scroll-anchoring fighting us)
-    if(isFixed) window.scrollTo(0,0);
-    else {
-      const absTop=el.getBoundingClientRect().top+window.scrollY;
-      window.scrollTo(0, Math.max(0, absTop-(barBottom+24)));
-    }
-    const r=el.getBoundingClientRect(), pad=6;
-    const hole=$("tutHole");
-    hole.style.left=(r.left-pad)+"px"; hole.style.top=(r.top-pad)+"px";
+    // compute the target's FINAL viewport position analytically, so the spotlight
+    // and the smooth-scroll glide together to the same place (no snapping)
+    const r=el.getBoundingClientRect();
+    const absTop=r.top+window.scrollY;
+    const targetScroll = isFixed ? window.scrollY : Math.max(0, absTop-(barBottom+24));
+    const finalTop = isFixed ? r.top : absTop-targetScroll;
+    const finalBot = finalTop + r.height;
+    if(!isFixed) window.scrollTo({top:targetScroll, behavior:"smooth"});
+    hole.style.left=(r.left-pad)+"px"; hole.style.top=(finalTop-pad)+"px";
     hole.style.width=(r.width+2*pad)+"px"; hole.style.height=(r.height+2*pad)+"px";
-    const card=$("tutCard");
     card.innerHTML=`<h3>${st.t}</h3><div class="small">${st.d}</div>
       <div class="spread">
         <span class="tiny">${tutStep+1} of ${TUT_STEPS.length}</span>
@@ -1835,14 +1929,15 @@ function tutShow(){
           ${tutStep<TUT_STEPS.length-1?`<button class="btn mini" onclick="tutNext()">Next →</button>`:""}
         </div>
       </div>`;
-    // clamp so the card never hides under the top bar or the bottom nav
+    // clamp the card between the top bar and the bottom nav
     const topMin=barBottom+8, botMax=window.innerHeight-96, ch=card.offsetHeight;
     let top;
-    if(r.bottom+pad+12+ch <= botMax) top=r.bottom+pad+12;      // below the target
-    else if(r.top-pad-12-ch >= topMin) top=r.top-pad-12-ch;    // above the target
-    else top=Math.max(topMin, Math.min(r.bottom+pad+12, botMax-ch)); // pin within bounds
+    if(finalBot+pad+12+ch <= botMax) top=finalBot+pad+12;
+    else if(finalTop-pad-12-ch >= topMin) top=finalTop-pad-12-ch;
+    else top=Math.max(topMin, Math.min(finalBot+pad+12, botMax-ch));
     card.style.top=top+"px";
-  },160);
+    requestAnimationFrame(()=>{ card.style.opacity="1"; }); // fade back in
+  }, tutStep===0 ? 60 : 120);
 }
 function tutNext(){
   if(tutStep>=TUT_STEPS.length-1){ endTutorial(); return; }
