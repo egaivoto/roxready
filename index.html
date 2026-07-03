@@ -26,14 +26,25 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   font-size:16px;line-height:1.45;overscroll-behavior:none;
 }
-#app{max-width:520px;margin:0 auto;min-height:100%;position:relative;padding-top:env(safe-area-inset-top);padding-bottom:calc(78px + env(safe-area-inset-bottom))}
+#app{max-width:520px;margin:0 auto;min-height:100%;position:relative;padding-bottom:calc(78px + env(safe-area-inset-bottom))}
+/* fixed top bar */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:60;max-width:520px;margin:0 auto;background:rgba(20,21,25,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+.tbInner{display:flex;align-items:center;justify-content:space-between;height:52px;padding:0 12px;gap:8px}
+.tbLeft{display:flex;align-items:center;gap:10px;min-width:0}
+.tbRight{display:flex;align-items:center;gap:6px}
+.tbLogo{width:34px;height:34px;border-radius:9px;background:var(--yellow);color:#111;font-weight:800;font-size:13px;letter-spacing:-.5px;flex:none;display:flex;align-items:center;justify-content:center}
+.tbTitle{font-weight:800;font-size:18px;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbIcon{background:var(--card2);border:1px solid var(--line);color:var(--txt);width:36px;height:36px;border-radius:10px;font-size:15px;display:flex;align-items:center;justify-content:center;flex:none}
+.tbIcon.txt{width:auto;padding:0 13px;font-size:14px;font-weight:700}
+.tbIcon.bare{background:none;border:none;font-size:24px;width:30px}
+.tbPill{background:linear-gradient(135deg,var(--yellow),#ffb700);color:#111;font-weight:800;font-size:12px;padding:0 11px;height:32px;border-radius:999px;flex:none;letter-spacing:.3px}
 h1{font-size:26px;font-weight:800;letter-spacing:-.5px}
 h2{font-size:19px;font-weight:700;margin-bottom:10px}
 h3{font-size:15px;font-weight:700}
 .small{font-size:13px;color:var(--dim)}
 .tiny{font-size:11.5px;color:var(--faint)}
 .yellow{color:var(--yellow)} .green{color:var(--green)} .red{color:var(--red)} .blue{color:var(--blue)}
-.view{display:none;padding:18px 16px 30px;animation:fade .18s ease}
+.view{display:none;padding:calc(60px + env(safe-area-inset-top)) 16px 30px;animation:fade .18s ease}
 .view.active{display:block}
 @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
@@ -114,7 +125,7 @@ svg text{fill:var(--dim);font-size:9px;font-family:inherit}
 .rpewrap{display:flex;gap:5px}
 .rpewrap button{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:9px 0;font-weight:700;font-size:13px}
 .rpewrap button.on{background:var(--yellow);color:#111;border-color:var(--yellow)}
-.toast{position:fixed;top:calc(18px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--yellow);color:var(--txt);padding:12px 20px;border-radius:14px;z-index:200;font-weight:600;font-size:14.5px;box-shadow:0 6px 24px rgba(0,0,0,.5);max-width:90%;text-align:center}
+.toast{position:fixed;top:calc(64px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--yellow);color:var(--txt);padding:12px 20px;border-radius:14px;z-index:200;font-weight:600;font-size:14.5px;box-shadow:0 6px 24px rgba(0,0,0,.5);max-width:90%;text-align:center}
 .banner{background:#26240f;border:1px solid var(--yellow-dim);border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:14px}
 table.pace{width:100%;border-collapse:collapse;font-size:14px}
 table.pace td,table.pace th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
@@ -152,18 +163,12 @@ a{color:var(--yellow)}
     </div>
   </div>
 
+  <!-- fixed top bar (content set by renderTopBar) -->
+  <header id="topbar"><div class="tbInner"></div></header>
+
   <!-- ============ HOME ============ -->
   <div class="view" id="v-home">
-    <div class="spread" style="margin-bottom:16px">
-      <div>
-        <div class="tiny" id="homeDate"></div>
-        <h1 id="homeGreet">ROXREADY</h1>
-      </div>
-      <div class="rowflex">
-        <button class="btn sec mini" onclick="go('guide')">?</button>
-        <button class="btn sec mini" onclick="go('settings')">⚙︎</button>
-      </div>
-    </div>
+    <div class="tiny" id="homeDate" style="margin-bottom:10px"></div>
     <div id="homeReminder"></div>
     <div class="card" id="homeCountdown"></div>
     <div class="card" id="homeStreak"></div>
@@ -174,9 +179,8 @@ a{color:var(--yellow)}
 
   <!-- ============ PLAN ============ -->
   <div class="view" id="v-plan">
-    <div class="spread" style="margin-bottom:12px">
-      <h1>Plan</h1>
-      <button class="btn sec mini" onclick="confirmRegen()">Regenerate</button>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+      <button class="btn sec mini" onclick="confirmRegen()">⟳ Regenerate</button>
     </div>
     <div id="planPhaseBar"></div>
     <div id="planList"></div>
@@ -184,7 +188,6 @@ a{color:var(--yellow)}
 
   <!-- ============ LOG ============ -->
   <div class="view" id="v-log">
-    <h1 style="margin-bottom:12px">Log a session</h1>
     <div class="grid2" id="logTypeGrid"></div>
     <h2 style="margin-top:22px">History</h2>
     <input id="histSearch" placeholder="Search history…" oninput="renderHistory()" style="margin-bottom:10px">
@@ -193,18 +196,16 @@ a{color:var(--yellow)}
 
   <!-- ============ PROGRESS ============ -->
   <div class="view" id="v-prog">
-    <h1 style="margin-bottom:12px">Progress</h1>
     <div id="progBody"></div>
   </div>
 
   <!-- ============ RACE ============ -->
   <div class="view" id="v-race">
-    <h1 style="margin-bottom:12px">Race day</h1>
     <div class="card">
       <h2>Pacing calculator</h2>
       <p class="small" style="margin-bottom:10px">Turn a goal finish time into run and station targets. Estimates based on typical time distribution — refine with your own simulations.</p>
       <label class="fld"><span class="lbl">Goal finish time (h:mm:ss)</span>
-        <input id="goalTimeInput" placeholder="1:30:00" inputmode="numeric">
+        <input id="goalTimeInput" placeholder="1:30:00" inputmode="numeric" class="timefld">
       </label>
       <button class="btn" onclick="renderPacing()">Calculate targets</button>
       <div id="paceOut" style="margin-top:14px"></div>
@@ -227,19 +228,11 @@ a{color:var(--yellow)}
 
   <!-- ============ SETTINGS ============ -->
   <div class="view" id="v-settings">
-    <div class="spread" style="margin-bottom:12px">
-      <h1>Settings</h1>
-      <button class="btn sec mini" onclick="go('home')">Done</button>
-    </div>
     <div id="settingsBody"></div>
   </div>
 
   <!-- ============ GUIDE ============ -->
   <div class="view" id="v-guide">
-    <div class="spread" style="margin-bottom:12px">
-      <h1>How to use this</h1>
-      <button class="btn sec mini" onclick="go('home')">Done</button>
-    </div>
     <div id="guideBody" class="guide"></div>
   </div>
 
@@ -357,6 +350,16 @@ function parseTime(str){
   if(parts.length===2) return parts[0]*60+parts[1];
   return parts[0]; // plain seconds
 }
+// auto-insert colons as digits are typed, so a numeric keypad is enough:
+// "2430" -> "24:30", "13000" -> "1:30:00"
+function formatTimeDigits(raw){
+  const d=String(raw||"").replace(/\D/g,"").slice(0,6);
+  if(d.length<=2) return d;
+  const parts=[]; let s=d;
+  while(s.length>2){ parts.unshift(s.slice(-2)); s=s.slice(0,-2); }
+  parts.unshift(s);
+  return parts.join(":");
+}
 function paceOf(sec, km){ return (sec&&km)? sec/km : null; }
 function fmtPace(spk){ return spk? fmtSec(spk)+"/km" : "–"; }
 function toast(msg){
@@ -404,7 +407,7 @@ function renderOb(){
   $("obFill").style.width = Math.round((obStep)/OB_STEPS.length*100)+"%";
   $("obBack").style.display = obStep===0 ? "none":"block";
   let h = `<div class="obQ">${st.q}</div><div class="obSub">${st.sub||""}</div>`;
-  if(st.type==="text") h += `<input id="obInput" placeholder="${st.ph}" value="${esc(obData[st.key]||"")}" ${st.key==='fiveK'?'inputmode="numeric"':''}>`;
+  if(st.type==="text") h += `<input id="obInput" placeholder="${st.ph}" value="${esc(obData[st.key]||"")}" ${st.key==='fiveK'?'inputmode="numeric" class="timefld"':''}>`;
   else if(st.type==="date"){
     const def = obData[st.key] || dISO(new Date(Date.now()+84*DAY));
     h += `<input id="obInput" type="date" value="${def}" min="${todayISO()}">`;
@@ -586,6 +589,7 @@ function go(v){
   document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
   $("v-"+v).classList.add("active");
   document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("on", b.dataset.v===v));
+  renderTopBar(v);
   window.scrollTo(0,0);
   if(v==="home") renderHome();
   if(v==="plan") renderPlan();
@@ -594,6 +598,42 @@ function go(v){
   if(v==="race") renderRace();
   if(v==="settings") renderSettings();
   if(v==="guide") renderGuide();
+}
+
+/* ================================================================
+   TOP BAR — fixed, tailored per tab. Reserves slots for future
+   upgrade / notifications / community features.
+   ================================================================ */
+function renderTopBar(v){
+  const bar=$("topbar"); if(!bar) return;
+  const p=S.profile;
+  if(!p){ bar.querySelector(".tbInner").innerHTML=""; return; }
+  const first=(p.name||"Athlete").split(" ")[0];
+  const titles={home:"Hey "+first+" 👊", plan:"Plan", log:"Log session", prog:"Progress", race:"Race day", settings:"Settings", guide:"Guide"};
+  const secondary=(v==="settings"||v==="guide");
+  let left, right;
+  if(secondary){
+    left=`<button class="tbIcon bare" onclick="go('home')" aria-label="Back">‹</button>
+      <span class="tbTitle">${esc(titles[v])}</span>`;
+    right=`<button class="tbIcon txt" onclick="go('home')">Done</button>`;
+  } else {
+    left=`<button class="tbLogo" onclick="go('settings')" aria-label="Profile & settings">RX</button>
+      <span class="tbTitle">${esc(titles[v]||"ROXREADY")}</span>`;
+    // reserved future slots: upgrade (freemium), notifications (push), community (Stage 3)
+    right=`<button class="tbPill" onclick="comingSoon('upgrade')">✦ PRO</button>
+      <button class="tbIcon" onclick="comingSoon('alerts')" aria-label="Notifications">🔔</button>
+      <button class="tbIcon" onclick="comingSoon('community')" aria-label="Community">👥</button>
+      <button class="tbIcon" onclick="go('settings')" aria-label="Settings">⚙</button>`;
+  }
+  bar.querySelector(".tbInner").innerHTML=`<div class="tbLeft">${left}</div><div class="tbRight">${right}</div>`;
+}
+function comingSoon(which){
+  const msgs={
+    upgrade:"✦ Premium is on the way — extra adaptivity, cloud sync and coach features. You're an early user, so you'll get a fair deal. 💛",
+    alerts:"🔔 Push notifications arrive with cloud accounts (Stage 3). For now, set reminders in Settings + a phone alarm.",
+    community:"👥 Community & challenges are coming with accounts (Stage 3) — train alongside your friends and compare streaks."
+  };
+  toast(msgs[which]||"Coming soon");
 }
 
 /* ================================================================
@@ -611,7 +651,6 @@ function currentPhase(){
 function renderHome(){
   const p=S.profile;
   $("homeDate").textContent = new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"});
-  $("homeGreet").textContent = "Hey "+p.name+" 👊";
   // countdown
   const d = daysToRace();
   const wk = currentPhase();
@@ -837,7 +876,7 @@ function openLog(type, planSessionId, editId){
   if(type==="run"||type==="intervals"){
     h += `<div class="grid2">
       <label class="fld"><span class="lbl">Distance (km)</span><input id="lg_km" inputmode="decimal" placeholder="${last&&last.distanceKm?last.distanceKm:'8'}" value="${km||""}"></label>
-      <label class="fld"><span class="lbl">Total time (mm:ss)</span><input id="lg_dur" inputmode="numeric" placeholder="45:00" value="${edit&&edit.durationSec?fmtSec(edit.durationSec):""}"></label>
+      <label class="fld"><span class="lbl">Total time (mm:ss)</span><input id="lg_dur" inputmode="numeric" class="timefld" placeholder="45:00" value="${edit&&edit.durationSec?fmtSec(edit.durationSec):""}"></label>
     </div>
     <div class="spread" style="margin-bottom:8px"><span class="lbl" style="font-size:12.5px;color:var(--dim);font-weight:600;text-transform:uppercase">1 km splits (optional)</span>
     <button class="btn sec mini" onclick="addSplitRow()">+ split</button></div>
@@ -846,7 +885,7 @@ function openLog(type, planSessionId, editId){
   if(type==="brick"){
     h += `<div class="grid2">
       <label class="fld"><span class="lbl">Rounds</span><input id="lg_rounds" inputmode="numeric" value="${edit&&edit.rounds||""}" placeholder="4"></label>
-      <label class="fld"><span class="lbl">Total time (mm:ss)</span><input id="lg_dur" inputmode="numeric" placeholder="35:00" value="${edit&&edit.durationSec?fmtSec(edit.durationSec):""}"></label>
+      <label class="fld"><span class="lbl">Total time (mm:ss)</span><input id="lg_dur" inputmode="numeric" class="timefld" placeholder="35:00" value="${edit&&edit.durationSec?fmtSec(edit.durationSec):""}"></label>
     </div>
     <div class="spread" style="margin-bottom:8px"><span class="lbl" style="font-size:12.5px;color:var(--dim);font-weight:600;text-transform:uppercase">Run splits after stations</span>
     <button class="btn sec mini" onclick="addSplitRow()">+ split</button></div>
@@ -858,7 +897,7 @@ function openLog(type, planSessionId, editId){
       <button class="${(edit&&edit.erg&&edit.erg.machine==='row')?'on':''}" onclick="segPick(this)" data-v="row">Row</button></div>
     <div class="grid2">
       <label class="fld"><span class="lbl">Distance (m)</span><input id="lg_m" inputmode="numeric" placeholder="1000" value="${edit&&edit.erg?edit.erg.meters:""}"></label>
-      <label class="fld"><span class="lbl">Time (mm:ss)</span><input id="lg_dur" inputmode="numeric" placeholder="4:00" value="${edit&&edit.erg&&edit.erg.seconds?fmtSec(edit.erg.seconds):""}"></label>
+      <label class="fld"><span class="lbl">Time (mm:ss)</span><input id="lg_dur" inputmode="numeric" class="timefld" placeholder="4:00" value="${edit&&edit.erg&&edit.erg.seconds?fmtSec(edit.erg.seconds):""}"></label>
     </div>`;
   }
   if(type==="strength"){
@@ -872,11 +911,11 @@ function openLog(type, planSessionId, editId){
     if(type==="sim") h += `<div class="segctl" id="simSeg">
       <button class="${(!edit||edit.simKind!=="half")?"on":""}" onclick="segPick(this)" data-v="full">Full</button>
       <button class="${(edit&&edit.simKind==="half")?"on":""}" onclick="segPick(this)" data-v="half">Half</button></div>`;
-    h += `<label class="fld"><span class="lbl">Total time (h:mm:ss)</span><input id="lg_dur" inputmode="numeric" placeholder="${type==='sim'?'1:35:00':'40:00'}" value="${edit&&edit.durationSec?fmtSec(edit.durationSec,type==='sim'):""}"></label>`;
+    h += `<label class="fld"><span class="lbl">Total time (h:mm:ss)</span><input id="lg_dur" inputmode="numeric" class="timefld" placeholder="${type==='sim'?'1:35:00':'40:00'}" value="${edit&&edit.durationSec?fmtSec(edit.durationSec,type==='sim'):""}"></label>`;
     if(type==="sim"){
       h += `<div class="spread" style="margin-bottom:8px"><span class="lbl" style="font-size:12.5px;color:var(--dim);font-weight:600;text-transform:uppercase">Run splits (1–8)</span>
       <button class="btn sec mini" onclick="addSplitRow()">+ split</button></div><div id="splitRows"></div>
-      <label class="fld" style="margin-top:6px"><span class="lbl">Total Roxzone / transition time (mm:ss, opt.)</span><input id="lg_rox" inputmode="numeric" placeholder="6:30"></label>`;
+      <label class="fld" style="margin-top:6px"><span class="lbl">Total Roxzone / transition time (mm:ss, opt.)</span><input id="lg_rox" inputmode="numeric" class="timefld" placeholder="6:30"></label>`;
     }
     h += `<div class="spread" style="margin:6px 0 8px"><span class="lbl" style="font-size:12.5px;color:var(--dim);font-weight:600;text-transform:uppercase">Stations</span></div>
       <div id="stRows"></div>
@@ -915,7 +954,7 @@ function addSplitRow(val){
     <button class="xbtn" onclick="this.parentElement.remove();renumberSplits()">✕</button>`;
   rows.appendChild(div);
   const inp=div.querySelector("input");
-  inp.addEventListener("input",()=>{ const s=parseTime(inp.value); div.querySelector(".paceHint").textContent = s?fmtPace(s):""; });
+  inp.addEventListener("input",()=>{ inp.value=formatTimeDigits(inp.value); const s=parseTime(inp.value); div.querySelector(".paceHint").textContent = s?fmtPace(s):""; });
   if(val) inp.dispatchEvent(new Event("input"));
   if(!val) inp.focus();
 }
@@ -931,7 +970,7 @@ function addStRow(id, pre){
   div.innerHTML = `<span style="font-size:18px">${st.icon}</span>
     <div style="flex:1"><div style="font-weight:700;font-size:14px">${st.name}</div>
     <div class="tiny">${st.unit}${load?" · "+load:""}</div></div>
-    <input inputmode="numeric" placeholder="mm:ss" style="width:86px;padding:9px" class="stTime" value="${pre&&pre.time?fmtSec(pre.time):""}">
+    <input inputmode="numeric" placeholder="mm:ss" style="width:86px;padding:9px" class="stTime timefld" value="${pre&&pre.time?fmtSec(pre.time):""}">
     <button class="xbtn" onclick="this.parentElement.remove()" style="width:36px">✕</button>`;
   rows.appendChild(div);
 }
@@ -1337,7 +1376,7 @@ function renderSettings(){
       <label class="fld"><span class="lbl">Days / week</span><select id="set_days">
         ${[3,4,5,6].map(d=>`<option ${p.days===d?"selected":""}>${d}</option>`).join("")}</select></label>
     </div>
-    <label class="fld"><span class="lbl">Recent 5K (mm:ss)</span><input id="set_5k" inputmode="numeric" value="${p.fiveK?fmtSec(p.fiveK):""}" placeholder="25:00"></label>
+    <label class="fld"><span class="lbl">Recent 5K (mm:ss)</span><input id="set_5k" inputmode="numeric" class="timefld" value="${p.fiveK?fmtSec(p.fiveK):""}" placeholder="25:00"></label>
     <button class="btn" onclick="saveSettings()">Save profile</button>
     <div class="tiny" style="margin-top:8px">Changing race date or days/week? Hit "Regenerate" on the Plan tab afterwards to rebuild around them.</div>
   </div>
@@ -1758,8 +1797,8 @@ const TUT_STEPS=[
    d:"Split consistency is the headline: under 5% means you're pacing like a metronome. Below it: your strengths radar, volume, PRs and adherence."},
   {v:"race", sel:"#goalTimeInput", t:"Race targets",
    d:"Enter a goal time to get per-kilometre run targets and station targets. After every simulation you log, you'll get a full report of where time leaked."},
-  {v:"home", sel:"#homeGreet", t:"That's the tour 👊",
-   d:"The ? button up top has the full guide, and Settings has backups. Now go train — the first logged session starts your streak."}];
+  {v:"home", sel:"#topbar", t:"Your control bar 👊",
+   d:"Up here lives your profile and settings (tap the RX badge or the gear), with notifications, community and premium coming soon. Settings can replay this tour any time. Now go log your first session — that's the whole game."}];
 let tutStep=0;
 function closeAskTut(){ $("askTut").classList.remove("open"); }
 function startTutorial(){ tutStep=0; $("tut").classList.add("on"); tutShow(); }
@@ -1773,8 +1812,16 @@ function tutShow(){
   go(st.v); // renders synchronously
   const el=document.querySelector(st.sel);
   if(!el || el.getBoundingClientRect().width<10){ tutNext(); return; }
-  el.scrollIntoView({block:"center"});
+  const inset=parseInt(getComputedStyle($("topbar")).paddingTop)||0;
+  const barBottom=53+inset;
+  const isFixed = !!el.closest("#nav") || el.id==="topbar" || getComputedStyle(el).position==="fixed";
   setTimeout(()=>{
+    // scroll AFTER the view switch settles (avoids the browser's scroll-anchoring fighting us)
+    if(isFixed) window.scrollTo(0,0);
+    else {
+      const absTop=el.getBoundingClientRect().top+window.scrollY;
+      window.scrollTo(0, Math.max(0, absTop-(barBottom+24)));
+    }
     const r=el.getBoundingClientRect(), pad=6;
     const hole=$("tutHole");
     hole.style.left=(r.left-pad)+"px"; hole.style.top=(r.top-pad)+"px";
@@ -1788,10 +1835,14 @@ function tutShow(){
           ${tutStep<TUT_STEPS.length-1?`<button class="btn mini" onclick="tutNext()">Next →</button>`:""}
         </div>
       </div>`;
-    const below = r.bottom < window.innerHeight*0.55;
-    card.style.top = below ? (r.bottom+pad+12)+"px"
-                           : Math.max(8, r.top-pad-card.offsetHeight-12)+"px";
-  },180);
+    // clamp so the card never hides under the top bar or the bottom nav
+    const topMin=barBottom+8, botMax=window.innerHeight-96, ch=card.offsetHeight;
+    let top;
+    if(r.bottom+pad+12+ch <= botMax) top=r.bottom+pad+12;      // below the target
+    else if(r.top-pad-12-ch >= topMin) top=r.top-pad-12-ch;    // above the target
+    else top=Math.max(topMin, Math.min(r.bottom+pad+12, botMax-ch)); // pin within bounds
+    card.style.top=top+"px";
+  },160);
 }
 function tutNext(){
   if(tutStep>=TUT_STEPS.length-1){ endTutorial(); return; }
@@ -1802,6 +1853,14 @@ function tutNext(){
    BOOT
    ================================================================ */
 document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{ if(e.target===m) m.classList.remove("open"); }));
+// time fields auto-format their colons (delegated, covers dynamic inputs)
+document.addEventListener("input", e=>{
+  const el=e.target;
+  if(el && el.classList && el.classList.contains("timefld")){
+    const f=formatTimeDigits(el.value);
+    if(f!==el.value) el.value=f;
+  }
+});
 if(!S.profile){ startOnboarding(); }
 else { adaptPlan(); go("home"); maybeNotify(); }
 // PWA service worker (offline + installable) — only on the hosted https site
