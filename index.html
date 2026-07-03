@@ -6,6 +6,10 @@
 <meta name="theme-color" content="#0e0f11">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ROXREADY">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
 <title>ROXREADY — Hyrox Training</title>
 <style>
 :root{
@@ -22,7 +26,7 @@ body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   font-size:16px;line-height:1.45;overscroll-behavior:none;
 }
-#app{max-width:520px;margin:0 auto;min-height:100%;position:relative;padding-bottom:calc(78px + env(safe-area-inset-bottom))}
+#app{max-width:520px;margin:0 auto;min-height:100%;position:relative;padding-top:env(safe-area-inset-top);padding-bottom:calc(78px + env(safe-area-inset-bottom))}
 h1{font-size:26px;font-weight:800;letter-spacing:-.5px}
 h2{font-size:19px;font-weight:700;margin-bottom:10px}
 h3{font-size:15px;font-weight:700}
@@ -70,7 +74,7 @@ label.fld span.lbl{display:block;font-size:12.5px;color:var(--dim);margin-bottom
 .navbtn.on{color:var(--yellow)}
 #fab{width:54px;height:54px;border-radius:50%;background:var(--yellow);color:#111;font-size:30px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:-24px;box-shadow:0 4px 18px rgba(255,214,10,.35);flex:none;align-self:flex-start}
 /* onboarding */
-#ob{position:fixed;inset:0;background:var(--bg);z-index:100;display:none;flex-direction:column;max-width:520px;margin:0 auto}
+#ob{position:fixed;inset:0;background:var(--bg);z-index:100;display:none;flex-direction:column;max-width:520px;margin:0 auto;padding-top:env(safe-area-inset-top)}
 #ob.active{display:flex}
 #obBar{height:4px;background:var(--card2);margin:14px 16px 0;border-radius:4px;overflow:hidden}
 #obFill{height:100%;background:var(--yellow);width:0%;transition:width .25s}
@@ -110,7 +114,7 @@ svg text{fill:var(--dim);font-size:9px;font-family:inherit}
 .rpewrap{display:flex;gap:5px}
 .rpewrap button{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:9px 0;font-weight:700;font-size:13px}
 .rpewrap button.on{background:var(--yellow);color:#111;border-color:var(--yellow)}
-.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--yellow);color:var(--txt);padding:12px 20px;border-radius:14px;z-index:200;font-weight:600;font-size:14.5px;box-shadow:0 6px 24px rgba(0,0,0,.5);max-width:90%;text-align:center}
+.toast{position:fixed;top:calc(18px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--yellow);color:var(--txt);padding:12px 20px;border-radius:14px;z-index:200;font-weight:600;font-size:14.5px;box-shadow:0 6px 24px rgba(0,0,0,.5);max-width:90%;text-align:center}
 .banner{background:#26240f;border:1px solid var(--yellow-dim);border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:14px}
 table.pace{width:100%;border-collapse:collapse;font-size:14px}
 table.pace td,table.pace th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
@@ -122,6 +126,13 @@ table.pace td.r,table.pace th.r{text-align:right;font-variant-numeric:tabular-nu
 .empty{color:var(--faint);text-align:center;padding:26px 10px;font-size:14px}
 a{color:var(--yellow)}
 .coach{background:#101d2c;border:1px solid #24405e;border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:14px}
+/* tutorial spotlight */
+#tut{position:fixed;inset:0;z-index:300;display:none}
+#tut.on{display:block}
+#tutHole{position:absolute;border-radius:16px;box-shadow:0 0 0 9999px rgba(0,0,0,.74);border:2px solid var(--yellow);transition:all .3s ease;pointer-events:none}
+#tutCard{position:absolute;left:16px;right:16px;max-width:488px;margin:0 auto;background:var(--card);border:1px solid var(--yellow-dim);border-radius:16px;padding:16px;transition:top .3s ease;box-shadow:0 8px 30px rgba(0,0,0,.6)}
+#tutCard h3{margin-bottom:4px;color:var(--yellow)}
+#tutCard .small{margin-bottom:12px}
 .pill.missed{background:#3a1620;color:var(--red)}
 .guide h3{margin:14px 0 4px}
 .guide p{font-size:14px;color:var(--dim);margin-bottom:8px}
@@ -247,6 +258,15 @@ a{color:var(--yellow)}
   <div class="modal" id="detailModal"><div class="sheet" id="detailSheet"></div></div>
   <!-- plan session edit modal -->
   <div class="modal" id="sessModal"><div class="sheet" id="sessSheet"></div></div>
+  <!-- tutorial spotlight overlay -->
+  <div id="tut"><div id="tutHole"></div><div id="tutCard"></div></div>
+  <!-- post-onboarding tour offer -->
+  <div class="modal" id="askTut"><div class="sheet" style="max-width:420px">
+    <h2>Want a 60-second tour? 🗺️</h2>
+    <p class="small" style="margin:8px 0 16px">A quick walkthrough of the five screens — what to look at, and when. You can replay it any time from Settings.</p>
+    <button class="btn" onclick="closeAskTut();startTutorial()">Show me around</button>
+    <button class="btn sec" style="margin-top:8px" onclick="closeAskTut()">Skip — I'll explore</button>
+  </div></div>
 </div>
 
 <script>
@@ -446,6 +466,7 @@ function finishOnboarding(){
   $("ob").classList.remove("active");
   go("home");
   toast(`Welcome, ${esc(S.profile.name)} — your ${S.plan.weeks.length}-week plan is ready 🔥`);
+  setTimeout(()=>$("askTut").classList.add("open"), 1200);
 }
 
 /* ================================================================
@@ -1323,6 +1344,7 @@ function renderSettings(){
   <div class="card">
     <h2>Help</h2>
     <button class="btn sec" onclick="go('guide')">📖 Open the user guide</button>
+    <button class="btn sec" style="margin-top:8px" onclick="startTutorial()">🗺️ Replay the tutorial</button>
   </div>
   <div class="card">
     <h2>Reminders</h2>
@@ -1717,11 +1739,74 @@ function renderGuide(){
 }
 
 /* ================================================================
+   TUTORIAL — spotlight walkthrough of the five screens
+   ================================================================ */
+const TUT_STEPS=[
+  {v:"home", sel:"#homeCountdown", t:"Your race, counting down",
+   d:"Home is your daily starting point: days to race, which training phase you're in, and today's session further down. Open the app, do what it says, done."},
+  {v:"home", sel:"#homeStreak", t:"The streak (it's friendly)",
+   d:"Counts weeks where you hit your session goal — rest days never break it, and you get one grace week a month. This is the habit engine."},
+  {v:"home", sel:"#homeCheckin", t:"2-second check-in",
+   d:"Tap your energy each day. Report running on empty and the coach automatically eases the next day or two — and tells you it did."},
+  {v:"plan", sel:"#planPhaseBar", t:"Your plan to race day",
+   d:"Base → build → specific → taper, with deloads built in. The plan adapts to what you actually do: missed key sessions get rescheduled, hard weeks get trimmed."},
+  {v:"plan", sel:"#planList .sess", t:"Every session is yours",
+   d:"Tap a session to expand it — log it, edit it, skip it. Use “+ add” on any week to insert your own sessions."},
+  {v:"home", sel:"#fab", t:"The most important button",
+   d:"Log any workout here in ~20 seconds. Enter your 1 km splits whenever you have them, and always tap RPE — it feeds the adaptive coach."},
+  {v:"prog", sel:"#progBody .card", t:"Are you getting better?",
+   d:"Split consistency is the headline: under 5% means you're pacing like a metronome. Below it: your strengths radar, volume, PRs and adherence."},
+  {v:"race", sel:"#goalTimeInput", t:"Race targets",
+   d:"Enter a goal time to get per-kilometre run targets and station targets. After every simulation you log, you'll get a full report of where time leaked."},
+  {v:"home", sel:"#homeGreet", t:"That's the tour 👊",
+   d:"The ? button up top has the full guide, and Settings has backups. Now go train — the first logged session starts your streak."}];
+let tutStep=0;
+function closeAskTut(){ $("askTut").classList.remove("open"); }
+function startTutorial(){ tutStep=0; $("tut").classList.add("on"); tutShow(); }
+function endTutorial(){
+  $("tut").classList.remove("on");
+  S.settings.tutorialDone=true; save();
+  go("home");
+}
+function tutShow(){
+  const st=TUT_STEPS[tutStep];
+  go(st.v); // renders synchronously
+  const el=document.querySelector(st.sel);
+  if(!el || el.getBoundingClientRect().width<10){ tutNext(); return; }
+  el.scrollIntoView({block:"center"});
+  setTimeout(()=>{
+    const r=el.getBoundingClientRect(), pad=6;
+    const hole=$("tutHole");
+    hole.style.left=(r.left-pad)+"px"; hole.style.top=(r.top-pad)+"px";
+    hole.style.width=(r.width+2*pad)+"px"; hole.style.height=(r.height+2*pad)+"px";
+    const card=$("tutCard");
+    card.innerHTML=`<h3>${st.t}</h3><div class="small">${st.d}</div>
+      <div class="spread">
+        <span class="tiny">${tutStep+1} of ${TUT_STEPS.length}</span>
+        <div class="rowflex">
+          <button class="btn sec mini" onclick="endTutorial()">${tutStep===TUT_STEPS.length-1?"Done":"End tour"}</button>
+          ${tutStep<TUT_STEPS.length-1?`<button class="btn mini" onclick="tutNext()">Next →</button>`:""}
+        </div>
+      </div>`;
+    const below = r.bottom < window.innerHeight*0.55;
+    card.style.top = below ? (r.bottom+pad+12)+"px"
+                           : Math.max(8, r.top-pad-card.offsetHeight-12)+"px";
+  },180);
+}
+function tutNext(){
+  if(tutStep>=TUT_STEPS.length-1){ endTutorial(); return; }
+  tutStep++; tutShow();
+}
+
+/* ================================================================
    BOOT
    ================================================================ */
 document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{ if(e.target===m) m.classList.remove("open"); }));
 if(!S.profile){ startOnboarding(); }
 else { adaptPlan(); go("home"); maybeNotify(); }
+// PWA service worker (offline + installable) — only on the hosted https site
+if("serviceWorker" in navigator && location.protocol==="https:")
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
 </body>
 </html>
