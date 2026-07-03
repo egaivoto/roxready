@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0e0f11">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>ROXREADY — Hyrox Training</title>
+<style>
+:root{
+  --bg:#0e0f11; --card:#17181c; --card2:#1e2025; --line:#2a2c33;
+  --txt:#f2f3f5; --dim:#9a9da6; --faint:#5c5f68;
+  --yellow:#ffd60a; --yellow-dim:#b89a00;
+  --green:#3ddc84; --red:#ff5c5c; --blue:#5aa8ff; --orange:#ff9f43;
+  --radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px;line-height:1.45;overscroll-behavior:none;
+}
+#app{max-width:520px;margin:0 auto;min-height:100%;position:relative;padding-bottom:calc(78px + env(safe-area-inset-bottom))}
+h1{font-size:26px;font-weight:800;letter-spacing:-.5px}
+h2{font-size:19px;font-weight:700;margin-bottom:10px}
+h3{font-size:15px;font-weight:700}
+.small{font-size:13px;color:var(--dim)}
+.tiny{font-size:11.5px;color:var(--faint)}
+.yellow{color:var(--yellow)} .green{color:var(--green)} .red{color:var(--red)} .blue{color:var(--blue)}
+.view{display:none;padding:18px 16px 30px;animation:fade .18s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.card.flat{padding:12px 14px}
+.rowflex{display:flex;align-items:center;gap:10px}
+.spread{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+button{font-family:inherit;cursor:pointer;border:none;border-radius:12px;font-size:15px}
+.btn{background:var(--yellow);color:#111;font-weight:800;padding:14px 18px;width:100%;border-radius:14px;font-size:16px}
+.btn:active{transform:scale(.98)}
+.btn.sec{background:var(--card2);color:var(--txt);border:1px solid var(--line);font-weight:600}
+.btn.danger{background:transparent;color:var(--red);border:1px solid var(--red)}
+.btn.mini{width:auto;padding:8px 14px;font-size:13px;border-radius:10px}
+.btn:disabled{opacity:.4}
+input,select,textarea{
+  font-family:inherit;font-size:16px;color:var(--txt);
+  background:var(--card2);border:1px solid var(--line);border-radius:12px;
+  padding:12px 12px;width:100%;outline:none;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--yellow-dim)}
+input[type=number]{-moz-appearance:textfield}
+label.fld{display:block;margin-bottom:12px}
+label.fld span.lbl{display:block;font-size:12.5px;color:var(--dim);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--card2);border:1px solid var(--line);color:var(--txt);padding:10px 14px;border-radius:999px;font-size:14px;font-weight:600}
+.chip.on{background:var(--yellow);color:#111;border-color:var(--yellow)}
+.pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+.pill.base{background:#173a2a;color:var(--green)} .pill.build{background:#3a2e14;color:var(--orange)}
+.pill.specific{background:#16283f;color:var(--blue)} .pill.taper{background:#332040;color:#c39bff}
+.pill.deload{background:#2a2c33;color:var(--dim)}
+.pill.done{background:#173a2a;color:var(--green)}
+/* bottom nav */
+#nav{position:fixed;bottom:0;left:0;right:0;z-index:50;display:flex;justify-content:center}
+#nav .inner{width:100%;max-width:520px;background:rgba(20,21,25,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+.navbtn{flex:1;background:none;color:var(--faint);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:700;padding:6px 0;letter-spacing:.3px}
+.navbtn .ic{font-size:20px;line-height:1}
+.navbtn.on{color:var(--yellow)}
+#fab{width:54px;height:54px;border-radius:50%;background:var(--yellow);color:#111;font-size:30px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:-24px;box-shadow:0 4px 18px rgba(255,214,10,.35);flex:none;align-self:flex-start}
+/* onboarding */
+#ob{position:fixed;inset:0;background:var(--bg);z-index:100;display:none;flex-direction:column;max-width:520px;margin:0 auto}
+#ob.active{display:flex}
+#obBar{height:4px;background:var(--card2);margin:14px 16px 0;border-radius:4px;overflow:hidden}
+#obFill{height:100%;background:var(--yellow);width:0%;transition:width .25s}
+#obBody{flex:1;padding:28px 22px;overflow-y:auto}
+#obFoot{padding:14px 22px calc(18px + env(safe-area-inset-bottom))}
+.obQ{font-size:24px;font-weight:800;letter-spacing:-.4px;margin-bottom:6px}
+.obSub{color:var(--dim);margin-bottom:22px;font-size:14.5px}
+.optbtn{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);color:var(--txt);padding:15px 16px;border-radius:14px;margin-bottom:10px;font-size:15.5px;font-weight:600}
+.optbtn .sub{display:block;font-size:12.5px;color:var(--dim);font-weight:400;margin-top:2px}
+.optbtn.on{border-color:var(--yellow);background:#26240f}
+/* big stat */
+.bignum{font-size:40px;font-weight:800;letter-spacing:-1.5px;line-height:1.05}
+.statlbl{font-size:11.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+/* streak dots */
+.dots{display:flex;gap:6px;margin-top:8px}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--card2);border:1px solid var(--line)}
+.dot.hit{background:var(--yellow);border-color:var(--yellow)}
+/* plan */
+.wkhead{display:flex;align-items:center;gap:8px;margin:18px 0 8px;flex-wrap:wrap}
+.sess{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:9px}
+.sess.done{opacity:.55}
+.sess .t{font-weight:700;font-size:15px}
+.sess .d{font-size:13px;color:var(--dim);margin-top:3px;white-space:pre-line}
+.typeic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none;background:var(--card2)}
+/* log */
+.splitrow{display:grid;grid-template-columns:44px 1fr 1fr 36px;gap:8px;align-items:center;margin-bottom:8px}
+.strow{display:grid;grid-template-columns:36px 1fr 1fr 36px;gap:8px;align-items:center;margin-bottom:8px}
+.xbtn{background:var(--card2);color:var(--dim);border:1px solid var(--line);border-radius:10px;height:40px;font-size:16px}
+.stitem{display:flex;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+/* history */
+.hist{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:9px}
+/* charts */
+svg text{fill:var(--dim);font-size:9px;font-family:inherit}
+.segctl{display:flex;background:var(--card2);border-radius:12px;padding:3px;border:1px solid var(--line);margin-bottom:14px}
+.segctl button{flex:1;background:none;color:var(--dim);padding:8px 4px;font-weight:700;font-size:13px;border-radius:9px}
+.segctl button.on{background:var(--yellow);color:#111}
+.rpewrap{display:flex;gap:5px}
+.rpewrap button{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:9px 0;font-weight:700;font-size:13px}
+.rpewrap button.on{background:var(--yellow);color:#111;border-color:var(--yellow)}
+.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--yellow);color:var(--txt);padding:12px 20px;border-radius:14px;z-index:200;font-weight:600;font-size:14.5px;box-shadow:0 6px 24px rgba(0,0,0,.5);max-width:90%;text-align:center}
+.banner{background:#26240f;border:1px solid var(--yellow-dim);border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:14px}
+table.pace{width:100%;border-collapse:collapse;font-size:14px}
+table.pace td,table.pace th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
+table.pace th{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+table.pace td.r,table.pace th.r{text-align:right;font-variant-numeric:tabular-nums}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:90;display:none;align-items:flex-end;justify-content:center}
+.modal.open{display:flex}
+.sheet{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;padding:20px 18px calc(24px + env(safe-area-inset-bottom));border:1px solid var(--line)}
+.empty{color:var(--faint);text-align:center;padding:26px 10px;font-size:14px}
+a{color:var(--yellow)}
+.coach{background:#101d2c;border:1px solid #24405e;border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:14px}
+.pill.missed{background:#3a1620;color:var(--red)}
+.guide h3{margin:14px 0 4px}
+.guide p{font-size:14px;color:var(--dim);margin-bottom:8px}
+.guide b{color:var(--txt)}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ ONBOARDING ============ -->
+  <div id="ob">
+    <div id="obBar"><div id="obFill"></div></div>
+    <div id="obBody"></div>
+    <div id="obFoot">
+      <button class="btn" id="obNext">Continue</button>
+      <button class="btn sec" id="obBack" style="margin-top:8px">Back</button>
+    </div>
+  </div>
+
+  <!-- ============ HOME ============ -->
+  <div class="view" id="v-home">
+    <div class="spread" style="margin-bottom:16px">
+      <div>
+        <div class="tiny" id="homeDate"></div>
+        <h1 id="homeGreet">ROXREADY</h1>
+      </div>
+      <div class="rowflex">
+        <button class="btn sec mini" onclick="go('guide')">?</button>
+        <button class="btn sec mini" onclick="go('settings')">⚙︎</button>
+      </div>
+    </div>
+    <div id="homeReminder"></div>
+    <div class="card" id="homeCountdown"></div>
+    <div class="card" id="homeStreak"></div>
+    <div id="homeCheckin"></div>
+    <div id="homeToday"></div>
+    <div id="homeRecent"></div>
+  </div>
+
+  <!-- ============ PLAN ============ -->
+  <div class="view" id="v-plan">
+    <div class="spread" style="margin-bottom:12px">
+      <h1>Plan</h1>
+      <button class="btn sec mini" onclick="confirmRegen()">Regenerate</button>
+    </div>
+    <div id="planPhaseBar"></div>
+    <div id="planList"></div>
+  </div>
+
+  <!-- ============ LOG ============ -->
+  <div class="view" id="v-log">
+    <h1 style="margin-bottom:12px">Log a session</h1>
+    <div class="grid2" id="logTypeGrid"></div>
+    <h2 style="margin-top:22px">History</h2>
+    <input id="histSearch" placeholder="Search history…" oninput="renderHistory()" style="margin-bottom:10px">
+    <div id="histList"></div>
+  </div>
+
+  <!-- ============ PROGRESS ============ -->
+  <div class="view" id="v-prog">
+    <h1 style="margin-bottom:12px">Progress</h1>
+    <div id="progBody"></div>
+  </div>
+
+  <!-- ============ RACE ============ -->
+  <div class="view" id="v-race">
+    <h1 style="margin-bottom:12px">Race day</h1>
+    <div class="card">
+      <h2>Pacing calculator</h2>
+      <p class="small" style="margin-bottom:10px">Turn a goal finish time into run and station targets. Estimates based on typical time distribution — refine with your own simulations.</p>
+      <label class="fld"><span class="lbl">Goal finish time (h:mm:ss)</span>
+        <input id="goalTimeInput" placeholder="1:30:00" inputmode="numeric">
+      </label>
+      <button class="btn" onclick="renderPacing()">Calculate targets</button>
+      <div id="paceOut" style="margin-top:14px"></div>
+    </div>
+    <div class="card">
+      <h2>Your station standards</h2>
+      <div id="standardsOut"></div>
+    </div>
+    <div class="card">
+      <h2>Race-week rules</h2>
+      <div class="small">
+        • Nothing new on race day — kit, shoes, food, pacing all rehearsed.<br>
+        • Taper means taper: short, sharp, rested. Fitness is already banked.<br>
+        • Go out conservative — the race starts at wall balls.<br>
+        • Walk the venue, learn the Roxzone layout, plan your transitions.<br>
+        • Carb up the day before, arrive early, warm up with 5–8 min easy + 2 strides.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SETTINGS ============ -->
+  <div class="view" id="v-settings">
+    <div class="spread" style="margin-bottom:12px">
+      <h1>Settings</h1>
+      <button class="btn sec mini" onclick="go('home')">Done</button>
+    </div>
+    <div id="settingsBody"></div>
+  </div>
+
+  <!-- ============ GUIDE ============ -->
+  <div class="view" id="v-guide">
+    <div class="spread" style="margin-bottom:12px">
+      <h1>How to use this</h1>
+      <button class="btn sec mini" onclick="go('home')">Done</button>
+    </div>
+    <div id="guideBody" class="guide"></div>
+  </div>
+
+  <!-- bottom nav -->
+  <div id="nav"><div class="inner">
+    <button class="navbtn" data-v="home" onclick="go('home')"><span class="ic">⌂</span>Home</button>
+    <button class="navbtn" data-v="plan" onclick="go('plan')"><span class="ic">▤</span>Plan</button>
+    <button id="fab" onclick="go('log')">+</button>
+    <button class="navbtn" data-v="prog" onclick="go('prog')"><span class="ic">◔</span>Progress</button>
+    <button class="navbtn" data-v="race" onclick="go('race')"><span class="ic">⚑</span>Race</button>
+  </div></div>
+
+  <!-- log form modal -->
+  <div class="modal" id="logModal"><div class="sheet" id="logSheet"></div></div>
+  <!-- workout detail modal -->
+  <div class="modal" id="detailModal"><div class="sheet" id="detailSheet"></div></div>
+  <!-- plan session edit modal -->
+  <div class="modal" id="sessModal"><div class="sheet" id="sessSheet"></div></div>
+</div>
+
+<script>
+"use strict";
+/* ================================================================
+   ROXREADY — single-file Hyrox training app
+   Data lives in localStorage. No accounts, no server.
+   ================================================================ */
+
+const LS_KEY = "roxready_v1";
+const DAY = 86400000;
+
+/* ---------- Hyrox station data (season 25/26 standards) ---------- */
+const STATIONS = [
+  {id:"ski",     name:"SkiErg",            unit:"1000 m",  icon:"⛷"},
+  {id:"push",    name:"Sled Push",         unit:"50 m",    icon:"🛷"},
+  {id:"pull",    name:"Sled Pull",         unit:"50 m",    icon:"🪢"},
+  {id:"bbj",     name:"Burpee Broad Jump", unit:"80 m",    icon:"🐸"},
+  {id:"row",     name:"Row",               unit:"1000 m",  icon:"🚣"},
+  {id:"farmers", name:"Farmers Carry",     unit:"200 m",   icon:"🧳"},
+  {id:"lunges",  name:"Sandbag Lunges",    unit:"100 m",   icon:"🎒"},
+  {id:"wb",      name:"Wall Balls",        unit:"100 reps",icon:"🏐"},
+];
+// loads by [division][sex]  (kg; sled totals include the sled)
+const LOADS = {
+  push:    {open:{m:"152 kg",f:"102 kg"}, pro:{m:"202 kg",f:"152 kg"}},
+  pull:    {open:{m:"103 kg",f:"78 kg"},  pro:{m:"153 kg",f:"103 kg"}},
+  farmers: {open:{m:"2×24 kg",f:"2×16 kg"},pro:{m:"2×32 kg",f:"2×24 kg"}},
+  lunges:  {open:{m:"20 kg",f:"10 kg"},   pro:{m:"30 kg",f:"20 kg"}},
+  wb:      {open:{m:"6 kg → 3.0 m",f:"4 kg → 2.7 m"}, pro:{m:"9 kg → 3.0 m",f:"6 kg → 2.7 m"}},
+};
+function stationLoad(id){
+  const p = S.profile;
+  const div = (p.division === "pro") ? "pro" : "open"; // doubles/relay use Open standards
+  const l = LOADS[id];
+  return l ? l[div][p.sex] : "";
+}
+
+// typical share of total race time (mid-pack estimates, used by pacing calc)
+const PACE_MODEL = {
+  runs:.515, rox:.075,
+  st:{ski:.046, push:.046, pull:.056, bbj:.064, row:.047, farmers:.037, lunges:.055, wb:.059}
+};
+
+const WTYPES = [
+  {id:"run",     name:"Run",             icon:"🏃", desc:"Easy / long / tempo"},
+  {id:"intervals",name:"Run Intervals",  icon:"⚡", desc:"Track or treadmill reps"},
+  {id:"brick",   name:"Compromised Run", icon:"🔁", desc:"Station + run combos"},
+  {id:"erg",     name:"Erg (Ski / Row)", icon:"🚣", desc:"Interval or steady"},
+  {id:"strength",name:"Strength",        icon:"🏋️", desc:"Sets, reps, load"},
+  {id:"stations",name:"Station Practice",icon:"🎯", desc:"Hyrox stations, timed"},
+  {id:"sim",     name:"Race Simulation", icon:"🏁", desc:"Full or half, with splits"},
+];
+const wtype = id => WTYPES.find(w=>w.id===id) || WTYPES[0];
+
+/* ---------- state ---------- */
+let S = load();
+function load(){
+  try{ const d = JSON.parse(localStorage.getItem(LS_KEY)); if(d && d.profile) return d; }catch(e){}
+  return { profile:null, plan:null, workouts:[], settings:{remindersOn:false, reminderTime:"17:30"} };
+}
+function save(){ localStorage.setItem(LS_KEY, JSON.stringify(S)); }
+
+/* ---------- utils ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function todayISO(){ return dISO(new Date()); }
+function dISO(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function fromISO(s){ const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); }
+function fmtDate(iso){ return fromISO(iso).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"}); }
+function monday(d){ const x=new Date(d); const wd=(x.getDay()+6)%7; x.setDate(x.getDate()-wd); x.setHours(0,0,0,0); return x; }
+function fmtSec(t, forceH){
+  if(t==null||isNaN(t)) return "–";
+  t = Math.round(t);
+  const h=Math.floor(t/3600), m=Math.floor(t%3600/60), s=t%60;
+  if(h>0||forceH) return h+":"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+  return m+":"+String(s).padStart(2,"0");
+}
+// accepts "1:30:00", "90:00", "5:30", "330" (sec if no colon & >20? treat plain number as minutes for durations — callers choose)
+function parseTime(str){
+  if(!str) return null;
+  str = String(str).trim().replace(/[^\d:.]/g,"");
+  if(!str) return null;
+  const parts = str.split(":").map(Number);
+  if(parts.some(isNaN)) return null;
+  if(parts.length===3) return parts[0]*3600+parts[1]*60+parts[2];
+  if(parts.length===2) return parts[0]*60+parts[1];
+  return parts[0]; // plain seconds
+}
+function paceOf(sec, km){ return (sec&&km)? sec/km : null; }
+function fmtPace(spk){ return spk? fmtSec(spk)+"/km" : "–"; }
+function toast(msg){
+  const t=document.createElement("div"); t.className="toast"; t.innerHTML=msg;
+  document.body.appendChild(t); setTimeout(()=>{t.style.opacity="0";t.style.transition="opacity .4s"},2200);
+  setTimeout(()=>t.remove(),2700);
+}
+function mean(a){ return a.reduce((x,y)=>x+y,0)/a.length; }
+function stdev(a){ const m=mean(a); return Math.sqrt(mean(a.map(x=>(x-m)**2))); }
+
+/* ================================================================
+   ONBOARDING  — one question per screen
+   ================================================================ */
+let obStep = 0, obData = {};
+const OB_STEPS = [
+  {key:"name", q:"What should we call you?", sub:"Let's get you to that finish line.", type:"text", ph:"Your name"},
+  {key:"goal", q:"What's the mission?", sub:"This shapes how aggressive your plan is.", type:"opts", opts:[
+    ["finish","Finish strong 💪","First Hyrox — get to the line prepared and confident"],
+    ["pb","Set a PB ⏱","I've raced before and want a faster time"],
+    ["podium","Compete 🏆","Chasing age-group / podium — I want to hurt"]]},
+  {key:"raceDate", q:"When's your race?", sub:"Your plan counts back from this date. No race booked? Pick a target ~12 weeks out.", type:"date"},
+  {key:"division", q:"Which division?", sub:"Sets your sled, carry and wall-ball standards.", type:"opts", opts:[
+    ["open","Open","The standard individual race"],
+    ["pro","Pro","Heavier loads — qualification level"],
+    ["doubles","Doubles","Shared stations, Open standards"]]},
+  {key:"sex", q:"Which weight standards?", sub:"Hyrox loads differ — this fills in the right numbers everywhere.", type:"opts", opts:[
+    ["m","Men's standards",""],["f","Women's standards",""]]},
+  {key:"experience", q:"Training background?", sub:"", type:"opts", opts:[
+    ["new","New to Hyrox","Gym-fit but first time training for the format"],
+    ["some","Raced once or twice","I know what compromised running feels like"],
+    ["adv","Competitive","10+ hrs/week, structured training history"]]},
+  {key:"days", q:"How many days a week can you realistically train?", sub:"Be honest — consistency beats ambition. You can change this later.", type:"opts", opts:[
+    ["3","3 days","The essentials, done well"],["4","4 days","The sweet spot for most"],
+    ["5","5 days","Serious build"],["6","6 days","Full send"]]},
+  {key:"equipment", q:"What equipment can you access?", sub:"Sessions adapt — no sled, no problem.", type:"multi", opts:[
+    ["ski","SkiErg"],["row","Rower"],["sled","Sled"],["wb","Wall ball"],
+    ["kb","Kettlebells / dumbbells"],["sandbag","Sandbag"],["run","Somewhere to run"]]},
+  {key:"fiveK", q:"Recent 5K time?", sub:"Best guess is fine — running is ~half your race, so this anchors your paces. (mm:ss)", type:"text", ph:"e.g. 25:00", optional:true},
+  {key:"wallballs", q:"Wall balls unbroken?", sub:"Roughly how many can you do without stopping? Helps spot your limiter.", type:"opts", opts:[
+    ["10","Under 15",""],["25","15–35",""],["50","35–60",""],["75","60+",""]], optional:true},
+];
+function startOnboarding(){ obStep=0; obData={}; $("ob").classList.add("active"); renderOb(); }
+function renderOb(){
+  const st = OB_STEPS[obStep];
+  $("obFill").style.width = Math.round((obStep)/OB_STEPS.length*100)+"%";
+  $("obBack").style.display = obStep===0 ? "none":"block";
+  let h = `<div class="obQ">${st.q}</div><div class="obSub">${st.sub||""}</div>`;
+  if(st.type==="text") h += `<input id="obInput" placeholder="${st.ph}" value="${esc(obData[st.key]||"")}" ${st.key==='fiveK'?'inputmode="numeric"':''}>`;
+  else if(st.type==="date"){
+    const def = obData[st.key] || dISO(new Date(Date.now()+84*DAY));
+    h += `<input id="obInput" type="date" value="${def}" min="${todayISO()}">`;
+  }
+  else if(st.type==="opts") h += st.opts.map(o=>
+    `<button class="optbtn ${obData[st.key]===o[0]?'on':''}" onclick="obPick('${o[0]}')">${o[1]}${o[2]?`<span class="sub">${o[2]}</span>`:""}</button>`).join("");
+  else if(st.type==="multi") h += `<div>` + st.opts.map(o=>{
+    const on = (obData[st.key]||[]).includes(o[0]);
+    return `<button class="optbtn ${on?'on':''}" onclick="obToggle('${o[0]}')">${on?'✓ ':''}${o[1]}</button>`;}).join("") + `</div>`;
+  if(st.optional) h += `<button class="btn sec" style="margin-top:6px" onclick="obSkip()">Skip for now</button>`;
+  $("obBody").innerHTML = h;
+  $("obNext").textContent = obStep===OB_STEPS.length-1 ? "Build my plan →" : "Continue";
+  const inp=$("obInput"); if(inp && st.type==="text") setTimeout(()=>inp.focus(),50);
+}
+function obPick(v){ obData[OB_STEPS[obStep].key]=v; renderOb(); setTimeout(obNext,180); }
+function obToggle(v){
+  const k=OB_STEPS[obStep].key; obData[k]=obData[k]||[];
+  const i=obData[k].indexOf(v); i>=0 ? obData[k].splice(i,1) : obData[k].push(v);
+  renderOb();
+}
+function obSkip(){ delete obData[OB_STEPS[obStep].key]; obAdvance(); }
+function obNext(){
+  const st=OB_STEPS[obStep];
+  if(st.type==="text"||st.type==="date"){
+    const v=$("obInput").value.trim();
+    if(!v && !st.optional){ toast("This one matters — fill it in 🙂"); return; }
+    if(v) obData[st.key]=v;
+  } else if(st.type==="opts" && !obData[st.key] && !st.optional){ toast("Pick one to continue"); return; }
+  else if(st.type==="multi" && !(obData[st.key]||[]).length){ toast("Pick at least one"); return; }
+  obAdvance();
+}
+function obAdvance(){
+  if(obStep < OB_STEPS.length-1){ obStep++; renderOb(); return; }
+  finishOnboarding();
+}
+$("obNext").onclick = obNext;
+$("obBack").onclick = ()=>{ if(obStep>0){ obStep--; renderOb(); } };
+
+function finishOnboarding(){
+  const fiveKSec = parseTime(obData.fiveK);
+  const wb = Number(obData.wallballs||0);
+  // limiter heuristic: fast runner + low wall balls = strength-limited; slow 5k = run-limited
+  let limiter = "balanced";
+  if(fiveKSec){
+    const fast = fiveKSec < (obData.sex==="f"? 26*60 : 23*60);
+    if(fast && wb && wb<=25) limiter="strength";
+    else if(!fast) limiter="run";
+    else if(wb && wb<=25) limiter="strength";
+  } else if(wb && wb<=25) limiter="strength";
+  S.profile = {
+    name: obData.name||"Athlete", goal: obData.goal||"finish",
+    raceDate: obData.raceDate, division: obData.division||"open", sex: obData.sex||"m",
+    experience: obData.experience||"new", days: Number(obData.days||4),
+    equipment: obData.equipment||["run","kb"], fiveK: fiveKSec||null,
+    wallballs: wb||null, limiter, createdAt: todayISO(),
+  };
+  S.plan = generatePlan(S.profile);
+  save();
+  $("ob").classList.remove("active");
+  go("home");
+  toast(`Welcome, ${esc(S.profile.name)} — your ${S.plan.weeks.length}-week plan is ready 🔥`);
+}
+
+/* ================================================================
+   PLAN GENERATION — base → build → specific → taper
+   ================================================================ */
+function generatePlan(p){
+  const start = monday(new Date());
+  const race = fromISO(p.raceDate);
+  let weeks = Math.max(4, Math.min(24, Math.ceil((race - start)/(7*DAY))));
+  // phase lengths (last week = taper/race week)
+  const rest = weeks-1;
+  const spec = Math.max(1, Math.round(rest*0.3));
+  const build = Math.max(1, Math.round(rest*0.35));
+  const base = Math.max(0, rest-spec-build);
+  const phases = [];
+  for(let i=0;i<base;i++) phases.push("base");
+  for(let i=0;i<build;i++) phases.push("build");
+  for(let i=0;i<spec;i++) phases.push("specific");
+  phases.push("taper");
+  // deloads every 4th week (not in taper, not the week before taper)
+  const deload = phases.map((ph,i)=> ph!=="taper" && (i+1)%4===0 && i < phases.length-2);
+  // simulations: full sim ~3 weeks out (specific), half sim mid-build
+  const fullSimWk = Math.max(0, weeks-4);
+  let halfSimWk = base + Math.floor(build/2);
+  if(halfSimWk>=fullSimWk) halfSimWk = -1;
+  if(weeks<7) halfSimWk = -1;
+
+  const wks = phases.map((ph,i)=>{
+    const wkStart = new Date(start.getTime()+i*7*DAY);
+    const sim = i===fullSimWk ? "full" : (i===halfSimWk ? "half" : null);
+    const sessions = weekSessions(p, ph, deload[i], sim, i, weeks).map(s=>({
+      id: uid(), ...s,
+      date: dISO(new Date(wkStart.getTime()+s.day*DAY)),
+      done:false, workoutId:null,
+    }));
+    return { index:i, phase:ph, deload:deload[i], start:dISO(wkStart), sessions };
+  });
+  return { generatedAt: todayISO(), raceDate: p.raceDate, weeks: wks };
+}
+
+// spread N sessions across the week (Mon=0)
+const DAY_LAYOUT = {2:[1,4],3:[0,2,5],4:[0,2,4,5],5:[0,1,3,4,5],6:[0,1,2,3,4,5]};
+function noEq(p,e){ return !p.equipment.includes(e); }
+function ergName(p){
+  if(!noEq(p,"ski") && !noEq(p,"row")) return "ski or row";
+  if(!noEq(p,"ski")) return "ski"; if(!noEq(p,"row")) return "row";
+  return "bike / hard uphill run";
+}
+function sledSub(p){ return noEq(p,"sled") ? "\nNo sled? Sub: heavy walking lunges + bent-over rows, or push a car/plate on turf." : ""; }
+function wbSub(p){ return noEq(p,"wb") ? "\nNo wall ball? Sub: thrusters with dumbbells." : ""; }
+
+function weekSessions(p, ph, deload, sim, wkIdx, totalWeeks){
+  const adv = p.experience==="adv", days = p.days;
+  const erg = ergName(p);
+  // 5K pace anchor (sec/km); default 5:30 if unknown
+  const fkp = p.fiveK ? p.fiveK/5 : 330;
+  const racePace = fmtSec(Math.round(fkp*1.10));   // ~race-run pace estimate
+  const intPace  = fmtSec(Math.round(fkp*0.98));   // interval pace
+  const L = [];
+
+  const IV = {
+    base:     {t:"Run Intervals", d:`Warm up 10 min easy.\n6 × 800 m @ ${intPace}/km-ish, 90 s jog recovery.\nCool down 5–10 min.`},
+    build:    {t:"Run Intervals", d:`Warm up 10 min.\n5 × 1 km @ ${racePace}/km (goal race pace), 90 s rest.\nFocus: identical splits, not heroics.`},
+    specific: {t:"Race-Pace Repeats", d:`Warm up 10 min.\n${adv?8:6} × 1 km @ ${racePace}/km, 60 s rest.\nLock the pace in — this is the race.`},
+  };
+  const ST = {
+    base: {t:"Strength Endurance", d:`3–4 rounds, minimal rest:\n• 10 goblet squats\n• 10 DB/KB deadlifts\n• 12 walking lunges /leg\n• 15 wall balls${wbSub(p)}\n• 200 m farmers carry (${stationLoad("farmers")||"heavy"})`},
+    build:{t:"Hyrox Strength", d:`4 rounds:\n• 20 m sled push + 20 m sled pull${sledSub(p)}\n• 20 wall balls (${stationLoad("wb")})${wbSub(p)}\n• 100 m farmers carry ${stationLoad("farmers")}\n• 10 burpee broad jumps`},
+    specific:{t:"Station Strength @ Race Loads", d:`3 rounds at race standards:\n• 25 m sled push ${stationLoad("push")} + 25 m sled pull ${stationLoad("pull")}${sledSub(p)}\n• 50 m sandbag lunges ${stationLoad("lunges")}\n• 30 wall balls ${stationLoad("wb")}${wbSub(p)}`},
+  };
+  const BR = {
+    build:{t:"Compromised Run", d:`4 rounds:\n• 500 m ${erg} hard\n• 1 km run @ ${racePace}/km\nThe run after the station IS the skill. Log your splits.`},
+    specific:{t:"Compromised Run", d:`3 rounds:\n• 20 wall balls + 100 m farmers carry\n• 1 km run @ ${racePace}/km\nMinimise the transition — treat it like the Roxzone.`},
+  };
+  const LR = {
+    base:{t:"Long Run", d:`50–${adv?80:70} min easy, conversational (Zone 2).\nEngine first — this is where the race is built.`},
+    build:{t:"Long Run + Finish", d:`60–${adv?85:75} min easy, last 15 min at race effort.`},
+    specific:{t:"Long Run", d:`45–60 min easy. Volume holds, intensity lives elsewhere now.`},
+  };
+  const EZ = {t:"Easy Run", d:"35–50 min conversational. If you can't chat, slow down."};
+  const ERG = {t:"Erg Intervals", d:`On the ${erg}:\n5 × 500 m @ target station pace, 1:1 rest.\nThen 3 × 10 burpee broad jumps.`};
+
+  const ph2 = ph==="taper" ? "specific" : ph;
+  if(ph==="taper"){
+    L.push({day:0, type:"intervals", t:"Sharpener", d:`20 min easy run + 4 × 30 s @ race pace, full recovery.`});
+    L.push({day:2, type:"stations", t:"Race Rehearsal (light)", d:`1 easy round, ~50% effort:\n500 m ${erg}, 15 wall balls, 100 m carry, 500 m run.\nGroove the movements, then rest.`});
+    if(days>=4) L.push({day:3, type:"run", t:"Shakeout", d:"15–20 min very easy + mobility. Trust the taper — fitness is banked."});
+    L.push({day:5, type:"sim", t:"🏁 RACE DAY", d:"Execute the plan: conservative first run, smooth Roxzone, empty the tank from wall balls home. See the Race tab for your targets."});
+    return L;
+  }
+
+  const picks = [];
+  picks.push({type:"intervals", ...IV[ph2]});
+  picks.push({type:"strength", ...ST[ph2]});
+  if(days>=4) picks.push(BR[ph2] ? {type:"brick", ...BR[ph2]} : {type:"erg", ...ERG});
+  picks.push({type:"run", ...LR[ph2]});
+  if(days>=5) picks.splice(2,0,{type:"run", ...EZ});
+  if(days>=6) picks.push({type:"erg", ...ERG});
+  const layout = DAY_LAYOUT[Math.min(6,Math.max(2,days))];
+  let out = picks.slice(0, days).map((s,i)=>({day:layout[i], type:s.type, t:s.t, d:s.d}));
+
+  if(sim==="full"){
+    out[out.length-1] = {day:5, type:"sim", t:"🏁 FULL RACE SIMULATION", d:`The dress rehearsal. Full format at race standards (scale loads only if you must):\n8 × (1 km run + station), in race order.\nRecord every split, station time and Roxzone. Go 90–95% — save 100% for race day.`};
+  } else if(sim==="half"){
+    out[out.length-1] = {day:5, type:"sim", t:"Half Simulation", d:`4 × 1 km run alternating with:\nSkiErg 500 m → sled push 25 m → row 500 m → 50 wall balls.\nRace effort. Record splits — this sets your pacing baseline.`};
+  }
+  if(deload){
+    out = out.map(s=>({...s, t:"Deload: "+s.t, d:"Deload week — cut volume ~40%, keep movement quality.\n"+s.d}));
+  }
+  return out;
+}
+
+/* ================================================================
+   NAVIGATION
+   ================================================================ */
+function go(v){
+  document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
+  $("v-"+v).classList.add("active");
+  document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("on", b.dataset.v===v));
+  window.scrollTo(0,0);
+  if(v==="home") renderHome();
+  if(v==="plan") renderPlan();
+  if(v==="log") renderLogHub();
+  if(v==="prog") renderProgress();
+  if(v==="race") renderRace();
+  if(v==="settings") renderSettings();
+  if(v==="guide") renderGuide();
+}
+
+/* ================================================================
+   HOME
+   ================================================================ */
+function daysToRace(){ return Math.ceil((fromISO(S.profile.raceDate) - new Date())/DAY); }
+function currentPhase(){
+  const t = todayISO();
+  for(const w of S.plan.weeks){
+    const end = dISO(new Date(fromISO(w.start).getTime()+6*DAY));
+    if(t>=w.start && t<=end) return w;
+  }
+  return null;
+}
+function renderHome(){
+  const p=S.profile;
+  $("homeDate").textContent = new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"});
+  $("homeGreet").textContent = "Hey "+p.name+" 👊";
+  // countdown
+  const d = daysToRace();
+  const wk = currentPhase();
+  $("homeCountdown").innerHTML = d>=0 ? `
+    <div class="spread">
+      <div><div class="statlbl">Race countdown</div>
+      <div class="bignum yellow">${d}<span style="font-size:18px;color:var(--dim)"> days</span></div>
+      <div class="small">${fmtDate(p.raceDate)} · ${p.division.toUpperCase()}</div></div>
+      <div style="text-align:right">${wk?`<span class="pill ${wk.phase}">${wk.phase}${wk.deload?" · deload":""}</span>
+      <div class="tiny" style="margin-top:6px">Week ${wk.index+1} of ${S.plan.weeks.length}</div>`:""}</div>
+    </div>
+    ${phaseMessage(wk)}`
+  : `<div class="statlbl">Race day has passed</div><div class="small" style="margin-top:4px">How did it go? Log it as a simulation to capture your splits, then set the next target in Settings. 🎉</div>`;
+  // streak
+  const st = calcStreak();
+  const dots = weekProgressDots();
+  $("homeStreak").innerHTML = `
+    <div class="spread">
+      <div><div class="statlbl">Consistency streak</div>
+        <div class="bignum">${st.weeks}<span style="font-size:18px;color:var(--dim)"> wk${st.weeks===1?"":"s"}</span> ${st.weeks>=3?"🔥":""}</div>
+      </div>
+      <div style="text-align:right"><div class="statlbl">This week</div>
+        <div style="font-weight:800;font-size:20px">${dots.done}/${dots.goal}</div></div>
+    </div>
+    <div class="dots">${Array.from({length:dots.goal},(_,i)=>`<div class="dot ${i<dots.done?"hit":""}"></div>`).join("")}</div>
+    <div class="tiny" style="margin-top:8px">${st.msg}</div>`;
+  // today's session
+  const t = todayISO();
+  let todays=[], next=null;
+  for(const w of S.plan.weeks) for(const s of w.sessions){
+    if(s.date===t) todays.push(s);
+    else if(!next && s.date>t && !s.done) next=s;
+  }
+  let h="";
+  if(todays.length){
+    h += todays.map(s=>sessCard(s,true)).join("");
+  } else {
+    h += `<div class="card"><div class="statlbl">Today</div><div style="font-weight:700;margin-top:4px">Rest day 😌</div>
+      <div class="small">Recovery is training. Eat, sleep, walk.</div>
+      ${next?`<div class="small" style="margin-top:8px">Next up: <b>${esc(next.t)}</b> · ${fmtDate(next.date)}</div>`:""}</div>`;
+  }
+  $("homeToday").innerHTML = `<h2 style="margin:4px 0 10px">Today</h2>`+h;
+  // recent
+  const rec = [...S.workouts].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,3);
+  $("homeRecent").innerHTML = rec.length? `<h2 style="margin:16px 0 10px">Recent</h2>`+rec.map(histCard).join("") : "";
+  // banners + check-in
+  $("homeReminder").innerHTML = coachBanner() + lapseBanner();
+  $("homeCheckin").innerHTML = renderCheckin();
+}
+function phaseMessage(wk){
+  if(!wk) return "";
+  const msgs={
+    base:"Engine phase — easy volume now is speed later. Boring on purpose.",
+    build:"Build phase — loads go up, bricks begin. This is where it clicks.",
+    specific:"Specific phase — everything at race pace and race loads now.",
+    taper:"Taper — the hay is in the barn. Rest IS the workout this week."};
+  return `<div class="tiny" style="margin-top:8px">${msgs[wk.phase]}</div>`;
+}
+function sessCard(s, big){
+  const w = wtype(s.type);
+  return `<div class="sess ${s.done?"done":""}">
+    <div class="rowflex">
+      <div class="typeic">${w.icon}</div>
+      <div style="flex:1"><div class="t">${esc(s.t)} ${s.done?'<span class="pill done">done ✓</span>':""}</div>
+      ${big?`<div class="d">${esc(sessText(s))}</div>`:`<div class="small">${fmtDate(s.date)}</div>`}</div>
+    </div>
+    ${!s.done?`<div class="rowflex" style="margin-top:10px">
+      <button class="btn mini" onclick="logPlanned('${s.id}')">Log this session</button>
+      <button class="btn sec mini" onclick="skipSession('${s.id}')">Skip</button>
+    </div>`:""}
+  </div>`;
+}
+function lapseBanner(){
+  if(!S.workouts.length){
+    return `<div class="banner">🎯 <b>First move:</b> your plan is ready in the Plan tab. Log your first session and the streak begins.</div>`;
+  }
+  const last = [...S.workouts].sort((a,b)=>b.date.localeCompare(a.date))[0];
+  const gap = Math.floor((fromISO(todayISO())-fromISO(last.date))/DAY);
+  if(gap>=4) return `<div class="banner">👋 It's been ${gap} days. One easy session restarts the momentum — today counts double (not really, but log one anyway).</div>`;
+  return "";
+}
+function skipSession(id){
+  const s = findSession(id); if(!s) return;
+  s.done = true; s.skipped = true; save();
+  toast("Skipped. Life happens — the plan rolls on.");
+  renderHome();
+}
+function findSession(id){
+  for(const w of S.plan.weeks) for(const s of w.sessions) if(s.id===id) return s;
+  return null;
+}
+
+/* ================================================================
+   STREAK  — weekly consistency, rest days never break it,
+   one grace week per calendar month
+   ================================================================ */
+function weekKey(d){ return dISO(monday(d)); }
+function workoutsInWeek(mondayISO){
+  const start = mondayISO, end = dISO(new Date(fromISO(mondayISO).getTime()+6*DAY));
+  return S.workouts.filter(w=>w.date>=start && w.date<=end).length;
+}
+function weeklyGoal(){ return Math.max(2, Math.min(S.profile.days, 6)) - 1; } // goal = days-1 (humane), min 2
+function calcStreak(){
+  const goal = weeklyGoal();
+  const thisMon = monday(new Date());
+  let weeks=0, graceMonths={}, msg="";
+  // walk backwards from LAST completed week
+  for(let i=1;i<=104;i++){
+    const wkMon = new Date(thisMon.getTime()-i*7*DAY);
+    const iso = dISO(wkMon);
+    if(S.profile.createdAt && iso < dISO(monday(fromISO(S.profile.createdAt)))) break;
+    const n = workoutsInWeek(iso);
+    if(n>=goal){ weeks++; continue; }
+    const mk = iso.slice(0,7);
+    if(n>0 && !graceMonths[mk]){ graceMonths[mk]=true; weeks++; continue; } // grace week
+    break;
+  }
+  // include current week if already hit
+  const cur = workoutsInWeek(dISO(thisMon));
+  if(cur>=goal) weeks++;
+  if(weeks===0) msg = S.workouts.length? "Fresh start — hit "+goal+" sessions this week and the streak is back on." : "Log "+goal+" sessions this week to start your streak.";
+  else if(cur>=goal) msg = "This week is banked ✓ — anything more is bonus.";
+  else msg = (goal-cur)+" more session"+(goal-cur===1?"":"s")+" this week keeps the streak alive. Rest days never break it.";
+  return {weeks, msg};
+}
+function weekProgressDots(){
+  return { done: Math.min(workoutsInWeek(dISO(monday(new Date()))), weeklyGoal()), goal: weeklyGoal() };
+}
+
+/* ================================================================
+   PLAN VIEW
+   ================================================================ */
+function renderPlan(){
+  const pl = S.plan;
+  const counts = {};
+  pl.weeks.forEach(w=>counts[w.phase]=(counts[w.phase]||0)+1);
+  $("planPhaseBar").innerHTML = `<div class="card flat"><div class="rowflex" style="flex-wrap:wrap">
+    ${["base","build","specific","taper"].filter(p=>counts[p]).map(p=>`<span class="pill ${p}">${p} · ${counts[p]}w</span>`).join(" ")}
+    </div><div class="tiny" style="margin-top:6px">Engine first, specificity late, deloads every 4th week — that's the science. Tap a session to expand.</div></div>`;
+  const t = todayISO();
+  $("planList").innerHTML = pl.weeks.map(w=>{
+    const end = dISO(new Date(fromISO(w.start).getTime()+6*DAY));
+    const isCur = t>=w.start && t<=end;
+    return `<div class="wkhead" ${isCur?'id="curweek"':''}>
+      <h3>Week ${w.index+1}</h3>
+      <span class="pill ${w.phase}">${w.phase}</span>
+      ${w.deload?'<span class="pill deload">deload</span>':""}
+      ${isCur?'<span class="pill done">this week</span>':""}
+      <span class="tiny">${fmtDate(w.start)}</span>
+      <button class="btn sec mini" style="margin-left:auto;padding:5px 10px" onclick="openSessEdit(null,${w.index})">+ add</button>
+    </div>` + w.sessions.map(s=>planSess(s)).join("");
+  }).join("");
+  const cur = $("curweek"); if(cur) setTimeout(()=>cur.scrollIntoView({block:"start",behavior:"instant"}),30);
+}
+function planSess(s){
+  const w = wtype(s.type);
+  const missed = !s.done && s.date < todayISO();
+  return `<div class="sess ${s.done?"done":""}" onclick="togglePlanDetail(this)">
+    <div class="rowflex">
+      <div class="typeic">${w.icon}</div>
+      <div style="flex:1">
+        <div class="spread"><span class="t">${esc(s.t)}</span>${s.done?`<span class="pill done">${s.skipped?"skipped":"done ✓"}</span>`:missed?`<span class="pill missed">missed</span>`:""}</div>
+        <div class="small">${fmtDate(s.date)}${s.rescheduled?' · <span class="tiny">rescheduled</span>':""}</div>
+        <div class="d pd" style="display:none">${esc(sessText(s))}</div>
+      </div>
+    </div>
+    <div class="pd" style="display:none;margin-top:10px" onclick="event.stopPropagation()">
+      ${!s.done?`<div class="rowflex" style="flex-wrap:wrap">
+        <button class="btn mini" onclick="logPlanned('${s.id}')">Log this session</button>
+        <button class="btn sec mini" onclick="openSessEdit('${s.id}')">Edit</button>
+        <button class="btn sec mini" onclick="skipSession('${s.id}');renderPlan()">Skip</button></div>`
+      :`<div class="rowflex">
+        <button class="btn sec mini" onclick="undoSession('${s.id}')">Mark not done</button>
+        <button class="btn sec mini" onclick="openSessEdit('${s.id}')">Edit</button></div>`}
+    </div>
+  </div>`;
+}
+function togglePlanDetail(el){
+  el.querySelectorAll(".pd").forEach(x=>x.style.display = x.style.display==="none"?"block":"none");
+}
+function undoSession(id){
+  const s=findSession(id); if(!s) return;
+  s.done=false; s.skipped=false; s.workoutId=null; save(); renderPlan();
+}
+function confirmRegen(){
+  if(confirm("Rebuild the plan from today to race day? Completed history is kept; remaining sessions are regenerated.")){
+    S.plan = generatePlan(S.profile); save(); renderPlan(); toast("Plan regenerated 🔄");
+  }
+}
+
+/* ================================================================
+   LOGGING
+   ================================================================ */
+let logCtx = null; // {type, planSessionId, editId}
+function renderLogHub(){
+  $("logTypeGrid").innerHTML = WTYPES.map(w=>
+    `<button class="card flat" style="text-align:left;cursor:pointer;margin:0" onclick="openLog('${w.id}')">
+      <div style="font-size:22px">${w.icon}</div><div style="font-weight:700;margin-top:4px">${w.name}</div>
+      <div class="tiny">${w.desc}</div></button>`).join("");
+  renderHistory();
+}
+function logPlanned(sessId){
+  const s = findSession(sessId); if(!s) return;
+  openLog(s.type, sessId);
+}
+function lastOfType(type){
+  return [...S.workouts].filter(w=>w.type===type).sort((a,b)=>b.date.localeCompare(a.date))[0] || null;
+}
+function openLog(type, planSessionId, editId){
+  logCtx = {type, planSessionId: planSessionId||null, editId: editId||null};
+  const edit = editId ? S.workouts.find(w=>w.id===editId) : null;
+  const plan = planSessionId ? findSession(planSessionId) : null;
+  const last = lastOfType(type);
+  const w = wtype(type);
+  let h = `<div class="spread" style="margin-bottom:12px">
+    <h2 style="margin:0">${w.icon} ${plan?esc(plan.t):w.name}</h2>
+    <button class="btn sec mini" onclick="closeLog()">✕</button></div>`;
+  if(plan) h += `<div class="tiny" style="margin-bottom:10px;white-space:pre-line">${esc(plan.d)}</div>`;
+  if(last && !edit) h += `<div class="tiny" style="margin-bottom:10px">Last time (${fmtDate(last.date)}): ${lastSummary(last)}</div>`;
+  h += `<label class="fld"><span class="lbl">Date</span><input type="date" id="lg_date" value="${edit?edit.date:todayISO()}"></label>`;
+
+  const km = edit?edit.distanceKm:"", dur = edit?fmtSec(edit.durationSec):"";
+  if(type==="run"||type==="intervals"){
+    h += `<div class="grid2">
+      <label class="fld"><span class="lbl">Distance (km)</span><input id="lg_km" inputmode="decimal" placeholder="${last&&last.distanceKm?last.distanceKm:'8'}" value="${km||""}"></label>
+      <label class="fld"><span class="lbl">Total time (mm:ss)</span><input id="lg_dur" inputmode="numeric" placeholder="45:00" value="${edit&&edit.durationSec?fmtSec(edit.durationSec):""}"></label>
+    </div>
+    <div class="spread" style="margin-bottom:8px"><span class="lbl" style="font-size:12.5px;color:var(--dim);font-weight:600;text-transform:uppercase">1 km splits (optional)</span>
+    <button class="btn sec mini" onclick="addSplitRow()">+ split</button></div>
+    <div id="splitRows"></div>`;
+  }
+  if(type==="brick"){
+    h += `<div class="grid2">
+      <label class="fld"><span class="lbl">Rounds</span><input id="lg_rounds" inputmode="numeric" value="${edit&&edit.rounds||""}" placeholder="4"></label>
+      <label class="fld"><span class="lbl">Total time (mm:ss)</span><input id="lg_dur" inputmode="numeric" placeholder="35:00" value="${edit&&edit.durationSec?fmtSec(edit.durationSec):""}"></label>
+    </div>
+    <div class="spread" style="margin-bottom:8px"><span class="lbl" style="font-size:12.5px;color:var(--dim);font-weight:600;text-transform:uppercase">Run splits after stations</span>
+    <button class="btn sec mini" onclick="addSplitRow()">+ split</button></div>
+    <div id="splitRows"></div>`;
+  }
+  if(type==="erg"){
+    h += `<div class="segctl" id="ergSeg">
+      <button class="${(!edit||!edit.erg||edit.erg.machine!=='row')?'on':''}" onclick="segPick(this)" data-v="ski">SkiErg</button>
+      <button class="${(edit&&edit.erg&&edit.erg.machine==='row')?'on':''}" onclick="segPick(this)" data-v="row">Row</button></div>
+    <div class="grid2">
+      <label class="fld"><span class="lbl">Distance (m)</span><input id="lg_m" inputmode="numeric" placeholder="1000" value="${edit&&edit.erg?edit.erg.meters:""}"></label>
+      <label class="fld"><span class="lbl">Time (mm:ss)</span><input id="lg_dur" inputmode="numeric" placeholder="4:00" value="${edit&&edit.erg&&edit.erg.seconds?fmtSec(edit.erg.seconds):""}"></label>
+    </div>`;
+  }
+  if(type==="strength"){
+    h += `<div class="spread" style="margin-bottom:8px"><span class="lbl" style="font-size:12.5px;color:var(--dim);font-weight:600;text-transform:uppercase">Exercises</span>
+      <button class="btn sec mini" onclick="addExRow()">+ exercise</button></div>
+      <div id="exRows"></div>
+      <div class="grid2"><label class="fld"><span class="lbl">Duration (min, opt.)</span><input id="lg_min" inputmode="numeric" value="${edit&&edit.durationSec?Math.round(edit.durationSec/60):""}"></label>
+      <div style="padding-top:22px"><button class="btn sec" onclick="toggleTimer()" id="rtBtn">Rest timer ▶ 90s</button></div></div>`;
+  }
+  if(type==="stations"||type==="sim"){
+    if(type==="sim") h += `<div class="segctl" id="simSeg">
+      <button class="${(!edit||edit.simKind!=="half")?"on":""}" onclick="segPick(this)" data-v="full">Full</button>
+      <button class="${(edit&&edit.simKind==="half")?"on":""}" onclick="segPick(this)" data-v="half">Half</button></div>`;
+    h += `<label class="fld"><span class="lbl">Total time (h:mm:ss)</span><input id="lg_dur" inputmode="numeric" placeholder="${type==='sim'?'1:35:00':'40:00'}" value="${edit&&edit.durationSec?fmtSec(edit.durationSec,type==='sim'):""}"></label>`;
+    if(type==="sim"){
+      h += `<div class="spread" style="margin-bottom:8px"><span class="lbl" style="font-size:12.5px;color:var(--dim);font-weight:600;text-transform:uppercase">Run splits (1–8)</span>
+      <button class="btn sec mini" onclick="addSplitRow()">+ split</button></div><div id="splitRows"></div>
+      <label class="fld" style="margin-top:6px"><span class="lbl">Total Roxzone / transition time (mm:ss, opt.)</span><input id="lg_rox" inputmode="numeric" placeholder="6:30"></label>`;
+    }
+    h += `<div class="spread" style="margin:6px 0 8px"><span class="lbl" style="font-size:12.5px;color:var(--dim);font-weight:600;text-transform:uppercase">Stations</span></div>
+      <div id="stRows"></div>
+      <div class="chips" id="stPicker">${STATIONS.map(s=>`<button class="chip" onclick="addStRow('${s.id}')">${s.icon} ${s.name}</button>`).join("")}</div>`;
+  }
+  // RPE + notes (all types)
+  h += `<label class="fld" style="margin-top:14px"><span class="lbl">RPE — how hard was it?</span>
+    <div class="rpewrap" id="rpeWrap">${[...Array(10)].map((_,i)=>`<button data-v="${i+1}" class="${edit&&edit.rpe===i+1?'on':''}" onclick="rpePick(this)">${i+1}</button>`).join("")}</div></label>
+    <label class="fld"><span class="lbl">Notes</span><textarea id="lg_notes" rows="2" placeholder="How did it feel?">${edit?esc(edit.notes||""):""}</textarea></label>
+    <button class="btn" onclick="saveLog()">${edit?"Save changes":"Save session"} ✓</button>
+    ${edit?`<button class="btn danger" style="margin-top:8px" onclick="deleteWorkout('${edit.id}')">Delete</button>`:""}`;
+
+  $("logSheet").innerHTML = h;
+  $("logModal").classList.add("open");
+  // prefill dynamic rows on edit
+  if(edit){
+    (edit.splits||[]).forEach(s=>addSplitRow(fmtSec(s)));
+    (edit.stations||[]).forEach(s=>addStRow(s.id, s));
+    (edit.exercises||[]).forEach(e=>addExRow(e));
+    if(edit.roxzone && $("lg_rox")) $("lg_rox").value = fmtSec(edit.roxzone);
+  } else if(type==="sim"){
+    for(let i=0;i<4;i++) addSplitRow();
+  }
+}
+function closeLog(){ $("logModal").classList.remove("open"); stopTimer(); }
+function segPick(btn){ btn.parentElement.querySelectorAll("button").forEach(b=>b.classList.remove("on")); btn.classList.add("on"); }
+function rpePick(btn){ btn.parentElement.querySelectorAll("button").forEach(b=>b.classList.remove("on")); btn.classList.add("on"); }
+function addSplitRow(val){
+  const rows = $("splitRows"); if(!rows) return;
+  const n = rows.children.length;
+  if(n>=8 && logCtx.type==="sim"){ toast("Max 8 splits — that's the race!"); return; }
+  const div=document.createElement("div"); div.className="splitrow";
+  div.innerHTML = `<span class="tiny" style="text-align:center">Run ${n+1}</span>
+    <input inputmode="numeric" placeholder="mm:ss" class="splitInp" value="${val||""}">
+    <span class="tiny paceHint"></span>
+    <button class="xbtn" onclick="this.parentElement.remove();renumberSplits()">✕</button>`;
+  rows.appendChild(div);
+  const inp=div.querySelector("input");
+  inp.addEventListener("input",()=>{ const s=parseTime(inp.value); div.querySelector(".paceHint").textContent = s?fmtPace(s):""; });
+  if(val) inp.dispatchEvent(new Event("input"));
+  if(!val) inp.focus();
+}
+function renumberSplits(){
+  const rows=$("splitRows"); if(!rows) return;
+  [...rows.children].forEach((r,i)=>r.firstElementChild.textContent="Run "+(i+1));
+}
+function addStRow(id, pre){
+  const st = STATIONS.find(s=>s.id===id);
+  const rows=$("stRows"); if(!rows) return;
+  const load = stationLoad(id);
+  const div=document.createElement("div"); div.className="stitem"; div.dataset.st=id;
+  div.innerHTML = `<span style="font-size:18px">${st.icon}</span>
+    <div style="flex:1"><div style="font-weight:700;font-size:14px">${st.name}</div>
+    <div class="tiny">${st.unit}${load?" · "+load:""}</div></div>
+    <input inputmode="numeric" placeholder="mm:ss" style="width:86px;padding:9px" class="stTime" value="${pre&&pre.time?fmtSec(pre.time):""}">
+    <button class="xbtn" onclick="this.parentElement.remove()" style="width:36px">✕</button>`;
+  rows.appendChild(div);
+}
+function addExRow(pre){
+  const rows=$("exRows"); if(!rows) return;
+  const div=document.createElement("div"); div.className="card flat";
+  div.style.marginBottom="8px"; div.dataset.ex="1";
+  div.innerHTML = `<input placeholder="Exercise (e.g. goblet squat)" class="exName" value="${pre?esc(pre.name):""}" style="margin-bottom:8px">
+    <div class="grid3">
+      <label><span class="tiny">Sets</span><input inputmode="numeric" class="exSets" value="${pre?pre.sets:""}" placeholder="3"></label>
+      <label><span class="tiny">Reps</span><input inputmode="numeric" class="exReps" value="${pre?pre.reps:""}" placeholder="10"></label>
+      <label><span class="tiny">kg</span><input inputmode="decimal" class="exKg" value="${pre?(pre.kg??""):""}" placeholder="24"></label>
+    </div>
+    <button class="btn sec mini" style="margin-top:8px" onclick="this.parentElement.remove()">Remove</button>`;
+  rows.appendChild(div);
+  if(!pre) div.querySelector(".exName").focus();
+}
+/* rest timer */
+let rtInt=null, rtLeft=0;
+function toggleTimer(){
+  const b=$("rtBtn"); if(!b) return;
+  if(rtInt){ stopTimer(); b.textContent="Rest timer ▶ 90s"; return; }
+  rtLeft=90;
+  rtInt=setInterval(()=>{
+    rtLeft--; const bb=$("rtBtn");
+    if(!bb){stopTimer();return;}
+    if(rtLeft<=0){ stopTimer(); bb.textContent="GO! ▶ restart"; try{navigator.vibrate&&navigator.vibrate([200,100,200]);}catch(e){} }
+    else bb.textContent="Rest… "+rtLeft+"s (tap to stop)";
+  },1000);
+  b.textContent="Rest… 90s";
+}
+function stopTimer(){ if(rtInt){clearInterval(rtInt); rtInt=null;} }
+
+function collectSplits(){
+  const rows=$("splitRows"); if(!rows) return [];
+  return [...rows.querySelectorAll(".splitInp")].map(i=>parseTime(i.value)).filter(v=>v&&v>60&&v<1800);
+}
+function saveLog(){
+  const type=logCtx.type;
+  const date=$("lg_date").value || todayISO();
+  const w = {
+    id: logCtx.editId || uid(), type, date,
+    title: null, notes: $("lg_notes")?$("lg_notes").value.trim():"",
+    rpe: (()=>{const b=document.querySelector("#rpeWrap button.on"); return b?Number(b.dataset.v):null})(),
+    planSessionId: logCtx.planSessionId,
+  };
+  const durEl=$("lg_dur");
+  if(durEl && durEl.value) w.durationSec = parseTime(durEl.value);
+  if(type==="run"||type==="intervals"||type==="brick"||type==="sim"){
+    w.splits = collectSplits();
+  }
+  if(type==="run"||type==="intervals"){
+    const km = $("lg_km").value ? parseFloat($("lg_km").value.replace(",",".")) : null;
+    w.distanceKm = km || (w.splits.length? w.splits.length : null);
+    if(!w.durationSec && w.splits.length) w.durationSec = w.splits.reduce((a,b)=>a+b,0);
+    if(!w.distanceKm && !w.durationSec){ toast("Add a distance or time"); return; }
+  }
+  if(type==="brick"){
+    w.rounds = Number($("lg_rounds").value)||null;
+    if(!w.durationSec && w.splits.length) w.durationSec = w.splits.reduce((a,b)=>a+b,0);
+  }
+  if(type==="erg"){
+    const mach = document.querySelector("#ergSeg button.on").dataset.v;
+    const m = Number($("lg_m").value)||null;
+    const sec = w.durationSec||null;
+    if(!m || !sec){ toast("Add distance and time"); return; }
+    w.erg = {machine:mach, meters:m, seconds:sec};
+    delete w.durationSec; w.durationSec = sec;
+  }
+  if(type==="strength"){
+    const minEl=$("lg_min"); if(minEl&&minEl.value) w.durationSec=Number(minEl.value)*60;
+    w.exercises = [...document.querySelectorAll("#exRows [data-ex]")].map(d=>({
+      name: d.querySelector(".exName").value.trim(),
+      sets: Number(d.querySelector(".exSets").value)||null,
+      reps: Number(d.querySelector(".exReps").value)||null,
+      kg: d.querySelector(".exKg").value? parseFloat(d.querySelector(".exKg").value.replace(",",".")):null,
+    })).filter(e=>e.name);
+    if(!w.exercises.length && !w.durationSec){ toast("Add at least one exercise"); return; }
+  }
+  if(type==="stations"||type==="sim"){
+    w.stations = [...document.querySelectorAll("#stRows .stitem")].map(d=>({
+      id: d.dataset.st, time: parseTime(d.querySelector(".stTime").value)
+    })).filter(s=>s.time);
+    if(type==="sim"){
+      w.simKind = document.querySelector("#simSeg button.on").dataset.v;
+      const rox=$("lg_rox"); if(rox&&rox.value) w.roxzone=parseTime(rox.value);
+      if(!w.durationSec && !w.splits.length && !w.stations.length){ toast("Add a total time, splits or stations"); return; }
+    } else if(!w.durationSec && !w.stations.length){ toast("Add a time or at least one station"); return; }
+  }
+  // PR detection before insert
+  const prs = detectPRs(w);
+  if(logCtx.editId){
+    const i=S.workouts.findIndex(x=>x.id===logCtx.editId);
+    if(i>=0) S.workouts[i]=w;
+  } else S.workouts.push(w);
+  // mark plan session done
+  if(logCtx.planSessionId){
+    const s=findSession(logCtx.planSessionId);
+    if(s){ s.done=true; s.skipped=false; s.workoutId=w.id; }
+  } else {
+    // auto-link: same-day planned session of same type
+    for(const wk of S.plan.weeks) for(const s of wk.sessions){
+      if(!s.done && s.date===date && s.type===type){ s.done=true; s.workoutId=w.id; break; }
+    }
+  }
+  save();
+  closeLog();
+  const st=calcStreak();
+  let msg = logCtx.editId? "Updated ✓" : celebrate(st);
+  if(prs.length) msg += `<br>🎉 <b>New PR:</b> ${prs.join(", ")}`;
+  toast(msg);
+  go("home");
+  if(type==="sim" && !logCtx.editId) setTimeout(()=>openDetail(w.id), 600); // show the report
+}
+function celebrate(st){
+  const n=S.workouts.length;
+  if(n===1) return "First session logged — it begins 🏁";
+  if(n===10) return "10 sessions down. You're officially consistent 💛";
+  const opts=["Session banked ✓","Another brick in the wall 🧱","Logged. Future-you says thanks ✓","Work done ✓"];
+  return opts[n%opts.length];
+}
+function deleteWorkout(id){
+  if(!confirm("Delete this session?")) return;
+  S.workouts = S.workouts.filter(w=>w.id!==id);
+  for(const wk of S.plan.weeks) for(const s of wk.sessions) if(s.workoutId===id){ s.done=false; s.workoutId=null; }
+  save(); closeLog(); $("detailModal").classList.remove("open");
+  toast("Deleted"); go("log");
+}
+function lastSummary(w){
+  if(w.type==="run"||w.type==="intervals") return [w.distanceKm?w.distanceKm+" km":null, w.durationSec?fmtSec(w.durationSec):null, (w.durationSec&&w.distanceKm)?fmtPace(w.durationSec/w.distanceKm):null].filter(Boolean).join(" · ");
+  if(w.type==="erg"&&w.erg) return w.erg.machine+" "+w.erg.meters+"m in "+fmtSec(w.erg.seconds);
+  if(w.type==="strength") return (w.exercises||[]).slice(0,3).map(e=>e.name).join(", ");
+  return w.durationSec?fmtSec(w.durationSec):"logged";
+}
+
+/* ---------- history ---------- */
+function renderHistory(){
+  const q = ($("histSearch").value||"").toLowerCase();
+  const list = [...S.workouts].sort((a,b)=>b.date.localeCompare(a.date)).filter(w=>{
+    if(!q) return true;
+    const hay = [wtype(w.type).name, w.notes, (w.exercises||[]).map(e=>e.name).join(" "),
+      (w.stations||[]).map(s=>STATIONS.find(x=>x.id===s.id)?.name).join(" ")].join(" ").toLowerCase();
+    return hay.includes(q);
+  });
+  $("histList").innerHTML = list.length? list.map(histCard).join("") : `<div class="empty">Nothing yet — log your first session above 👆</div>`;
+}
+function histCard(w){
+  const t=wtype(w.type);
+  return `<div class="hist" onclick="openDetail('${w.id}')">
+    <div class="typeic">${t.icon}</div>
+    <div style="flex:1"><div style="font-weight:700;font-size:14.5px">${t.name}${w.simKind?` (${w.simKind})`:""}</div>
+    <div class="small">${fmtDate(w.date)} · ${lastSummary(w)}${w.rpe?` · RPE ${w.rpe}`:""}</div></div>
+    <div class="tiny">›</div></div>`;
+}
+function openDetail(id){
+  const w=S.workouts.find(x=>x.id===id); if(!w) return;
+  const t=wtype(w.type);
+  let h=`<div class="spread" style="margin-bottom:10px"><h2 style="margin:0">${t.icon} ${t.name}</h2>
+    <button class="btn sec mini" onclick="$('detailModal').classList.remove('open')">✕</button></div>
+    <div class="small" style="margin-bottom:12px">${fmtDate(w.date)}${w.rpe?` · RPE ${w.rpe}`:""}${w.durationSec?` · ${fmtSec(w.durationSec,w.type==="sim")}`:""}</div>`;
+  if(w.splits&&w.splits.length){
+    h+=`<h3 style="margin-bottom:6px">Run splits</h3>${splitBars(w.splits)}
+    <div class="tiny" style="margin:6px 0 12px">Avg ${fmtPace(mean(w.splits))} · spread ${fmtSec(Math.max(...w.splits)-Math.min(...w.splits))} · consistency ${splitCV(w.splits)!=null?splitCV(w.splits).toFixed(1)+"% CV":"–"}</div>`;
+  }
+  if(w.stations&&w.stations.length){
+    h+=`<h3 style="margin-bottom:6px">Stations</h3><table class="pace">`+w.stations.map(s=>{
+      const st=STATIONS.find(x=>x.id===s.id);
+      return `<tr><td>${st.icon} ${st.name}</td><td class="r">${fmtSec(s.time)}</td></tr>`;}).join("")+`</table><div style="height:10px"></div>`;
+  }
+  if(w.roxzone) h+=`<div class="small" style="margin-bottom:10px">Roxzone total: <b>${fmtSec(w.roxzone)}</b></div>`;
+  if(w.erg) h+=`<div class="small" style="margin-bottom:10px">${w.erg.machine==="ski"?"SkiErg":"Row"}: <b>${w.erg.meters} m</b> in <b>${fmtSec(w.erg.seconds)}</b> (${fmtSec(w.erg.seconds/w.erg.meters*500)}/500m)</div>`;
+  if(w.exercises&&w.exercises.length){
+    h+=`<h3 style="margin-bottom:6px">Exercises</h3><table class="pace">`+w.exercises.map(e=>
+      `<tr><td>${esc(e.name)}</td><td class="r">${e.sets||"?"}×${e.reps||"?"}${e.kg?` @ ${e.kg}kg`:""}</td></tr>`).join("")+`</table><div style="height:10px"></div>`;
+  }
+  if(w.type==="sim") h+=simReportHTML(w);
+  if(w.notes) h+=`<div class="card flat" style="margin-top:4px"><div class="tiny">Notes</div>${esc(w.notes)}</div>`;
+  h+=`<div class="rowflex" style="margin-top:14px">
+    <button class="btn sec" onclick="$('detailModal').classList.remove('open');openLog('${w.type}',null,'${w.id}')">Edit</button>
+    <button class="btn danger" onclick="deleteWorkout('${w.id}')">Delete</button></div>`;
+  $("detailSheet").innerHTML=h;
+  $("detailModal").classList.add("open");
+}
+function splitBars(splits){
+  const max=Math.max(...splits), min=Math.min(...splits);
+  return `<div>`+splits.map((s,i)=>{
+    const pct = 30+((s-min)/(max-min||1))*70;
+    return `<div class="rowflex" style="margin-bottom:4px"><span class="tiny" style="width:38px">Run ${i+1}</span>
+      <div style="flex:1;background:var(--card2);border-radius:6px;height:18px;overflow:hidden">
+        <div style="width:${pct}%;height:100%;background:${s===min?"var(--green)":s===max?"var(--red)":"var(--yellow)"};opacity:.85;border-radius:6px"></div></div>
+      <span class="tiny" style="width:44px;text-align:right;font-variant-numeric:tabular-nums">${fmtSec(s)}</span></div>`;
+  }).join("")+`</div>`;
+}
+function splitCV(splits){
+  if(!splits || splits.length<3) return null;
+  return stdev(splits)/mean(splits)*100;
+}
+
+/* ================================================================
+   PR DETECTION
+   ================================================================ */
+function detectPRs(w){
+  const prs=[];
+  const others = S.workouts.filter(x=>x.id!==w.id);
+  const bestSplit = ws => Math.min(...ws.flatMap(x=>x.splits||[]).filter(s=>s>120), Infinity);
+  if(w.splits&&w.splits.length){
+    const mine=Math.min(...w.splits.filter(s=>s>120), Infinity);
+    if(mine<Infinity && mine < bestSplit(others)) prs.push("fastest 1km "+fmtSec(mine));
+  }
+  if(w.erg){
+    const pace = w.erg.seconds/w.erg.meters;
+    const best = Math.min(...others.filter(x=>x.erg&&x.erg.machine===w.erg.machine&&x.erg.meters>=500).map(x=>x.erg.seconds/x.erg.meters), Infinity);
+    if(w.erg.meters>=500 && pace<best) prs.push((w.erg.machine==="ski"?"SkiErg":"Row")+" pace "+fmtSec(pace*500)+"/500m");
+  }
+  (w.stations||[]).forEach(s=>{
+    const best=Math.min(...others.flatMap(x=>(x.stations||[]).filter(y=>y.id===s.id).map(y=>y.time)), Infinity);
+    if(s.time<best && best<Infinity){ const st=STATIONS.find(x=>x.id===s.id); prs.push(st.name+" "+fmtSec(s.time)); }
+  });
+  (w.exercises||[]).forEach(e=>{
+    if(!e.kg) return;
+    const best=Math.max(...others.flatMap(x=>(x.exercises||[]).filter(y=>y.name.toLowerCase()===e.name.toLowerCase()&&y.kg).map(y=>y.kg)), 0);
+    if(best>0 && e.kg>best) prs.push(e.name+" "+e.kg+"kg");
+  });
+  return prs;
+}
+
+/* ================================================================
+   PROGRESS DASHBOARD
+   ================================================================ */
+function renderProgress(){
+  const ws=[...S.workouts].sort((a,b)=>a.date.localeCompare(b.date));
+  let h="";
+  // --- headline: split consistency ---
+  const cvSeries = ws.filter(w=>splitCV(w.splits)!=null).map(w=>({date:w.date, v:splitCV(w.splits)}));
+  const latest = cvSeries.length? cvSeries[cvSeries.length-1] : null;
+  let trendTxt="";
+  if(cvSeries.length>=2){
+    const prev=cvSeries[cvSeries.length-2].v, d=latest.v-prev;
+    trendTxt = d<=-0.3? `<span class="green">▼ ${Math.abs(d).toFixed(1)} vs last — steadier ✓</span>` : d>=0.3? `<span class="red">▲ ${d.toFixed(1)} vs last</span>` : "≈ holding steady";
+  }
+  h+=`<div class="card">
+    <div class="statlbl">Split consistency (headline KPI)</div>
+    <div class="bignum ${latest? (latest.v<5?"green":latest.v<9?"yellow":"red"):""}">${latest?latest.v.toFixed(1)+"%":"–"}</div>
+    <div class="tiny">Variation between your 1km run splits — the #1 predictor of a good Hyrox. Under 5% = metronome. ${trendTxt}</div>
+    ${cvSeries.length>=2? sparkline(cvSeries.map(x=>x.v), true) : `<div class="tiny" style="margin-top:8px">Log runs or sims with 3+ splits to start this trend.</div>`}
+  </div>`;
+  // --- strengths & weaknesses radar ---
+  h += radarCard();
+  // --- weekly volume ---
+  const volByWeek = {};
+  ws.forEach(w=>{
+    const k=weekKey(fromISO(w.date));
+    volByWeek[k]=volByWeek[k]||{km:0,min:0};
+    if(w.distanceKm) volByWeek[k].km += w.distanceKm;
+    else if(w.splits&&w.splits.length) volByWeek[k].km += w.splits.length;
+    if(w.erg) volByWeek[k].km += w.erg.meters/1000;
+    if(w.durationSec) volByWeek[k].min += w.durationSec/60;
+  });
+  const last8=[];
+  for(let i=7;i>=0;i--){
+    const k=dISO(new Date(monday(new Date()).getTime()-i*7*DAY));
+    last8.push({k, ...(volByWeek[k]||{km:0,min:0})});
+  }
+  h+=`<div class="card"><div class="statlbl">Weekly volume (run + erg km)</div>
+    ${barChart(last8.map(x=>x.km), last8.map((x,i)=>i===7?"now":""))}
+    <div class="tiny">This week: <b>${last8[7].km.toFixed(1)} km</b> · ${Math.round(last8[7].min)} min trained. Build gradually — big jumps are how injuries happen.</div></div>`;
+  // --- pace trend ---
+  const paceByWeek = {};
+  ws.forEach(w=>{
+    let p=null;
+    if((w.type==="run")&&w.durationSec&&w.distanceKm) p=w.durationSec/w.distanceKm;
+    if(p&&p>150&&p<720){ const k=weekKey(fromISO(w.date)); (paceByWeek[k]=paceByWeek[k]||[]).push(p); }
+  });
+  const paceSeries = Object.keys(paceByWeek).sort().map(k=>mean(paceByWeek[k]));
+  if(paceSeries.length>=2){
+    h+=`<div class="card"><div class="statlbl">Easy-run pace trend (aerobic proxy)</div>
+      ${sparkline(paceSeries, true)}
+      <div class="tiny">Latest avg: <b>${fmtPace(paceSeries[paceSeries.length-1])}</b>. Downward = your engine is growing. 📉 = 🎉</div></div>`;
+  }
+  // --- PRs ---
+  const prList = allPRs();
+  h+=`<div class="card"><div class="statlbl" style="margin-bottom:8px">Personal records</div>
+    ${prList.length? `<table class="pace">${prList.map(p=>`<tr><td>${p.icon} ${p.name}</td><td class="r"><b>${p.val}</b></td><td class="r tiny">${fmtDate(p.date)}</td></tr>`).join("")}</table>`
+    : `<div class="empty">PRs appear as you log splits, ergs, stations and lifts.</div>`}</div>`;
+  // --- adherence ---
+  let planned=0, done=0;
+  const t=todayISO();
+  S.plan.weeks.forEach(w=>w.sessions.forEach(s=>{ if(s.date<=t){ planned++; if(s.done&&!s.skipped) done++; }}));
+  if(planned>0){
+    const pct=Math.round(done/planned*100);
+    h+=`<div class="card"><div class="statlbl">Plan adherence</div>
+      <div class="bignum ${pct>=80?"green":pct>=50?"yellow":"red"}">${pct}%</div>
+      <div class="tiny">${done} of ${planned} planned sessions completed so far. ${pct>=80?"Elite consistency — this is what gets PBs.":pct>=50?"Solid — protect your key sessions (intervals + long run) first.":"Aim for the two big ones each week: intervals and the long run. The rest is bonus."}</div></div>`;
+  }
+  $("progBody").innerHTML=h;
+}
+function allPRs(){
+  const out=[];
+  const splits=S.workouts.flatMap(w=>(w.splits||[]).filter(s=>s>120).map(s=>({v:s,date:w.date})));
+  if(splits.length){ const b=splits.reduce((a,c)=>c.v<a.v?c:a); out.push({icon:"🏃",name:"Fastest 1 km split",val:fmtSec(b.v),date:b.date}); }
+  const runs=S.workouts.filter(w=>w.type==="run"&&w.distanceKm>=5&&w.durationSec);
+  if(runs.length){ const b=runs.reduce((a,c)=>(c.durationSec/c.distanceKm<a.durationSec/a.distanceKm)?c:a); out.push({icon:"👟",name:"Best run pace (5km+)",val:fmtPace(b.durationSec/b.distanceKm),date:b.date}); }
+  ["ski","row"].forEach(m=>{
+    const es=S.workouts.filter(w=>w.erg&&w.erg.machine===m&&w.erg.meters>=500);
+    if(es.length){ const b=es.reduce((a,c)=>(c.erg.seconds/c.erg.meters<a.erg.seconds/a.erg.meters)?c:a);
+      out.push({icon:m==="ski"?"⛷":"🚣",name:(m==="ski"?"SkiErg":"Row")+" best pace",val:fmtSec(b.erg.seconds/b.erg.meters*500)+"/500m",date:b.date}); }
+  });
+  STATIONS.forEach(st=>{
+    const es=S.workouts.flatMap(w=>(w.stations||[]).filter(s=>s.id===st.id).map(s=>({v:s.time,date:w.date})));
+    if(es.length){ const b=es.reduce((a,c)=>c.v<a.v?c:a); out.push({icon:st.icon,name:st.name+" ("+st.unit+")",val:fmtSec(b.v),date:b.date}); }
+  });
+  const lifts={};
+  S.workouts.forEach(w=>(w.exercises||[]).forEach(e=>{
+    if(!e.kg) return; const k=e.name.toLowerCase();
+    if(!lifts[k]||e.kg>lifts[k].v) lifts[k]={name:e.name,v:e.kg,date:w.date};
+  }));
+  Object.values(lifts).slice(0,5).forEach(l=>out.push({icon:"🏋️",name:l.name,val:l.v+" kg",date:l.date}));
+  return out;
+}
+/* tiny SVG charts */
+function sparkline(vals, lowerIsBetter){
+  const W=300,H=60,P=6;
+  const mn=Math.min(...vals), mx=Math.max(...vals);
+  const x=i=>P+i*(W-2*P)/Math.max(1,vals.length-1);
+  const y=v=>P+(H-2*P)*(1-((v-mn)/((mx-mn)||1)));
+  const pts=vals.map((v,i)=>x(i)+","+y(v)).join(" ");
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:60px;margin-top:8px">
+    <polyline points="${pts}" fill="none" stroke="var(--yellow)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    ${vals.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="3" fill="${i===vals.length-1?"var(--yellow)":"var(--faint)"}"/>`).join("")}
+  </svg>`;
+}
+function barChart(vals, labels){
+  const W=300,H=90,P=4,bw=(W-2*P)/vals.length;
+  const mx=Math.max(...vals,1);
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:90px;margin:8px 0 4px">
+    ${vals.map((v,i)=>{
+      const h=(H-22)*(v/mx), x=P+i*bw;
+      return `<rect x="${x+3}" y="${H-16-h}" width="${bw-6}" height="${Math.max(h,1.5)}" rx="3" fill="${i===vals.length-1?"var(--yellow)":"var(--card2)"}" stroke="${i===vals.length-1?"none":"var(--line)"}"/>
+      <text x="${x+bw/2}" y="${H-4}" text-anchor="middle">${labels[i]||""}</text>
+      ${v>0?`<text x="${x+bw/2}" y="${Math.max(10,H-20-h)}" text-anchor="middle">${v.toFixed(0)}</text>`:""}`;
+    }).join("")}</svg>`;
+}
+
+/* ================================================================
+   RACE — pacing calculator + standards
+   ================================================================ */
+function renderRace(){
+  const gt=$("goalTimeInput");
+  if(!gt.value && S.profile.goalTime) gt.value = fmtSec(S.profile.goalTime, true);
+  renderStandards();
+  if(gt.value) renderPacing();
+}
+function renderPacing(){
+  const sec = parseTime($("goalTimeInput").value);
+  if(!sec || sec<3000 || sec>3600*4){ $("paceOut").innerHTML=`<div class="tiny red">Enter a realistic goal, e.g. 1:30:00 (most first-timers finish 80–110 min).</div>`; return; }
+  S.profile.goalTime = sec; save();
+  const runTotal = sec*PACE_MODEL.runs, perKm = runTotal/8;
+  const rox = sec*PACE_MODEL.rox;
+  let rows = `<tr><th>Segment</th><th class="r">Target</th></tr>`;
+  rows += `<tr><td>🏃 Each 1 km run (avg)</td><td class="r"><b>${fmtSec(perKm)}</b></td></tr>`;
+  rows += `<tr><td style="padding-left:22px" class="tiny">Opening 1 km — go out controlled, no faster than</td><td class="r">${fmtSec(perKm*0.96)}</td></tr>`;
+  STATIONS.forEach(st=>{
+    const t=sec*PACE_MODEL.st[st.id];
+    const load=stationLoad(st.id);
+    rows+=`<tr><td>${st.icon} ${st.name} <span class="tiny">${st.unit}${load?" · "+load:""}</span></td><td class="r"><b>${fmtSec(t)}</b></td></tr>`;
+  });
+  rows += `<tr><td>🔄 Roxzone total (transitions)</td><td class="r"><b>${fmtSec(rox)}</b></td></tr>`;
+  const runsSum=runTotal, stSum=Object.values(PACE_MODEL.st).reduce((a,b)=>a+b,0)*sec;
+  $("paceOut").innerHTML = `<table class="pace">${rows}</table>
+    <div class="tiny" style="margin-top:10px">Split: running ${fmtSec(runsSum,true)} · stations ${fmtSec(stSum,true)} · Roxzone ${fmtSec(rox)}.
+    Based on typical mid-pack distributions — your simulations will tell you where you differ (e.g. strong runner → bank time on runs, protect the sleds).</div>`;
+}
+function renderStandards(){
+  const p=S.profile;
+  $("standardsOut").innerHTML = `<div class="tiny" style="margin-bottom:8px">${p.division.toUpperCase()} · ${p.sex==="m"?"Men's":"Women's"} standards (season 25/26)${p.division==="doubles"?" — Doubles run everything, share station work":""}</div>
+    <table class="pace">${STATIONS.map(st=>{
+      const load=stationLoad(st.id);
+      return `<tr><td>${st.icon} ${st.name}</td><td class="r">${st.unit}</td><td class="r"><b>${load||"—"}</b></td></tr>`;
+    }).join("")}</table>
+    <div class="tiny" style="margin-top:8px">Sled weights include the sled itself. 8 × 1 km of running ties it all together.</div>`;
+}
+
+/* ================================================================
+   SETTINGS
+   ================================================================ */
+function renderSettings(){
+  const p=S.profile;
+  $("settingsBody").innerHTML = `
+  <div class="card">
+    <h2>Profile</h2>
+    <label class="fld"><span class="lbl">Name</span><input id="set_name" value="${esc(p.name)}"></label>
+    <div class="grid2">
+      <label class="fld"><span class="lbl">Race date</span><input type="date" id="set_race" value="${p.raceDate}"></label>
+      <label class="fld"><span class="lbl">Division</span><select id="set_div">
+        <option value="open" ${p.division==="open"?"selected":""}>Open</option>
+        <option value="pro" ${p.division==="pro"?"selected":""}>Pro</option>
+        <option value="doubles" ${p.division==="doubles"?"selected":""}>Doubles</option></select></label>
+    </div>
+    <div class="grid2">
+      <label class="fld"><span class="lbl">Standards</span><select id="set_sex">
+        <option value="m" ${p.sex==="m"?"selected":""}>Men's</option>
+        <option value="f" ${p.sex==="f"?"selected":""}>Women's</option></select></label>
+      <label class="fld"><span class="lbl">Days / week</span><select id="set_days">
+        ${[3,4,5,6].map(d=>`<option ${p.days===d?"selected":""}>${d}</option>`).join("")}</select></label>
+    </div>
+    <label class="fld"><span class="lbl">Recent 5K (mm:ss)</span><input id="set_5k" inputmode="numeric" value="${p.fiveK?fmtSec(p.fiveK):""}" placeholder="25:00"></label>
+    <button class="btn" onclick="saveSettings()">Save profile</button>
+    <div class="tiny" style="margin-top:8px">Changing race date or days/week? Hit "Regenerate" on the Plan tab afterwards to rebuild around them.</div>
+  </div>
+  <div class="card">
+    <h2>Help</h2>
+    <button class="btn sec" onclick="go('guide')">📖 Open the user guide</button>
+  </div>
+  <div class="card">
+    <h2>Reminders</h2>
+    <div class="spread"><span class="small">Training-day notifications</span>
+      <button class="btn ${S.settings.remindersOn?"":"sec"} mini" onclick="toggleReminders()">${S.settings.remindersOn?"On ✓":"Off"}</button></div>
+    <div class="tiny" style="margin-top:8px">Heads-up: browser notifications only fire while the app is open (single-file app, no server). For bulletproof reminders, also set a phone alarm for your training days. 😉</div>
+  </div>
+  <div class="card">
+    <h2>Your data</h2>
+    <p class="tiny" style="margin-bottom:10px">Everything lives on this device only. Export regularly as a backup, or to move to a new phone.</p>
+    <div class="grid2">
+      <button class="btn sec" onclick="exportData()">Export JSON</button>
+      <button class="btn sec" onclick="$('importFile').click()">Import</button>
+    </div>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    <button class="btn danger" style="margin-top:10px" onclick="resetAll()">Reset everything</button>
+  </div>
+  <div class="tiny" style="text-align:center;margin:8px 0 20px">ROXREADY · your data never leaves this device.<br>Share the app: just send friends this HTML file.</div>`;
+}
+function saveSettings(){
+  const p=S.profile;
+  p.name=$("set_name").value.trim()||p.name;
+  p.raceDate=$("set_race").value||p.raceDate;
+  p.division=$("set_div").value; p.sex=$("set_sex").value;
+  p.days=Number($("set_days").value);
+  p.fiveK=parseTime($("set_5k").value)||null;
+  save(); toast("Saved ✓"); go("home");
+}
+function toggleReminders(){
+  if(!S.settings.remindersOn){
+    if("Notification" in window){
+      Notification.requestPermission().then(perm=>{
+        S.settings.remindersOn = perm==="granted";
+        if(perm!=="granted") toast("Notifications blocked by the browser — in-app nudges still work.");
+        save(); renderSettings();
+      });
+      return;
+    }
+    toast("This browser doesn't support notifications — in-app nudges still work.");
+  }
+  S.settings.remindersOn=!S.settings.remindersOn; save(); renderSettings();
+}
+function maybeNotify(){
+  if(!S.settings.remindersOn || !("Notification" in window) || Notification.permission!=="granted") return;
+  const t=todayISO();
+  const todays=[]; S.plan.weeks.forEach(w=>w.sessions.forEach(s=>{if(s.date===t&&!s.done)todays.push(s);}));
+  const already = S.workouts.some(w=>w.date===t);
+  if(todays.length && !already && new Date().getHours()>=16){
+    try{ new Notification("ROXREADY 👊", {body: todays[0].t+" is on the plan today. Short version beats no version."}); }catch(e){}
+  }
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="roxready-backup-"+todayISO()+".json";
+  a.click(); URL.revokeObjectURL(a.href);
+  toast("Backup downloaded ✓");
+}
+function importData(ev){
+  const f=ev.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{
+      const d=JSON.parse(r.result);
+      if(!d.profile||!d.plan) throw 0;
+      S=d; save(); toast("Data imported ✓"); go("home");
+    }catch(e){ toast("That doesn't look like a ROXREADY backup"); } };
+  r.readAsText(f);
+}
+function resetAll(){
+  if(confirm("Delete ALL data — profile, plan and every logged workout? Export a backup first if unsure.")){
+    localStorage.removeItem(LS_KEY); location.reload();
+  }
+}
+
+/* ================================================================
+   ADAPTIVITY — the plan responds to what actually happens
+   ================================================================ */
+function coachLog(msg){ (S.adaptLog=S.adaptLog||[]).push({date:todayISO(), msg}); }
+function coachBanner(){
+  const logs=(S.adaptLog||[]).filter(l=>(fromISO(todayISO())-fromISO(l.date))/DAY<=2).slice(-2);
+  return logs.map(l=>`<div class="coach">🧠 <b>Coach:</b> ${l.msg}</div>`).join("");
+}
+function annotate(s,note){ s.adaptNotes=s.adaptNotes||[]; if(!s.adaptNotes.includes(note)) s.adaptNotes.push(note); }
+function sessText(s){ return (s.adaptNotes&&s.adaptNotes.length? s.adaptNotes.join("\n")+"\n":"")+s.d; }
+
+function adaptPlan(){
+  if(!S.plan) return;
+  const t=todayISO();
+  let changed=false;
+  /* --- daily: reschedule the most recent missed KEY session (last 3 days) --- */
+  if(S.settings.lastAdaptDay!==t){
+    S.settings.lastAdaptDay=t; changed=true;
+    const key=["intervals","brick","sim","run"];
+    let cand=null, candWeek=null;
+    for(const wk of S.plan.weeks) for(const s of wk.sessions){
+      const gap=(fromISO(t)-fromISO(s.date))/DAY;
+      if(!s.done && !s.rescheduled && gap>0 && gap<=3 && key.includes(s.type)){
+        if(!cand || s.date>cand.date){ cand=s; candWeek=wk; }
+      }
+    }
+    if(cand){
+      const wkEnd=dISO(new Date(fromISO(candWeek.start).getTime()+6*DAY));
+      const taken=new Set();
+      S.plan.weeks.forEach(w=>w.sessions.forEach(s=>{ if(!s.done) taken.add(s.date); }));
+      for(let d=0; d<=2; d++){
+        const nd=dISO(new Date(fromISO(t).getTime()+d*DAY));
+        if(nd>wkEnd || nd>=S.profile.raceDate) break;
+        if(!taken.has(nd)){
+          coachLog(`You missed <b>${esc(cand.t)}</b> (${fmtDate(cand.date)}) — I've moved it to <b>${fmtDate(nd)}</b>. One missed session never sinks a plan; pretending it didn't happen does.`);
+          cand.date=nd; cand.rescheduled=true;
+          candWeek.sessions.sort((a,b)=>a.date.localeCompare(b.date));
+          break;
+        }
+      }
+    }
+  }
+  /* --- weekly (first open each week): adjust this week from the last 14 days --- */
+  const wk=weekKey(new Date());
+  if(S.settings.lastWeeklyAdapt!==wk && S.workouts.length>=3){
+    S.settings.lastWeeklyAdapt=wk; changed=true;
+    const from=dISO(new Date(fromISO(t).getTime()-14*DAY));
+    let planned=0, done=0;
+    S.plan.weeks.forEach(w=>w.sessions.forEach(s=>{ if(s.date>=from && s.date<t){ planned++; if(s.done&&!s.skipped) done++; } }));
+    const recent=S.workouts.filter(w=>w.date>=from && w.date<t);
+    const rpes=recent.map(w=>w.rpe).filter(Boolean);
+    const avgRPE=rpes.length? mean(rpes):null;
+    const adherence=planned? done/planned:null;
+    const thisWeek=S.plan.weeks.find(w=>w.start===wk);
+    if(thisWeek){
+      const undone=thisWeek.sessions.filter(s=>!s.done);
+      if(adherence!=null && planned>=3 && adherence<0.5){
+        undone.forEach(s=>annotate(s,"🔻 Adapted down: the last two weeks were patchy, so this week is trimmed ~25% — shorter versions, bottom of every range. Rebuild the rhythm first, then the volume."));
+        coachLog("Rough fortnight — I've trimmed this week ~25% so it's easy to say yes to. Consistency first, heroics later.");
+      } else if(avgRPE!=null && rpes.length>=3 && avgRPE>=8.5){
+        undone.forEach(s=>annotate(s,"🔻 Adapted down: recent sessions all felt very hard (avg RPE "+avgRPE.toFixed(1)+"). Cut a round or a couple of reps everywhere, and keep runs conversational this week."));
+        coachLog("Everything's been feeling brutal (avg RPE "+avgRPE.toFixed(1)+") — I've eased this week off before your body does it for you.");
+      } else if(adherence!=null && adherence>=0.85 && avgRPE!=null && avgRPE<=6.5 && recent.length>=4){
+        undone.forEach(s=>annotate(s,"🔺 Adapted up: you're cruising — add one round, or take the top of every range this week."));
+        coachLog("You've hit "+Math.round(adherence*100)+"% of sessions and they're feeling comfortable — this week nudges up. Earned.");
+      }
+    }
+  }
+  if(changed) save();
+}
+
+/* --- daily energy check-in (feeds adaptivity) --- */
+const FACES=["","😵","😮‍💨","😐","🙂","🔥"];
+function renderCheckin(){
+  const today=(S.checkins||[]).find(c=>c.date===todayISO());
+  if(today) return `<div class="card flat"><span class="small">Checked in: ${FACES[today.energy]} ${today.energy<=2?"— easy-day mode. Moving at all is the win today.":today.energy>=4?"— green light. Go get it. 👊":""}</span></div>`;
+  return `<div class="card flat"><div class="spread">
+    <span class="small"><b>Check-in:</b> energy today?</span>
+    <div class="rowflex" style="gap:4px">${[1,2,3,4,5].map(e=>`<button class="chip" style="padding:6px 9px" onclick="saveCheckin(${e})">${FACES[e]}</button>`).join("")}</div>
+  </div></div>`;
+}
+function saveCheckin(e){
+  (S.checkins=S.checkins||[]).push({date:todayISO(), energy:e});
+  if(e<=2){
+    const t=fromISO(todayISO());
+    for(const wk of S.plan.weeks) for(const s of wk.sessions){
+      const gap=(fromISO(s.date)-t)/DAY;
+      if(!s.done && gap>=0 && gap<=1) annotate(s,"🔻 You checked in running on empty — do the easiest version: half the volume, everything conversational. Or take the rest day; the plan adapts.");
+    }
+    coachLog("Low battery today — I've softened the next day or two. An easy session beats a skipped week.");
+  }
+  save(); renderHome();
+  toast(e<=2? "Noted — plan eased for a day or two 💛" : "Logged ✓");
+}
+
+/* ================================================================
+   PACE TARGETS + SIMULATION REPORT (F-3)
+   ================================================================ */
+function paceTargets(){
+  let total=S.profile.goalTime, assumed=false;
+  if(!total){
+    const fkp=S.profile.fiveK? S.profile.fiveK/5:330;
+    total=Math.round(fkp*1.10*8/PACE_MODEL.runs); assumed=true;
+  }
+  const st={}; STATIONS.forEach(s=>st[s.id]=total*PACE_MODEL.st[s.id]);
+  return {total, perKm: total*PACE_MODEL.runs/8, rox: total*PACE_MODEL.rox, st, assumed};
+}
+function simReportHTML(w){
+  const T=paceTargets(), half=w.simKind==="half", f=half?0.5:1;
+  const bits=[];
+  if(w.splits && w.splits.length>=4){
+    const n=w.splits.length, h1=w.splits.slice(0,Math.ceil(n/2)), h2=w.splits.slice(Math.ceil(n/2));
+    const fade=(mean(h2)-mean(h1))/mean(h1)*100;
+    bits.push(fade>8? `<b class="red">Fade: ${fade.toFixed(0)}%</b> — you slowed a lot in the back half. The opening was too hot: start around ${fmtSec(mean(h1)*1.05)}/km next time and aim to negative-split.`
+      : fade>3? `<b class="yellow">Fade: ${fade.toFixed(0)}%</b> — mild slowdown in the back half. Slightly cooler start, and more compromised-run work.`
+      : `<b class="green">Pacing: excellent</b> — back half within ${Math.abs(fade).toFixed(0)}% of the front. That's how it's done.`);
+    const worst=w.splits.indexOf(Math.max(...w.splits));
+    bits.push(`Slowest run: <b>Run ${worst+1}</b> (${fmtSec(w.splits[worst])})${(!half && worst>0)? ` — that's the one after ${STATIONS[worst-1].name}; train running straight off that station.`:""}`);
+    bits.push(`Avg run split <b>${fmtSec(mean(w.splits))}</b> vs your ${fmtSec(T.perKm)} target (${mean(w.splits)-T.perKm>0?"+":""}${Math.round(mean(w.splits)-T.perKm)} s/km).`);
+  }
+  if(w.stations && w.stations.length){
+    const rows=w.stations.map(s=>{
+      const st=STATIONS.find(x=>x.id===s.id), tgt=T.st[s.id]*f, d=s.time-tgt;
+      return {st, s, tgt, d, pct:d/tgt*100};
+    });
+    bits.push(`<table class="pace"><tr><th>Station</th><th class="r">You</th><th class="r">Target</th><th class="r">Δ</th></tr>`
+      + rows.map(r=>`<tr><td>${r.st.icon} ${r.st.name}</td><td class="r">${fmtSec(r.s.time)}</td><td class="r">${fmtSec(r.tgt)}</td>
+        <td class="r" style="color:${r.d<=0?"var(--green)":r.pct>12?"var(--red)":"var(--orange)"}">${r.d>0?"+":""}${Math.round(r.d)}s</td></tr>`).join("")
+      + `</table>`);
+    const bad=rows.filter(r=>r.pct>12).sort((a,b)=>b.pct-a.pct).slice(0,2);
+    if(bad.length) bits.push(`🎯 Time is leaking at <b>${bad.map(r=>r.st.name).join(" and ")}</b> — give ${bad.length>1?"them":"it"} a dedicated weekly slot in the next block.`);
+    else if(w.stations.length>=4) bits.push(`✅ Stations on or ahead of target — your race will be won by holding run pace.`);
+  }
+  if(w.roxzone){
+    const rt=T.rox*f, d=w.roxzone-rt;
+    bits.push(`Roxzone <b>${fmtSec(w.roxzone)}</b> vs ~${fmtSec(rt)} expected${d>30? ` — <b class="yellow">${fmtSec(d)} lost in transitions</b>. That's free time: walk with purpose, know the layout, no faffing.` : " — transitions are tight ✓"}`);
+  }
+  if(!bits.length) return "";
+  if(T.assumed) bits.push(`<span class="tiny">Targets estimated from your 5K — set a goal time in the Race tab for sharper analysis.</span>`);
+  return `<div class="card flat" style="margin-top:6px;background:var(--card2)">
+    <h3 style="margin-bottom:8px">📊 Simulation report${half?" (half — targets scaled ×0.5)":""}</h3>`
+    + bits.map(b=>`<div class="small" style="margin-bottom:8px">${b}</div>`).join("") + `</div>`;
+}
+
+/* ================================================================
+   STRENGTHS & WEAKNESSES RADAR (D-2)
+   ================================================================ */
+function radarData(){
+  const T=paceTargets();
+  const axes=[];
+  const splitPool=S.workouts.flatMap(w=>(w.splits||[])).filter(s=>s>150&&s<900);
+  if(splitPool.length>=3){
+    const sorted=[...splitPool].sort((a,b)=>a-b);
+    const med=sorted[Math.floor(sorted.length/2)];
+    axes.push({id:"run", name:"Run", ratio:T.perKm/med});
+  }
+  STATIONS.forEach(st=>{
+    const times=S.workouts.flatMap(w=>(w.stations||[]).filter(x=>x.id===st.id)
+      .map(x=> w.simKind==="half" ? x.time*2 : x.time));
+    if(times.length) axes.push({id:st.id, name:st.name.replace("Burpee Broad Jump","Burpees").replace("Sandbag ",""), ratio:T.st[st.id]/Math.min(...times)});
+  });
+  return {axes, assumed:T.assumed};
+}
+const RADAR_ADVICE={
+  run:"add one more easy run per week — cheapest engine gains there are",
+  ski:"erg intervals: 6 × 500 m at target pace, 1:1 rest",
+  row:"erg intervals: 6 × 500 m at target pace, 1:1 rest",
+  push:"heavy sled pushes, or squats + lunges if no sled",
+  pull:"sled pulls, heavy rows and grip work",
+  bbj:"burpee capacity: EMOM 6–10 burpee broad jumps for 8 min",
+  farmers:"heavy carries + grip endurance",
+  lunges:"weighted walking lunges — volume over load",
+  wb:"EMOM wall balls: 10–15 per minute for 8–10 min"};
+function radarCard(){
+  const {axes, assumed}=radarData();
+  if(axes.length<3) return `<div class="card"><div class="statlbl">Strengths & weaknesses</div>
+    <div class="tiny" style="margin-top:6px">Log station times and run splits (a simulation is perfect) and your strengths-vs-weaknesses radar appears here.</div></div>`;
+  const N=axes.length, cx=150, cy=105, R=72;
+  const pt=(i,r)=>{ const a=-Math.PI/2 + i*2*Math.PI/N; return (cx+r*Math.cos(a)).toFixed(1)+","+(cy+r*Math.sin(a)).toFixed(1); };
+  const norm=x=>{ const c=Math.max(.7,Math.min(1.3,x)); return .2+(c-.7)/.6*.8; };
+  const rings=[.33,.66,1].map(f=>`<polygon points="${axes.map((_,i)=>pt(i,R*f)).join(" ")}" fill="none" stroke="var(--line)"/>`).join("");
+  const spokes=axes.map((_,i)=>`<line x1="${cx}" y1="${cy}" x2="${pt(i,R).split(",")[0]}" y2="${pt(i,R).split(",")[1]}" stroke="var(--line)"/>`).join("");
+  const poly=axes.map((ax,i)=>pt(i,R*norm(ax.ratio))).join(" ");
+  const labels=axes.map((ax,i)=>{ const [x,y]=pt(i,R+16).split(","); return `<text x="${x}" y="${y}" text-anchor="middle">${ax.name}</text>`; }).join("");
+  const weakest=axes.reduce((a,c)=>c.ratio<a.ratio?c:a);
+  const strongest=axes.reduce((a,c)=>c.ratio>a.ratio?c:a);
+  return `<div class="card"><div class="statlbl">Strengths & weaknesses vs goal pace</div>
+    <svg viewBox="0 0 300 215" style="width:100%">${rings}${spokes}
+      <polygon points="${poly}" fill="rgba(255,214,10,.22)" stroke="var(--yellow)" stroke-width="2"/>${labels}</svg>
+    <div class="tiny">💪 Strongest: <b>${strongest.name}</b> · 🎯 Focus: <b>${weakest.name}</b> — ${RADAR_ADVICE[weakest.id]||"give it a weekly slot"}.
+    ${assumed?" (No goal time set — comparing to an estimate from your 5K. Set one in the Race tab.)":""}</div></div>`;
+}
+
+/* ================================================================
+   PLAN SESSION EDITING (B-3)
+   ================================================================ */
+let sessCtx=null;
+function weekForDate(dateISO){
+  for(const w of S.plan.weeks){
+    const end=dISO(new Date(fromISO(w.start).getTime()+6*DAY));
+    if(dateISO>=w.start && dateISO<=end) return w;
+  }
+  return null;
+}
+function openSessEdit(id, weekIdx){
+  const s=id? findSession(id):null;
+  sessCtx={id};
+  const defDate = s? s.date : (weekIdx!=null? (S.plan.weeks[weekIdx].start>=todayISO()? S.plan.weeks[weekIdx].start : todayISO()) : todayISO());
+  $("sessSheet").innerHTML=`
+    <div class="spread" style="margin-bottom:12px"><h2 style="margin:0">${s?"Edit session":"Add session"}</h2>
+    <button class="btn sec mini" onclick="$('sessModal').classList.remove('open')">✕</button></div>
+    <label class="fld"><span class="lbl">Title</span><input id="se_title" value="${s?esc(s.t):""}" placeholder="e.g. Tempo Run"></label>
+    <div class="grid2">
+      <label class="fld"><span class="lbl">Type</span><select id="se_type">${WTYPES.map(w=>`<option value="${w.id}" ${s&&s.type===w.id?"selected":""}>${w.icon} ${w.name}</option>`).join("")}</select></label>
+      <label class="fld"><span class="lbl">Date</span><input type="date" id="se_date" value="${defDate}"></label>
+    </div>
+    <label class="fld"><span class="lbl">Instructions</span><textarea id="se_d" rows="5" placeholder="What to do…">${s?esc(s.d):""}</textarea></label>
+    <button class="btn" onclick="saveSessEdit()">Save</button>
+    ${s?`<div class="grid2" style="margin-top:8px">
+      <button class="btn sec" onclick="duplicateSess('${s.id}')">Duplicate</button>
+      <button class="btn danger" onclick="deleteSess('${s.id}')">Delete</button></div>`:""}`;
+  $("sessModal").classList.add("open");
+}
+function saveSessEdit(){
+  const title=$("se_title").value.trim(), type=$("se_type").value, date=$("se_date").value, d=$("se_d").value.trim();
+  if(!date){ toast("Pick a date"); return; }
+  const s = sessCtx.id? findSession(sessCtx.id):null;
+  if(s){
+    const oldWeek=weekForDate(s.date), newWeek=weekForDate(date)||oldWeek;
+    s.t=title||wtype(type).name; s.type=type; s.d=d;
+    if(oldWeek && newWeek && oldWeek!==newWeek){
+      oldWeek.sessions=oldWeek.sessions.filter(x=>x.id!==s.id);
+      newWeek.sessions.push(s);
+    }
+    s.date=date;
+    (newWeek||oldWeek).sessions.sort((a,b)=>a.date.localeCompare(b.date));
+  } else {
+    const wkTarget=weekForDate(date);
+    if(!wkTarget){ toast("That date is outside your plan"); return; }
+    wkTarget.sessions.push({id:uid(), day:0, type, t:title||wtype(type).name, d, date, done:false, workoutId:null, custom:true});
+    wkTarget.sessions.sort((a,b)=>a.date.localeCompare(b.date));
+  }
+  save(); $("sessModal").classList.remove("open"); renderPlan(); toast("Plan updated ✓");
+}
+function deleteSess(id){
+  if(!confirm("Remove this session from the plan?")) return;
+  S.plan.weeks.forEach(w=>w.sessions=w.sessions.filter(s=>s.id!==id));
+  save(); $("sessModal").classList.remove("open"); renderPlan(); toast("Removed");
+}
+function duplicateSess(id){
+  const s=findSession(id); if(!s) return;
+  const nd=dISO(new Date(fromISO(s.date).getTime()+DAY));
+  const wk=weekForDate(nd); if(!wk){ toast("No room after this one"); return; }
+  wk.sessions.push({id:uid(), day:0, type:s.type, t:s.t, d:s.d, date:nd, done:false, workoutId:null, custom:true});
+  wk.sessions.sort((a,b)=>a.date.localeCompare(b.date));
+  save(); $("sessModal").classList.remove("open"); renderPlan(); toast("Duplicated to "+fmtDate(nd));
+}
+
+/* ================================================================
+   IN-APP USER GUIDE
+   ================================================================ */
+function renderGuide(){
+  $("guideBody").innerHTML = `
+  <div class="card">
+    <h2>The 60-second version</h2>
+    <p><b>1.</b> Check <b>Home</b> each day — it shows today's session (or rest day) and your streak.<br>
+    <b>2.</b> Train, then hit <b>“Log this session”</b> — logging takes ~20 seconds.<br>
+    <b>3.</b> Once a week, glance at <b>Progress</b> to see if you're getting faster and steadier.<br>
+    <b>4.</b> Every 4–6 weeks do the <b>simulation</b> in your plan and read its report.<br>
+    That's the whole system. Consistency does the rest.</p>
+  </div>
+  <div class="card guide">
+    <h2>🏠 Home</h2>
+    <p><b>Race countdown & phase</b> — your plan runs base → build → specific → taper. Each phase has a job; trust it.</p>
+    <p><b>Streak</b> — counts <i>weeks</i> where you hit your session goal (your training days minus one, so one busy day never ruins it). Rest days never break a streak, and you get one grace week a month. Missing a week just means you start a new streak — no guilt, just restart.</p>
+    <p><b>Check-in</b> — tap an energy emoji each day. If you report running on empty, the coach automatically eases the next day or two.</p>
+    <p><b>🧠 Coach messages</b> — when the plan adapts (missed session rescheduled, week trimmed or nudged up), it tells you here in plain language.</p>
+  </div>
+  <div class="card guide">
+    <h2>▤ Plan</h2>
+    <p><b>Phases:</b> <span class="pill base">base</span> builds your engine (easy volume), <span class="pill build">build</span> adds Hyrox loads and compromised runs, <span class="pill specific">specific</span> is everything at race pace, <span class="pill taper">taper</span> is rest — the fitness is already banked. Deload weeks every 4th week are intentional: back off so you can absorb the work.</p>
+    <p><b>Adaptivity:</b> miss a key session and it gets rescheduled within the week. Crush two good weeks and the next one nudges up. Struggle for two weeks and it trims itself ~25%. Every change is explained.</p>
+    <p><b>Make it yours:</b> tap any session → <b>Edit</b> to change it, <b>+ add</b> on a week header to add your own, Duplicate/Delete as needed. Train your own way — the plan is a scaffold, not a contract.</p>
+  </div>
+  <div class="card guide">
+    <h2>＋ Logging (the important habit)</h2>
+    <p>Tap the yellow <b>+</b>. Pick the session type. Fill only what you have — everything is optional except the basics.</p>
+    <p><b>Run splits matter most.</b> Whenever you run 1 km repeats or a simulation, enter each split. Split consistency is the single best predictor of a good Hyrox, and it's the headline number on your Progress tab.</p>
+    <p><b>Station times:</b> log them at full race distance when you can (e.g. full 50 m sled push, 100 wall balls) so comparisons stay honest. Your division's loads are shown on each station.</p>
+    <p><b>RPE</b> (1 = stroll, 10 = collapse) takes one tap and powers the adaptive coach — always tap it.</p>
+  </div>
+  <div class="card guide">
+    <h2>◔ Progress</h2>
+    <p><b>Split consistency (CV%)</b> — how even your 1 km splits are. Under 5% = metronome, racing well. Over 9% = pacing or engine issue.</p>
+    <p><b>Radar</b> — your strengths vs weaknesses compared to your goal pace. The “Focus” suggestion is what to add to your week.</p>
+    <p><b>Volume</b> — build gradually (~10%/week max). The chart makes big risky jumps obvious.</p>
+    <p><b>PRs and adherence</b> — proof it's working. 80%+ adherence is elite.</p>
+  </div>
+  <div class="card guide">
+    <h2>⚑ Race day</h2>
+    <p>Set a goal time → get per-run pace and per-station targets. Go out <b>no faster</b> than the suggested opening kilometre — every minute you steal early costs two at wall balls.</p>
+    <p>After each simulation the app writes a <b>report</b>: fade analysis, station-by-station vs target, Roxzone time. Do a sim every 4–6 weeks and let the report pick your next focus.</p>
+  </div>
+  <div class="card guide">
+    <h2>💾 Your data & sharing</h2>
+    <p>Everything lives <b>on this device only</b> — nothing is uploaded anywhere. Two consequences:</p>
+    <p><b>Back up</b>: Settings → Export JSON now and then (and before switching phones — Import restores everything).</p>
+    <p><b>Share with friends</b>: send them this HTML file (WhatsApp, email, AirDrop). They open it in a browser, get their own onboarding, their own plan, their own private data. On a phone, use the browser menu → <b>“Add to Home Screen”</b> to make it feel like a real app.</p>
+  </div>
+  <div class="card guide">
+    <h2>❓ FAQ</h2>
+    <p><b>No notification arrived?</b> Browser notifications only work while the app is open. Set a phone alarm for training days as backup.</p>
+    <p><b>Race date changed / different days per week?</b> Update Settings, then Plan → Regenerate.</p>
+    <p><b>Numbers in kg?</b> Yes — official Hyrox standards are metric.</p>
+    <p><b>I train my own way.</b> Great — skip the plan entirely, just log. Streaks, PRs, radar and reports all work off your logs.</p>
+  </div>`;
+}
+
+/* ================================================================
+   BOOT
+   ================================================================ */
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{ if(e.target===m) m.classList.remove("open"); }));
+if(!S.profile){ startOnboarding(); }
+else { adaptPlan(); go("home"); maybeNotify(); }
+</script>
+</body>
+</html>
