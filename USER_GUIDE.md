@@ -65,6 +65,10 @@ The plan **adapts by itself**: miss a key session → it's rescheduled within th
 
 Send them the `index.html` file (WhatsApp, email, AirDrop, USB — anything). Each person gets their own onboarding, their own plan, and their own private data on their own device. Nothing is shared between phones.
 
+## Apple Watch import
+
+Settings → **Apple Watch & Health** walks you through a one-time Apple **Shortcut** that opens the app with your latest workout's data in the URL. The app maps it to the right session type and, if it fits, ticks off that day's planned Hyrox session automatically. It's the best a web app can do today; fully seamless HealthKit sync needs the native app-store build (Stage 4). Tap **Try a sample import** in Settings to see it work.
+
 ## Backup / moving phones
 
 Settings → **Export JSON** downloads everything. On the new device: open the app → Settings → **Import** → pick the file. Done.

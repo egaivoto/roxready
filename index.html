@@ -271,6 +271,12 @@ a{color:var(--yellow)}
     <div id="techBody"></div>
   </div>
 
+  <!-- ============ ADMIN (hidden — #admin or 5 taps on Settings footer) ============ -->
+  <div class="view" id="v-admin">
+    <div id="adminBody"></div>
+    <input type="file" id="cohortFile" accept=".json" multiple style="display:none" onchange="importCohort(event)">
+  </div>
+
   <!-- bottom nav -->
   <div id="nav"><div class="inner">
     <button class="navbtn" data-v="home" onclick="go('home')"><span class="ic">⌂</span>Home</button>
@@ -376,6 +382,22 @@ function load(){
 }
 function save(){ localStorage.setItem(LS_KEY, JSON.stringify(S)); }
 
+/* ---------- usage analytics (LOCAL ONLY — nothing leaves the device) ----------
+   Records feature usage on this device so the owner can audit what's useful vs
+   wasteful. Cross-user aggregation is done by importing each user's export in
+   the hidden admin dashboard. Automatic cohort collection would need a backend. */
+let _saveT=null;
+function scheduleSave(){ clearTimeout(_saveT); _saveT=setTimeout(save, 700); }
+function track(ev, meta){
+  if(!S.analytics) S.analytics={installedAt:todayISO(), events:[], counts:{}, days:{}};
+  const a=S.analytics;
+  a.counts[ev]=(a.counts[ev]||0)+1;
+  a.days[todayISO()]=true;
+  a.events.push({t:Date.now(), ev, meta:meta||null});
+  if(a.events.length>1500) a.events=a.events.slice(-1500);
+  scheduleSave();
+}
+
 /* ---------- utils ---------- */
 const $ = id => document.getElementById(id);
 const esc = s => String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -447,9 +469,13 @@ const OB_STEPS = [
   {key:"days", q:"How many days a week can you realistically train?", sub:"Be honest — consistency beats ambition. You can change this later.", type:"opts", opts:[
     ["3","3 days","The essentials, done well"],["4","4 days","The sweet spot for most"],
     ["5","5 days","Serious build"],["6","6 days","Full send"]]},
-  {key:"equipment", q:"What equipment can you access?", sub:"Sessions adapt — no sled, no problem.", type:"multi", opts:[
-    ["ski","SkiErg"],["row","Rower"],["sled","Sled"],["wb","Wall ball"],
-    ["kb","Kettlebells / dumbbells"],["sandbag","Sandbag"],["run","Somewhere to run"]]},
+  {key:"equipment", q:"What equipment can you access?", sub:"Pick everything you've got — sessions adapt to it. Full gym? Hit Select all.", type:"multi", opts:[
+    ["run","Somewhere to run"],["treadmill","Treadmill"],
+    ["ski","SkiErg"],["row","Rower"],["bike","Air / assault bike"],
+    ["sled","Sled"],["wb","Wall ball"],["sandbag","Sandbag"],
+    ["dumbbells","Dumbbells"],["kettlebells","Kettlebells"],["barbell","Barbell & plates"],
+    ["pullup","Pull-up bar"],["box","Plyo / jump box"],["medball","Medicine ball"],
+    ["bands","Resistance bands"],["rope","Jump rope"],["bench","Bench"]]},
   {key:"classes", q:"Do you train at a fitness studio?", sub:"HIIT, circuit or functional classes (e.g. a 45-min studio session). We'll build your plan around them instead of double-booking your body.", type:"opts", opts:[
     ["0","No / rarely","Just my own training"],
     ["1","~1 a week","The odd class"],
@@ -472,9 +498,14 @@ function renderOb(){
   }
   else if(st.type==="opts") h += st.opts.map(o=>
     `<button class="optbtn ${obData[st.key]===o[0]?'on':''}" onclick="obPick('${o[0]}')">${o[1]}${o[2]?`<span class="sub">${o[2]}</span>`:""}</button>`).join("");
-  else if(st.type==="multi") h += `<div>` + st.opts.map(o=>{
-    const on = (obData[st.key]||[]).includes(o[0]);
-    return `<button class="optbtn ${on?'on':''}" onclick="obToggle('${o[0]}')">${on?'✓ ':''}${o[1]}</button>`;}).join("") + `</div>`;
+  else if(st.type==="multi"){
+    const sel = obData[st.key]||[];
+    const allOn = sel.length===st.opts.length;
+    h += `<button class="btn sec" style="margin-bottom:12px" onclick="obSelectAll(${allOn?'false':'true'})">${allOn?'Clear all':'✓ Select all'}</button>`;
+    h += `<div>` + st.opts.map(o=>{
+      const on = sel.includes(o[0]);
+      return `<button class="optbtn ${on?'on':''}" onclick="obToggle('${o[0]}')">${on?'✓ ':''}${o[1]}</button>`;}).join("") + `</div>`;
+  }
   if(st.optional) h += `<button class="btn sec" style="margin-top:6px" onclick="obSkip()">Skip for now</button>`;
   $("obBody").innerHTML = h;
   $("obNext").textContent = obStep===OB_STEPS.length-1 ? "Build my plan →" : "Continue";
@@ -484,6 +515,11 @@ function obPick(v){ obData[OB_STEPS[obStep].key]=v; renderOb(); setTimeout(obNex
 function obToggle(v){
   const k=OB_STEPS[obStep].key; obData[k]=obData[k]||[];
   const i=obData[k].indexOf(v); i>=0 ? obData[k].splice(i,1) : obData[k].push(v);
+  renderOb();
+}
+function obSelectAll(on){
+  const st=OB_STEPS[obStep];
+  obData[st.key] = on ? st.opts.map(o=>o[0]) : [];
   renderOb();
 }
 function obSkip(){ delete obData[OB_STEPS[obStep].key]; obAdvance(); }
@@ -655,6 +691,7 @@ function weekSessions(p, ph, deload, sim, wkIdx, totalWeeks){
    NAVIGATION
    ================================================================ */
 function go(v){
+  track("view:"+v);
   document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
   $("v-"+v).classList.add("active");
   document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("on", b.dataset.v===v));
@@ -668,6 +705,7 @@ function go(v){
   if(v==="settings") renderSettings();
   if(v==="guide") renderGuide();
   if(v==="technique") renderTechnique();
+  if(v==="admin") renderAdmin();
 }
 
 /* ================================================================
@@ -679,8 +717,8 @@ function renderTopBar(v){
   const p=S.profile;
   if(!p){ bar.querySelector(".tbInner").innerHTML=""; return; }
   const first=(p.name||"Athlete").split(" ")[0];
-  const titles={home:"Hey "+first+" 👊", plan:"Plan", log:"Log session", prog:"Progress", race:"Race day", settings:"Settings", guide:"Guide", technique:"Technique & form"};
-  const secondary=(v==="settings"||v==="guide"||v==="technique");
+  const titles={home:"Hey "+first+" 👊", plan:"Plan", log:"Log session", prog:"Progress", race:"Race day", settings:"Settings", guide:"Guide", technique:"Technique & form", admin:"📊 Admin"};
+  const secondary=(v==="settings"||v==="guide"||v==="technique"||v==="admin");
   let left, right;
   if(secondary){
     left=`<button class="tbIcon bare" onclick="go('home')" aria-label="Back">‹</button>
@@ -698,6 +736,7 @@ function renderTopBar(v){
   bar.querySelector(".tbInner").innerHTML=`<div class="tbLeft">${left}</div><div class="tbRight">${right}</div>`;
 }
 function comingSoon(which){
+  track("tap:"+which);
   const msgs={
     upgrade:"✦ Premium is on the way — extra adaptivity, cloud sync and coach features. You're an early user, so you'll get a fair deal. 💛",
     alerts:"🔔 Push notifications arrive with cloud accounts (Stage 3). For now, set reminders in Settings + a phone alarm.",
@@ -1176,7 +1215,7 @@ function saveLog(){
   if(logCtx.editId){
     const i=S.workouts.findIndex(x=>x.id===logCtx.editId);
     if(i>=0) S.workouts[i]=w;
-  } else S.workouts.push(w);
+  } else { S.workouts.push(w); track("log", {type, source:w.source||"manual"}); }
   // mark plan session done
   if(logCtx.planSessionId){
     const s=findSession(logCtx.planSessionId);
@@ -1250,7 +1289,7 @@ function histCard(w){
   const t=wtype(w.type);
   return `<div class="hist" onclick="openDetail('${w.id}')">
     <div class="typeic">${t.icon}</div>
-    <div style="flex:1"><div style="font-weight:700;font-size:14.5px">${t.name}${w.simKind?` (${w.simKind})`:""}</div>
+    <div style="flex:1"><div style="font-weight:700;font-size:14.5px">${t.name}${w.simKind?` (${w.simKind})`:""}${w.source==="watch"?' <span class="tiny">⌚</span>':""}</div>
     <div class="small">${fmtDate(w.date)} · ${lastSummary(w)}${w.rpe?` · RPE ${w.rpe}`:""}</div></div>
     <div class="tiny">›</div></div>`;
 }
@@ -1456,7 +1495,7 @@ function renderRace(){
 function renderPacing(){
   const sec = parseTime($("goalTimeInput").value);
   if(!sec || sec<3000 || sec>3600*4){ $("paceOut").innerHTML=`<div class="tiny red">Enter a realistic goal, e.g. 1:30:00 (most first-timers finish 80–110 min).</div>`; return; }
-  S.profile.goalTime = sec; save();
+  S.profile.goalTime = sec; save(); track("pacing_calc");
   const runTotal = sec*PACE_MODEL.runs, perKm = runTotal/8;
   const rox = sec*PACE_MODEL.rox;
   let rows = `<tr><th>Segment</th><th class="r">Target</th></tr>`;
@@ -1521,6 +1560,20 @@ function renderSettings(){
     <button class="btn sec" style="margin-top:8px" onclick="startTutorial()">🗺️ Replay the tutorial</button>
   </div>
   <div class="card">
+    <h2>⌚ Apple Watch &amp; Health</h2>
+    <p class="tiny" style="margin-bottom:10px">Auto-import your watch workouts and have them matched to that day's planned Hyrox session. Set it up once with a free Apple <b>Shortcut</b>:</p>
+    <div class="small" style="line-height:1.7">
+      1. iPhone → <b>Shortcuts</b> app → new Automation (or Shortcut).<br>
+      2. Add action <b>Find Health Samples → Workouts</b> (latest 1).<br>
+      3. Add <b>Open URLs</b> with:<br>
+      <code style="font-size:11px;word-break:break-all;color:var(--yellow)">https://egaivoto.github.io/roxready/?wtype=[Type]&amp;dur=[Duration in sec]&amp;km=[Distance]&amp;hr=[Avg HR]&amp;date=[Date yyyy-mm-dd]</code><br>
+      …inserting the workout's values as magic variables.<br>
+      4. Run it after a workout — the app opens and logs it. 👊
+    </div>
+    <button class="btn sec" style="margin-top:12px" onclick="testWatchImport()">Try a sample import</button>
+    <div class="tiny" style="margin-top:8px">Note: this is the best a web app can do today. Seamless, automatic HealthKit sync (no Shortcut, background) needs the native app-store build — that's Stage 4. Tip: open the app in Safari for imports; an installed icon may use separate storage.</div>
+  </div>
+  <div class="card">
     <h2>Reminders</h2>
     <div class="spread"><span class="small">Training-day notifications</span>
       <button class="btn ${S.settings.remindersOn?"":"sec"} mini" onclick="toggleReminders()">${S.settings.remindersOn?"On ✓":"Off"}</button></div>
@@ -1536,7 +1589,7 @@ function renderSettings(){
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
     <button class="btn danger" style="margin-top:10px" onclick="resetAll()">Reset everything</button>
   </div>
-  <div class="tiny" style="text-align:center;margin:8px 0 20px">ROXREADY · your data never leaves this device.<br>Share the app: just send friends this HTML file.</div>`;
+  <div class="tiny" style="text-align:center;margin:8px 0 20px" onclick="adminTap()">ROXREADY · your data never leaves this device.<br>Share the app: just send friends this HTML file.</div>`;
 }
 function saveSettings(){
   const p=S.profile;
@@ -1572,6 +1625,7 @@ function maybeNotify(){
   }
 }
 function exportData(){
+  track("export");
   const blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
@@ -1588,6 +1642,45 @@ function importData(ev){
       S=d; save(); toast("Data imported ✓"); go("home");
     }catch(e){ toast("That doesn't look like a ROXREADY backup"); } };
   r.readAsText(f);
+}
+/* ---------- Apple Watch / Health import via URL (works with an Apple Shortcut) ----------
+   A Shortcut reads the last workout and opens:
+   .../?wtype=Running&dur=2880&km=8&hr=155&date=2026-07-05
+   We map the watch workout to the right Hyrox session type and link it to that
+   day's planned session so it counts toward the plan, streak and progress. */
+const WATCH_MAP={running:"run",trailrunning:"run",walking:"run",hiking:"run",
+  rowing:"erg",indoorrowing:"erg",
+  hiit:"class",functionalstrengthtraining:"strength",traditionalstrengthtraining:"strength",strengthtraining:"strength",
+  crosstraining:"class",functional:"class",elliptical:"class",cycling:"class",indoorcycling:"class",cardio:"class",stairclimbing:"class",coretraining:"class"};
+function clearImportUrl(){ try{ history.replaceState(null,"",location.pathname); }catch(e){} }
+function testWatchImport(){
+  location.hash="#w?wtype=Running&dur=2880&km=8&hr=158&date="+todayISO();
+  importFromParams();
+  setTimeout(()=>go("home"), 200);
+}
+function importFromParams(){
+  let qs=location.search.slice(1);
+  if(!qs && location.hash.startsWith("#w?")) qs=location.hash.slice(3);
+  if(!qs) return;
+  const p=new URLSearchParams(qs);
+  const raw=p.get("wtype"); if(!raw) return;
+  const dur=Number(p.get("dur"))||null, km=p.get("km")?parseFloat(p.get("km")):null, hr=Number(p.get("hr"))||null;
+  const date=/^\d{4}-\d{2}-\d{2}$/.test(p.get("date")||"")? p.get("date"):todayISO();
+  let type=WATCH_MAP[raw.toLowerCase().replace(/[^a-z]/g,"")]||"run";
+  // dedupe repeat opens of the same URL
+  if(S.workouts.some(w=>w.source==="watch"&&w.date===date&&Math.abs((w.durationSec||0)-(dur||0))<30)){ clearImportUrl(); return; }
+  // fill the matching planned Hyrox session if one fits that day
+  const fam={run:["run","intervals","brick"],erg:["erg"],strength:["strength"],class:["class","strength","stations"]};
+  let ps=null;
+  for(const wk of S.plan.weeks){ for(const s of wk.sessions){ if(!s.done&&s.date===date&&fam[type].includes(s.type)){ ps=s; type=s.type; break; } } if(ps) break; }
+  const w={ id:uid(), type, date, source:"watch", title:null,
+    notes:"⌚ Imported from Apple Watch"+(hr?` · avg HR ${hr}`:""), rpe:null,
+    durationSec:dur||null, distanceKm:(type==="run"||type==="intervals")?(km||null):null, avgHr:hr||null, splits:[] };
+  if(type==="erg"&&dur) w.erg={machine:"row", meters:km?Math.round(km*1000):1000, seconds:dur};
+  S.workouts.push(w); track("watch_import",{type,raw});
+  if(ps){ ps.done=true; ps.skipped=false; ps.workoutId=w.id; }
+  save(); clearImportUrl();
+  setTimeout(()=>toast("⌚ Watch workout imported"+(ps?` and matched to today's <b>${esc(ps.t)}</b>`:"")), 500);
 }
 function resetAll(){
   if(confirm("Delete ALL data — profile, plan and every logged workout? Export a backup first if unsure.")){
@@ -1698,6 +1791,7 @@ function renderCheckin(){
   </div>`;
 }
 function saveCheckin(e){
+  track("checkin", {energy:e});
   (S.checkins=S.checkins||[]).push({date:todayISO(), energy:e});
   if(e<=2){
     const t=fromISO(todayISO());
@@ -1923,6 +2017,7 @@ const TECHNIQUE = [
    train:"Practise 'compromised' runs and rehearse moving straight into the next task."},
 ];
 function renderTechnique(){
+  track("technique_open");
   $("techBody").innerHTML = `
     <div class="banner">🏋️ New to the movements? You're the person this app is built for. Tap any station for form cues, the most common mistake, and what to train. Great technique saves more time than raw fitness.</div>`
     + TECHNIQUE.map((t,i)=>`
@@ -1945,12 +2040,106 @@ function renderTechnique(){
     + `<div class="tiny" style="text-align:center;margin:10px 0 20px">Videos open a YouTube search for that movement so they're always current. General guidance, not medical or coaching advice — build load gradually and respect pain.</div>`;
 }
 function techQuery(name){ return "HYROX "+name.replace(/\s*\(.*?\)\s*/g," ").replace(/&/g,"and").trim()+" technique"; }
-function watchForm(q){ window.open("https://www.youtube.com/results?search_query="+encodeURIComponent(q), "_blank", "noopener"); }
+function watchForm(q){ track("video_watch", {q}); window.open("https://www.youtube.com/results?search_query="+encodeURIComponent(q), "_blank", "noopener"); }
 function toggleTech(i){
   const el=$("tech"+i), arr=$("techArr"+i);
   const open = el.style.display==="none";
   el.style.display = open?"block":"none";
   arr.textContent = open?"▴":"▾";
+}
+
+/* ================================================================
+   ADMIN DASHBOARD — usage auditing (owner-only, hidden)
+   ================================================================ */
+let adminCohort=[]; // imported user exports, in-memory only
+const TRACKED_FEATURES=[
+  ["log","Logging workouts"],["view:plan","Plan tab"],["view:prog","Progress tab"],
+  ["view:race","Race tab"],["pacing_calc","Pacing calculator"],["technique_open","Technique guide"],
+  ["video_watch","Form videos"],["tutorial_complete","Finished tutorial"],["checkin","Energy check-ins"],
+  ["view:guide","User guide"],["export","Data export/backup"],["watch_import","Apple Watch import"],
+  ["class_template_save","Saved class format"],["tap:community","Tapped Community"],["tap:upgrade","Tapped Upgrade"],
+];
+function userMetrics(state){
+  const a=state.analytics||{counts:{},days:{},events:[]};
+  const days=Object.keys(a.days||{}).sort();
+  const install=a.installedAt || (state.profile&&state.profile.createdAt) || days[0] || todayISO();
+  const lastActive=days.length? days[days.length-1] : install;
+  const d7=days.filter(d=>{ const diff=(fromISO(d)-fromISO(install))/DAY; return diff>=0 && diff<7; });
+  let planned=0, done=0;
+  ((state.plan&&state.plan.weeks)||[]).forEach(w=>w.sessions.forEach(s=>{ if(s.date<=lastActive){ planned++; if(s.done&&!s.skipped) done++; }}));
+  const byType={}; (state.workouts||[]).forEach(w=>byType[w.type]=(byType[w.type]||0)+1);
+  return {
+    name:(state.profile&&state.profile.name)||"User",
+    install, lastActive, activeDays:days.length,
+    spanDays:Math.max(1, Math.round((fromISO(lastActive)-fromISO(install))/DAY)+1),
+    workouts:(state.workouts||[]).length, byType,
+    tutorialDone:(a.counts["tutorial_complete"]||0)>0,
+    retainedD7:new Set(d7).size>=2,
+    adherence: planned? Math.round(done/planned*100):null,
+    counts:a.counts||{}, used:new Set(Object.keys(a.counts||{})),
+  };
+}
+function statTile(v,l,cls){ return `<div class="tile"><div class="v ${cls||''}">${v}</div><div class="l">${l}</div></div>`; }
+function renderAdmin(){
+  const me=userMetrics(S), a=S.analytics||{counts:{},days:{},events:[]};
+  const rate=Math.round(me.activeDays/me.spanDays*100);
+  const sinceActive=Math.round((fromISO(todayISO())-fromISO(me.lastActive))/DAY);
+  let h=`<div class="banner">🔒 <b>Admin — this device only.</b> To audit the whole group, have each tester export their data (Settings → Export JSON) and import the files below. Automatic cross-user analytics needs the Stage 3 backend.</div>`;
+  // device overview
+  h+=`<div class="sectlbl">This device</div>
+    <div class="tiles">${statTile(me.workouts,"Workouts")}${statTile(me.activeDays,"Active days")}${statTile(me.adherence==null?"–":me.adherence+"%","Adherence")}</div>
+    <div class="tiles">${statTile(me.spanDays+"d","Since install")}${statTile(rate+"%","Active rate")}${statTile(calcStreak().weeks,"Streak wks")}</div>
+    <div class="card flat"><div class="small">Installed ${fmtDate(me.install)} · last active ${sinceActive===0?"today":sinceActive+"d ago"} · tutorial ${me.tutorialDone?"✅ completed":(a.counts["tutorial_start"]?"⚠️ started, not finished":"❌ never opened")}</div></div>`;
+  // workouts by type
+  const wt=WTYPES.filter(w=>me.byType[w.id]);
+  if(wt.length) h+=`<div class="card"><div class="statlbl">Workouts logged by type</div>
+    ${barChart(wt.map(w=>me.byType[w.id]), wt.map(w=>w.id.slice(0,4)))}</div>`;
+  // tab usage
+  const views=Object.entries(a.counts).filter(([k])=>k.startsWith("view:")).map(([k,v])=>[k.slice(5),v]).sort((x,y)=>y[1]-x[1]);
+  if(views.length) h+=`<div class="card"><div class="statlbl">Screen visits</div>
+    ${barChart(views.map(v=>v[1]), views.map(v=>v[0].slice(0,4)))}</div>`;
+  // feature usage table (beneficial vs wasteful)
+  const feats=TRACKED_FEATURES.map(([k,l])=>({k,l,n:a.counts[k]||0})).sort((x,y)=>y.n-x.n);
+  h+=`<div class="card"><div class="statlbl" style="margin-bottom:8px">Feature usage — what's earning its place</div>
+    <table class="pace">${feats.map(f=>`<tr><td>${f.l}</td><td class="r"><b class="${f.n===0?'red':f.n>=5?'green':''}">${f.n}</b></td></tr>`).join("")}</table>
+    <div class="tiny" style="margin-top:8px">Red 0 = never used on this device (candidate to cut or resurface). Aggregate across users below for a real signal.</div></div>`;
+  // ---- cohort ----
+  h+=`<div class="sectlbl" style="margin-top:16px">Group cohort ${adminCohort.length?`(${adminCohort.length} users)`:""}</div>`;
+  h+=`<div class="grid2" style="margin-bottom:14px">
+    <button class="btn sec" onclick="$('cohortFile').click()">＋ Import user exports</button>
+    <button class="btn sec" onclick="adminCohort=[];renderAdmin()">Clear</button></div>`;
+  if(adminCohort.length){
+    const n=adminCohort.length;
+    const avg=arr=>arr.length?Math.round(arr.reduce((a,b)=>a+b,0)/arr.length):0;
+    const avgWk=avg(adminCohort.map(u=>u.workouts));
+    const tutPct=Math.round(adminCohort.filter(u=>u.tutorialDone).length/n*100);
+    const d7=Math.round(adminCohort.filter(u=>u.retainedD7).length/n*100);
+    const avgActive=avg(adminCohort.map(u=>u.activeDays));
+    const adh=avg(adminCohort.filter(u=>u.adherence!=null).map(u=>u.adherence));
+    h+=`<div class="tiles">${statTile(n,"Users")}${statTile(avgWk,"Avg workouts")}${statTile(avgActive,"Avg active days")}</div>
+      <div class="tiles">${statTile(d7+"%","D7 retention",d7>=40?"green":d7>=20?"yellow":"red")}${statTile(tutPct+"%","Finished tutorial")}${statTile(adh+"%","Avg adherence")}</div>`;
+    // feature adoption across cohort
+    const adopt=TRACKED_FEATURES.map(([k,l])=>({l,pct:Math.round(adminCohort.filter(u=>u.used.has(k)).length/n*100)})).sort((x,y)=>y.pct-x.pct);
+    h+=`<div class="card"><div class="statlbl" style="margin-bottom:8px">Feature adoption (% of users who used it)</div>
+      <table class="pace">${adopt.map(f=>`<tr><td>${f.l}</td><td class="r"><b class="${f.pct>=50?'green':f.pct>=20?'':'red'}">${f.pct}%</b></td></tr>`).join("")}</table>
+      <div class="tiny" style="margin-top:8px">Low-adoption features are your "wasteful" candidates — either cut them or make them more discoverable.</div></div>`;
+    h+=`<div class="card"><div class="statlbl" style="margin-bottom:8px">Per user</div>
+      <table class="pace"><tr><th>User</th><th class="r">Wkouts</th><th class="r">Active</th><th class="r">Adher.</th></tr>
+      ${adminCohort.map(u=>`<tr><td>${esc(u.name)}</td><td class="r">${u.workouts}</td><td class="r">${u.activeDays}d</td><td class="r">${u.adherence==null?"–":u.adherence+"%"}</td></tr>`).join("")}</table></div>`;
+  } else {
+    h+=`<div class="card flat"><div class="small">No cohort loaded. Import one or more exported <code>.json</code> files to see group KPIs: retention, avg workouts, feature adoption, and per-user breakdown.</div></div>`;
+  }
+  h+=`<div class="tiny" style="text-align:center;margin:10px 0 20px">Usage data is stored only on each device and only leaves it if that user hands you their export.</div>`;
+  $("adminBody").innerHTML=h;
+}
+function importCohort(ev){
+  const files=[...ev.target.files]; if(!files.length) return;
+  let pending=files.length;
+  files.forEach(f=>{ const r=new FileReader();
+    r.onload=()=>{ try{ const d=JSON.parse(r.result); if(d&&d.profile) adminCohort.push(userMetrics(d)); }catch(e){}
+      if(--pending===0){ toast("Imported "+adminCohort.length+" user"+(adminCohort.length===1?"":"s")); renderAdmin(); } };
+    r.readAsText(f); });
+  ev.target.value="";
 }
 
 function renderGuide(){
@@ -2035,8 +2224,9 @@ const TUT_STEPS=[
    d:"Up here lives your profile and settings (tap the RX badge or the gear), with notifications, community and premium coming soon. Settings can replay this tour any time. Now go log your first session — that's the whole game."}];
 let tutStep=0;
 function closeAskTut(){ $("askTut").classList.remove("open"); }
-function startTutorial(){ tutStep=0; $("tut").classList.add("on"); tutShow(); }
+function startTutorial(){ track("tutorial_start"); tutStep=0; $("tut").classList.add("on"); tutShow(); }
 function endTutorial(){
+  track(tutStep>=TUT_STEPS.length-1 ? "tutorial_complete" : "tutorial_exit", {step:tutStep+1});
   $("tut").classList.remove("on");
   S.settings.tutorialDone=true; save();
   go("home");
@@ -2100,8 +2290,18 @@ document.addEventListener("input", e=>{
     if(f!==el.value) el.value=f;
   }
 });
+// hidden admin access: #admin in the URL, or 5 quick taps on the Settings footer
+let _adminTaps=0, _adminT=null;
+function adminTap(){
+  clearTimeout(_adminT); _adminTaps++;
+  _adminT=setTimeout(()=>{_adminTaps=0;}, 1200);
+  if(_adminTaps>=5){ _adminTaps=0; if(S.profile) go("admin"); }
+}
+function checkAdminHash(){ if(location.hash==="#admin" && S.profile) go("admin"); }
+window.addEventListener("hashchange", checkAdminHash);
+
 if(!S.profile){ startOnboarding(); }
-else { adaptPlan(); go("home"); maybeNotify(); }
+else { adaptPlan(); importFromParams(); go("home"); maybeNotify(); checkAdminHash(); }
 // PWA service worker (offline + installable) — only on the hosted https site
 if("serviceWorker" in navigator && location.protocol==="https:")
   navigator.serviceWorker.register("sw.js").catch(()=>{});
