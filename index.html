@@ -53,7 +53,11 @@ h3{font-size:15px;font-weight:700}
 .spread{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-button{font-family:inherit;cursor:pointer;border:none;border-radius:12px;font-size:15px}
+button{font-family:inherit;cursor:pointer;border:none;border-radius:12px;font-size:15px;transition:transform .08s ease,filter .12s ease,background-color .15s ease,border-color .15s ease,box-shadow .12s ease}
+/* tactile press feedback across every tappable control */
+button:active{transform:scale(.95)}
+.btn:active,.card[onclick]:active,button.card:active,.sess:active,.hist:active{filter:brightness(1.12)}
+.chip:active,.optbtn:active,.tbIcon:active,.navbtn:active,.xbtn:active,.rpewrap button:active,.segctl button:active{filter:brightness(1.35)}
 .btn{background:var(--yellow);color:#111;font-weight:800;padding:14px 18px;width:100%;border-radius:14px;font-size:16px}
 .btn:active{transform:scale(.98)}
 .btn.sec{background:var(--card2);color:var(--txt);border:1px solid var(--line);font-weight:600}
@@ -143,6 +147,8 @@ table.pace td.r,table.pace th.r{text-align:right;font-variant-numeric:tabular-nu
 .empty{color:var(--faint);text-align:center;padding:26px 10px;font-size:14px}
 a{color:var(--yellow)}
 .coach{background:#101d2c;border:1px solid #24405e;border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:14px}
+.whybox{background:#1c2412;border:1px solid #3a4a24;border-radius:12px;padding:9px 12px;margin-top:10px;font-size:13px;color:#cfe0b8}
+.whybox b{color:var(--green)}
 /* tutorial spotlight */
 #tut{position:fixed;inset:0;z-index:300;display:none}
 #tut.on{display:block}
@@ -209,6 +215,10 @@ a{color:var(--yellow)}
 
   <!-- ============ RACE ============ -->
   <div class="view" id="v-race">
+    <button class="card" style="width:100%;text-align:left;cursor:pointer;display:block" onclick="go('technique')">
+      <div class="spread"><h2 style="margin:0">📖 Technique &amp; form guide</h2><span class="tiny">›</span></div>
+      <p class="small" style="margin:4px 0 0">New to the movements? Station-by-station form cues, common mistakes, and what to train. Great technique saves more time than raw fitness.</p>
+    </button>
     <div class="card">
       <h2>Pacing calculator</h2>
       <p class="small" style="margin-bottom:10px">Turn a goal finish time into run and station targets. Estimates based on typical time distribution — refine with your own simulations.</p>
@@ -242,6 +252,11 @@ a{color:var(--yellow)}
   <!-- ============ GUIDE ============ -->
   <div class="view" id="v-guide">
     <div id="guideBody" class="guide"></div>
+  </div>
+
+  <!-- ============ TECHNIQUE ============ -->
+  <div class="view" id="v-technique">
+    <div id="techBody"></div>
   </div>
 
   <!-- bottom nav -->
@@ -639,6 +654,7 @@ function go(v){
   if(v==="race") renderRace();
   if(v==="settings") renderSettings();
   if(v==="guide") renderGuide();
+  if(v==="technique") renderTechnique();
 }
 
 /* ================================================================
@@ -650,8 +666,8 @@ function renderTopBar(v){
   const p=S.profile;
   if(!p){ bar.querySelector(".tbInner").innerHTML=""; return; }
   const first=(p.name||"Athlete").split(" ")[0];
-  const titles={home:"Hey "+first+" 👊", plan:"Plan", log:"Log session", prog:"Progress", race:"Race day", settings:"Settings", guide:"Guide"};
-  const secondary=(v==="settings"||v==="guide");
+  const titles={home:"Hey "+first+" 👊", plan:"Plan", log:"Log session", prog:"Progress", race:"Race day", settings:"Settings", guide:"Guide", technique:"Technique & form"};
+  const secondary=(v==="settings"||v==="guide"||v==="technique");
   let left, right;
   if(secondary){
     left=`<button class="tbIcon bare" onclick="go('home')" aria-label="Back">‹</button>
@@ -758,6 +774,7 @@ function sessCard(s, big){
       <div style="flex:1"><div class="t">${esc(s.t)} ${s.done?'<span class="pill done">done ✓</span>':""}</div>
       ${big?`<div class="d">${esc(sessText(s))}</div>`:`<div class="small">${fmtDate(s.date)}</div>`}</div>
     </div>
+    ${big?whyLine(s):""}
     ${!s.done?`<div class="rowflex" style="margin-top:10px">
       <button class="btn mini" onclick="logPlanned('${s.id}')">Log this session</button>
       <button class="btn sec mini" onclick="skipSession('${s.id}')">Skip</button>
@@ -856,6 +873,7 @@ function planSess(s){
         <div class="spread"><span class="t">${esc(s.t)}</span>${s.done?`<span class="pill done">${s.skipped?"skipped":"done ✓"}</span>`:missed?`<span class="pill missed">missed</span>`:""}</div>
         <div class="small">${fmtDate(s.date)}${s.rescheduled?' · <span class="tiny">rescheduled</span>':""}</div>
         <div class="d pd" style="display:none">${esc(sessText(s))}</div>
+        <div class="pd" style="display:none">${whyLine(s)}</div>
       </div>
     </div>
     <div class="pd" style="display:none;margin-top:10px" onclick="event.stopPropagation()">
@@ -909,8 +927,8 @@ function openLog(type, planSessionId, editId){
   let h = `<div class="spread" style="margin-bottom:12px">
     <h2 style="margin:0">${w.icon} ${plan?esc(plan.t):w.name}</h2>
     <button class="btn sec mini" onclick="closeLog()">✕</button></div>`;
-  if(plan) h += `<div class="tiny" style="margin-bottom:10px;white-space:pre-line">${esc(plan.d)}</div>`;
-  if(last && !edit) h += `<div class="tiny" style="margin-bottom:10px">Last time (${fmtDate(last.date)}): ${lastSummary(last)}</div>`;
+  if(plan) h += `<div class="tiny" style="margin-bottom:10px;white-space:pre-line">${esc(plan.d)}</div>${whyLine(plan)}`;
+  if(last && !edit) h += `<div class="tiny" style="margin:10px 0">Last time (${fmtDate(last.date)}): ${lastSummary(last)}</div>`;
   h += `<label class="fld"><span class="lbl">Date</span><input type="date" id="lg_date" value="${edit?edit.date:todayISO()}"></label>`;
 
   const km = edit?edit.distanceKm:"", dur = edit?fmtSec(edit.durationSec):"";
@@ -1473,7 +1491,8 @@ function renderSettings(){
   </div>
   <div class="card">
     <h2>Help</h2>
-    <button class="btn sec" onclick="go('guide')">📖 Open the user guide</button>
+    <button class="btn sec" onclick="go('technique')">🏋️ Technique &amp; form guide</button>
+    <button class="btn sec" style="margin-top:8px" onclick="go('guide')">📖 Open the user guide</button>
     <button class="btn sec" style="margin-top:8px" onclick="startTutorial()">🗺️ Replay the tutorial</button>
   </div>
   <div class="card">
@@ -1561,6 +1580,27 @@ function coachBanner(){
 }
 function annotate(s,note){ s.adaptNotes=s.adaptNotes||[]; if(!s.adaptNotes.includes(note)) s.adaptNotes.push(note); }
 function sessText(s){ return (s.adaptNotes&&s.adaptNotes.length? s.adaptNotes.join("\n")+"\n":"")+s.d; }
+// coach's plain-language reason each planned session helps the user's Hyrox
+const WHY = {
+  intervals:"Trains you to hold goal race pace when tired — the biggest single lever on your finish time.",
+  run:"Grows your aerobic engine. Running is ~half of Hyrox, and a bigger engine makes every station feel easier.",
+  brick:"'Compromised running' — running fast straight off a station is where most people lose the most time. This is the skill that wins races.",
+  strength:"Builds the muscular endurance to keep moving on sleds, carries and wall balls without redlining.",
+  erg:"Low-skill, high-return conditioning: ski/row efficiency, power endurance and burpee capacity.",
+  stations:"Grooves the movement patterns and transitions so race day feels familiar, not new.",
+  class:"Counts as general conditioning so you're not doubling up — your Hyrox-specific sessions are protected around it.",
+  sim:"A full dress rehearsal — the best predictor of race readiness and your sharpest pacing data.",
+};
+function whyFor(s){
+  if(s.custom) return null; // user-made sessions have no canned rationale
+  const t=(s.t||"").toLowerCase();
+  if(s.type==="intervals" && t.includes("sharp")) return "Keeps your legs sharp during taper without adding fatigue — race pace is banked, not built now.";
+  if(s.type==="run" && (t.includes("shake")||t.includes("sharp"))) return "Stays loose and primes your legs while you rest into race day.";
+  return WHY[s.type] || null;
+}
+function whyLine(s){
+  const w=whyFor(s); return w? `<div class="whybox">💡 <b>Why this helps:</b> ${esc(w)}</div>` : "";
+}
 
 function adaptPlan(){
   if(!S.plan) return;
@@ -1812,6 +1852,79 @@ function duplicateSess(id){
 /* ================================================================
    IN-APP USER GUIDE
    ================================================================ */
+/* ================================================================
+   TECHNIQUE & FORM LIBRARY — for athletes new to the movements
+   ================================================================ */
+const TECHNIQUE = [
+  {icon:"🏃", name:"Running (the 8 km)", focus:"~50% of your race. Efficiency here saves more time than any station.",
+   cues:["Relax shoulders and hands — no clenching. Tension wastes oxygen.","Quick, light cadence (~170–180 steps/min) with a short stride; don't over-reach.","Land under your hips, not out in front. Lean slightly from the ankles.","Breathe rhythmically — nose+mouth, belly not chest."],
+   mistake:"Going out too fast on the first run. You bank a 20 s lead and pay it back double at wall balls.",
+   train:"Most of your running should be easy (Zone 2). Add race-pace intervals once a week."},
+  {icon:"⛷", name:"SkiErg (1000 m)", focus:"Full-body pull. Technique beats brute arm strength.",
+   cues:["Drive from the hips and lats, not the arms — hinge like a deadlift.","Reach tall at the top, then snap down engaging your core.","Finish with hands past your hips; let the handle rise smoothly.","Long, powerful strokes — aim for a low, steady stroke rate."],
+   mistake:"Pulling with the arms and standing upright. Your arms fatigue fast and power drops.",
+   train:"Practise 500 m repeats focusing on the hip hinge; film yourself from the side."},
+  {icon:"🛷", name:"Sled Push (50 m)", focus:"Legs and low body angle. One of the biggest fatiguers.",
+   cues:["Low hips, arms long and locked, body at ~45°.","Drive through the balls of your feet with short, choppy, powerful steps.","Keep constant pressure — a stopped sled is much harder to restart.","Head neutral, eyes down-forward."],
+   mistake:"Standing too upright with bent arms — you push down instead of forward.",
+   train:"Heavy sled pushes, plus squats and split squats for leg drive. No sled? Push a plate on turf or do heavy sled-style walking lunges."},
+  {icon:"🪢", name:"Sled Pull (50 m)", focus:"Back, grip and rhythm. Efficient hand-over-hand wins.",
+   cues:["Sit back into your heels, hips low, and pull with your whole body.","Hand-over-hand in a smooth rhythm; reset your feet between big pulls.","Keep the rope moving — don't let the sled fully stop.","Brace your core; don't round and yank with the lower back."],
+   mistake:"Pulling only with the arms while standing tall, then gassing your grip.",
+   train:"Rows, deadlifts and grip work (dead hangs, farmer holds)."},
+  {icon:"🐸", name:"Burpee Broad Jump (80 m)", focus:"Efficiency under fatigue. Small savings add up over 80 m.",
+   cues:["Chest to floor, then a compact pop-up — no wasted height.","Jump forward for distance, not up; land soft with bent knees.","Find a repeatable rhythm and hold it; don't sprint then stall.","Breathe on every rep — it's a long, gassy station."],
+   mistake:"Exploding early, spiking your heart rate, then grinding to a walk.",
+   train:"EMOM burpee broad jumps (6–10/min) to build a sustainable pace."},
+  {icon:"🚣", name:"Row (1000 m)", focus:"Legs-first sequencing. The rower rewards timing over effort.",
+   cues:["Drive order: legs → back → arms. Return: arms → back → legs.","Push with the legs first; the arms only finish the stroke.","Strong, controlled drive and a slower recovery (roughly 1:2 ratio).","Keep the chain flat and level; don't yank early with the arms."],
+   mistake:"Opening the back and arms too early ('shooting the hips'), losing power.",
+   train:"Technique rows at low rate, then 500 m efforts at target split."},
+  {icon:"🧳", name:"Farmers Carry (200 m)", focus:"Grip and posture at pace. Often underestimated.",
+   cues:["Stand tall, shoulders back, ribs down — walk, don't shuffle.","Grip the very ends of the handles; squeeze hard.","Fast, controlled steps; breathe steadily.","Only set down if grip fully fails — re-gripping costs time."],
+   mistake:"Leaning forward and taking tiny nervous steps, which slows you and taxes grip.",
+   train:"Heavy carries for distance, plus dedicated grip work."},
+  {icon:"🎒", name:"Sandbag Lunges (100 m)", focus:"Balance and quad endurance with load on the back.",
+   cues:["Sandbag high on the shoulders/traps, elbows down, torso upright.","Back knee lightly touches; front shin stays roughly vertical.","Consistent stride length; drive through the front heel.","Look ahead, brace your core, keep a steady rhythm."],
+   mistake:"Leaning forward and taking huge steps — you stall and your quads blow up.",
+   train:"Weighted walking lunges for volume; build to race distance."},
+  {icon:"🏐", name:"Wall Balls (100 reps)", focus:"The final station. Legs + breathing under deep fatigue.",
+   cues:["Full squat, then drive up explosively — the throw comes from the legs.","Aim through the target, catch soft and absorb straight into the next squat.","Breathe out on the throw; find an unbroken rhythm you can hold.","Break into planned sets (e.g. 20s) before you fail, not after."],
+   mistake:"Throwing with the arms and going unbroken until you redline, then long rests.",
+   train:"EMOM wall balls (10–15/min) and lots of squatting. No ball? Dumbbell thrusters."},
+  {icon:"🔄", name:"Roxzone & Transitions", focus:"Free time most people leave on the table.",
+   cues:["Walk with purpose between the run and the station — don't dawdle or sprint.","Know the venue layout so you never hesitate or go the wrong way.","Start each station calm and controlled; the panic-start costs you later.","Use transitions to slow your breathing before high-HR stations."],
+   mistake:"Standing around catching your breath — minutes vanish across 8 transitions.",
+   train:"Practise 'compromised' runs and rehearse moving straight into the next task."},
+];
+function renderTechnique(){
+  $("techBody").innerHTML = `
+    <div class="banner">🏋️ New to the movements? You're the person this app is built for. Tap any station for form cues, the most common mistake, and what to train. Great technique saves more time than raw fitness.</div>`
+    + TECHNIQUE.map((t,i)=>`
+    <div class="sess" onclick="toggleTech(${i})" style="cursor:pointer">
+      <div class="rowflex">
+        <div class="typeic">${t.icon}</div>
+        <div style="flex:1">
+          <div class="spread"><span class="t">${t.name}</span><span class="tiny techArrow" id="techArr${i}">▾</span></div>
+          <div class="small">${esc(t.focus)}</div>
+        </div>
+      </div>
+      <div id="tech${i}" style="display:none;margin-top:12px">
+        <div class="tiny" style="text-transform:uppercase;letter-spacing:.5px;color:var(--dim);font-weight:700;margin-bottom:5px">Form cues</div>
+        ${t.cues.map(c=>`<div class="small" style="margin-bottom:5px">✅ ${esc(c)}</div>`).join("")}
+        <div class="coach" style="margin-top:10px"><b class="red">✗ Common mistake:</b> ${esc(t.mistake)}</div>
+        <div class="banner" style="margin-bottom:0"><b>🎯 What to train:</b> ${esc(t.train)}</div>
+      </div>
+    </div>`).join("")
+    + `<div class="tiny" style="text-align:center;margin:10px 0 20px">General guidance, not medical or coaching advice. Build load gradually and respect pain.</div>`;
+}
+function toggleTech(i){
+  const el=$("tech"+i), arr=$("techArr"+i);
+  const open = el.style.display==="none";
+  el.style.display = open?"block":"none";
+  arr.textContent = open?"▴":"▾";
+}
+
 function renderGuide(){
   $("guideBody").innerHTML = `
   <div class="card">
@@ -1915,7 +2028,10 @@ function tutShow(){
     // and the smooth-scroll glide together to the same place (no snapping)
     const r=el.getBoundingClientRect();
     const absTop=r.top+window.scrollY;
-    const targetScroll = isFixed ? window.scrollY : Math.max(0, absTop-(barBottom+24));
+    // clamp to what the page can ACTUALLY scroll — short views (Home) can't scroll far,
+    // so the spotlight must be placed where the element really ends up, not where we wished
+    const maxScroll=Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    const targetScroll = isFixed ? window.scrollY : Math.min(maxScroll, Math.max(0, absTop-(barBottom+24)));
     const finalTop = isFixed ? r.top : absTop-targetScroll;
     const finalBot = finalTop + r.height;
     if(!isFixed) window.scrollTo({top:targetScroll, behavior:"smooth"});
