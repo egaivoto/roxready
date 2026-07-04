@@ -357,6 +357,16 @@ const WTYPES = [
 ];
 const wtype = id => WTYPES.find(w=>w.id===id) || WTYPES[0];
 
+// shared equipment list (onboarding + Settings editor)
+const EQUIPMENT = [
+  ["run","Somewhere to run"],["treadmill","Treadmill"],
+  ["ski","SkiErg"],["row","Rower"],["bike","Air / assault bike"],
+  ["sled","Sled"],["wb","Wall ball"],["sandbag","Sandbag"],
+  ["dumbbells","Dumbbells"],["kettlebells","Kettlebells"],["barbell","Barbell & plates"],
+  ["pullup","Pull-up bar"],["box","Plyo / jump box"],["medball","Medicine ball"],
+  ["bands","Resistance bands"],["rope","Jump rope"],["bench","Bench"],
+];
+
 // generic (unbranded) studio-class formats — inspired by common circuit-class structures
 const CLASS_FOCUS = {
   cardio:   {label:"Cardio / conditioning", tag:"cardio",  emoji:"❤️‍🔥"},
@@ -469,13 +479,7 @@ const OB_STEPS = [
   {key:"days", q:"How many days a week can you realistically train?", sub:"Be honest — consistency beats ambition. You can change this later.", type:"opts", opts:[
     ["3","3 days","The essentials, done well"],["4","4 days","The sweet spot for most"],
     ["5","5 days","Serious build"],["6","6 days","Full send"]]},
-  {key:"equipment", q:"What equipment can you access?", sub:"Pick everything you've got — sessions adapt to it. Full gym? Hit Select all.", type:"multi", opts:[
-    ["run","Somewhere to run"],["treadmill","Treadmill"],
-    ["ski","SkiErg"],["row","Rower"],["bike","Air / assault bike"],
-    ["sled","Sled"],["wb","Wall ball"],["sandbag","Sandbag"],
-    ["dumbbells","Dumbbells"],["kettlebells","Kettlebells"],["barbell","Barbell & plates"],
-    ["pullup","Pull-up bar"],["box","Plyo / jump box"],["medball","Medicine ball"],
-    ["bands","Resistance bands"],["rope","Jump rope"],["bench","Bench"]]},
+  {key:"equipment", q:"What equipment can you access?", sub:"Pick everything you've got — sessions adapt to it. Full gym? Hit Select all.", type:"multi", opts:EQUIPMENT},
   {key:"classes", q:"Do you train at a fitness studio?", sub:"HIIT, circuit or functional classes (e.g. a 45-min studio session). We'll build your plan around them instead of double-booking your body.", type:"opts", opts:[
     ["0","No / rarely","Just my own training"],
     ["1","~1 a week","The odd class"],
@@ -1554,6 +1558,13 @@ function renderSettings(){
     <div class="tiny" style="margin-top:8px">Changing race date or days/week? Hit "Regenerate" on the Plan tab afterwards to rebuild around them.</div>
   </div>
   <div class="card">
+    <h2>🧰 Equipment</h2>
+    <p class="tiny" style="margin-bottom:10px">What you can train with. Update it and rebuild — your coach re-writes the affected sessions (e.g. sled and wall-ball work) around what you've got.</p>
+    <div class="rowflex" style="margin-bottom:10px"><button class="btn sec mini" onclick="setEquipAll(true)">Select all</button><button class="btn sec mini" onclick="setEquipAll(false)">Clear</button></div>
+    <div class="chips" id="equipChips"></div>
+    <button class="btn" style="margin-top:14px" onclick="saveEquipment()">Save &amp; rebuild plan 🔧</button>
+  </div>
+  <div class="card">
     <h2>Help</h2>
     <button class="btn sec" onclick="go('technique')">🏋️ Technique &amp; form guide</button>
     <button class="btn sec" style="margin-top:8px" onclick="go('guide')">📖 Open the user guide</button>
@@ -1590,6 +1601,26 @@ function renderSettings(){
     <button class="btn danger" style="margin-top:10px" onclick="resetAll()">Reset everything</button>
   </div>
   <div class="tiny" style="text-align:center;margin:8px 0 20px" onclick="adminTap()">ROXREADY · your data never leaves this device.<br>Share the app: just send friends this HTML file.</div>`;
+  _equip = [...(S.profile.equipment||[])];
+  renderEquipChips();
+}
+let _equip = [];
+function renderEquipChips(){
+  const el=$("equipChips"); if(!el) return;
+  el.innerHTML = EQUIPMENT.map(e=>{
+    const on=_equip.includes(e[0]);
+    return `<button class="chip ${on?'on':''}" onclick="toggleEquip('${e[0]}')">${on?'✓ ':''}${e[1]}</button>`;
+  }).join("");
+}
+function toggleEquip(k){ const i=_equip.indexOf(k); i>=0?_equip.splice(i,1):_equip.push(k); renderEquipChips(); }
+function setEquipAll(on){ _equip = on? EQUIPMENT.map(e=>e[0]) : []; renderEquipChips(); }
+function saveEquipment(){
+  if(!_equip.length){ toast("Pick at least one — you need somewhere to train 🙂"); return; }
+  S.profile.equipment = [..._equip];
+  S.plan = generatePlan(S.profile);
+  save(); track("equipment_edit", {count:_equip.length});
+  toast("Equipment saved — plan rebuilt around it 🔧");
+  go("plan");
 }
 function saveSettings(){
   const p=S.profile;
@@ -2057,7 +2088,7 @@ const TRACKED_FEATURES=[
   ["view:race","Race tab"],["pacing_calc","Pacing calculator"],["technique_open","Technique guide"],
   ["video_watch","Form videos"],["tutorial_complete","Finished tutorial"],["checkin","Energy check-ins"],
   ["view:guide","User guide"],["export","Data export/backup"],["watch_import","Apple Watch import"],
-  ["class_template_save","Saved class format"],["tap:community","Tapped Community"],["tap:upgrade","Tapped Upgrade"],
+  ["class_template_save","Saved class format"],["equipment_edit","Edited equipment"],["tap:community","Tapped Community"],["tap:upgrade","Tapped Upgrade"],
 ];
 function userMetrics(state){
   const a=state.analytics||{counts:{},days:{},events:[]};
