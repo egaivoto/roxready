@@ -1,8 +1,9 @@
-/* ROXREADY service worker — offline support with background refresh.
-   Strategy: serve from cache immediately, update the cache from the
-   network in the background (stale-while-revalidate). Users get new
-   versions on their next visit after a deploy. */
-const CACHE = "roxready-v1";
+/* ROXREADY service worker — network-first with offline fallback.
+   Strategy: always try the network first so users get the latest version
+   immediately when online; fall back to cache only when offline. This avoids
+   the "one reload behind" problem of stale-while-revalidate during active
+   development. Bump CACHE to purge old caches on the next SW activation. */
+const CACHE = "roxready-v3";
 const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
@@ -21,13 +22,14 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET" || !e.request.url.startsWith(self.location.origin)) return;
   e.respondWith(
-    caches.open(CACHE).then(async cache => {
-      const cached = await cache.match(e.request);
-      const fresh = fetch(e.request).then(resp => {
-        if (resp && resp.ok) cache.put(e.request, resp.clone());
+    fetch(e.request)
+      .then(resp => {
+        if (resp && resp.ok) {
+          const copy = resp.clone();
+          caches.open(CACHE).then(c => c.put(e.request, copy));
+        }
         return resp;
-      }).catch(() => cached);
-      return cached || fresh;
-    })
+      })
+      .catch(() => caches.match(e.request).then(r => r || caches.match("./index.html")))
   );
 });
