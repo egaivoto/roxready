@@ -244,24 +244,10 @@ a{color:var(--yellow)}
       <div id="paceOut" style="margin-top:14px"></div>
     </div>
     <div class="card">
-      <h2>Your station standards</h2>
+      <h2>🏁 Race format, standards &amp; rules</h2>
+      <p class="small" style="margin-bottom:10px">The format is identical at every race: <b>8 × 1 km run</b>, each followed by one functional station, always in this order. Loads shown are <b>yours</b> for the selected division.</p>
       <div id="standardsOut"></div>
-    </div>
-    <div class="card">
-      <h2>🏁 Hyrox race rules</h2>
-      <p class="small" style="margin-bottom:10px">The format is identical at every race: <b>8 × 1 km run</b>, each followed by one functional station, always in this order.</p>
-      <table class="pace" style="margin-bottom:12px">
-        <tr><th>#</th><th>After each run</th><th class="r">Standard</th></tr>
-        <tr><td>1</td><td>⛷ SkiErg</td><td class="r">1000 m</td></tr>
-        <tr><td>2</td><td>🛷 Sled Push</td><td class="r">50 m</td></tr>
-        <tr><td>3</td><td>🪢 Sled Pull</td><td class="r">50 m</td></tr>
-        <tr><td>4</td><td>🐸 Burpee Broad Jump</td><td class="r">80 m</td></tr>
-        <tr><td>5</td><td>🚣 Row</td><td class="r">1000 m</td></tr>
-        <tr><td>6</td><td>🧳 Farmers Carry</td><td class="r">200 m</td></tr>
-        <tr><td>7</td><td>🎒 Sandbag Lunges</td><td class="r">100 m</td></tr>
-        <tr><td>8</td><td>🏐 Wall Balls</td><td class="r">100 reps</td></tr>
-      </table>
-      <h3 style="margin-bottom:6px">Judging &amp; no-reps</h3>
+      <h3 style="margin:14px 0 6px">Judging &amp; no-reps</h3>
       <div class="small" style="line-height:1.75">
         • <b>Wall balls:</b> squat below parallel (hip crease under knee) and the ball must hit the target — miss either and it doesn't count.<br>
         • <b>Burpee broad jump:</b> chest and thighs to the floor, then jump forward; both feet must land past the marker.<br>
@@ -1552,11 +1538,14 @@ function renderPacing(){
 }
 function renderStandards(){
   const p=S.profile;
-  $("standardsOut").innerHTML = `<div class="tiny" style="margin-bottom:8px">${p.division.toUpperCase()} · ${p.sex==="m"?"Men's":"Women's"} standards (season 25/26)${p.division==="doubles"?" — Doubles run everything, share station work":""}</div>
-    <table class="pace">${STATIONS.map(st=>{
-      const load=stationLoad(st.id);
-      return `<tr><td>${st.icon} ${st.name}</td><td class="r">${st.unit}</td><td class="r"><b>${load||"—"}</b></td></tr>`;
-    }).join("")}</table>
+  $("standardsOut").innerHTML = `<div class="tiny" style="margin-bottom:8px">${p.division.toUpperCase()} · ${p.sex==="m"?"Men's":"Women's"} · season 25/26${p.division==="doubles"?" — Doubles run everything, share station work":""}</div>
+    <table class="pace">
+      <tr><th>#</th><th>After each run</th><th class="r">Standard</th><th class="r">Your load</th></tr>
+      ${STATIONS.map((st,i)=>{
+        const load=stationLoad(st.id);
+        return `<tr><td>${i+1}</td><td>${st.icon} ${st.name}</td><td class="r">${st.unit}</td><td class="r"><b>${load||"—"}</b></td></tr>`;
+      }).join("")}
+    </table>
     <div class="tiny" style="margin-top:8px">Sled weights include the sled itself. 8 × 1 km of running ties it all together.</div>`;
 }
 
