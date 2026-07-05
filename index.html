@@ -54,10 +54,13 @@ h3{font-size:15px;font-weight:700}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 button{font-family:inherit;cursor:pointer;border:none;border-radius:12px;font-size:15px;transition:transform .08s ease,filter .12s ease,background-color .15s ease,border-color .15s ease,box-shadow .12s ease}
-/* tactile press feedback across every tappable control */
+/* tactile press feedback — driven by JS .pressing class so it fires reliably on
+   iOS too (where :active needs a touch handler and the transparent tap-highlight
+   removes the default flash). :active kept as a desktop fallback. */
 button:active{transform:scale(.95)}
-.btn:active,.card[onclick]:active,button.card:active,.sess:active,.hist:active{filter:brightness(1.12)}
-.chip:active,.optbtn:active,.tbIcon:active,.navbtn:active,.xbtn:active,.rpewrap button:active,.segctl button:active{filter:brightness(1.35)}
+.pressing{transform:scale(.93)!important;filter:brightness(1.3)!important;opacity:.9}
+.btn.pressing{filter:brightness(.9)!important}
+.sess.pressing,.hist.pressing,.card.pressing,.optbtn.pressing,.chip.pressing{filter:brightness(1.5)!important}
 .btn{background:var(--yellow);color:#111;font-weight:800;padding:14px 18px;width:100%;border-radius:14px;font-size:16px}
 .btn:active{transform:scale(.98)}
 .btn.sec{background:var(--card2);color:var(--txt);border:1px solid var(--line);font-weight:600}
@@ -243,6 +246,37 @@ a{color:var(--yellow)}
     <div class="card">
       <h2>Your station standards</h2>
       <div id="standardsOut"></div>
+    </div>
+    <div class="card">
+      <h2>🏁 Hyrox race rules</h2>
+      <p class="small" style="margin-bottom:10px">The format is identical at every race: <b>8 × 1 km run</b>, each followed by one functional station, always in this order.</p>
+      <table class="pace" style="margin-bottom:12px">
+        <tr><th>#</th><th>After each run</th><th class="r">Standard</th></tr>
+        <tr><td>1</td><td>⛷ SkiErg</td><td class="r">1000 m</td></tr>
+        <tr><td>2</td><td>🛷 Sled Push</td><td class="r">50 m</td></tr>
+        <tr><td>3</td><td>🪢 Sled Pull</td><td class="r">50 m</td></tr>
+        <tr><td>4</td><td>🐸 Burpee Broad Jump</td><td class="r">80 m</td></tr>
+        <tr><td>5</td><td>🚣 Row</td><td class="r">1000 m</td></tr>
+        <tr><td>6</td><td>🧳 Farmers Carry</td><td class="r">200 m</td></tr>
+        <tr><td>7</td><td>🎒 Sandbag Lunges</td><td class="r">100 m</td></tr>
+        <tr><td>8</td><td>🏐 Wall Balls</td><td class="r">100 reps</td></tr>
+      </table>
+      <h3 style="margin-bottom:6px">Judging &amp; no-reps</h3>
+      <div class="small" style="line-height:1.75">
+        • <b>Wall balls:</b> squat below parallel (hip crease under knee) and the ball must hit the target — miss either and it doesn't count.<br>
+        • <b>Burpee broad jump:</b> chest and thighs to the floor, then jump forward; both feet must land past the marker.<br>
+        • <b>Sled push/pull:</b> the <b>whole sled</b> must cross the line each length.<br>
+        • <b>Farmers carry:</b> no dropping the bells between the lines; set-downs cost you.<br>
+        • <b>Sandbag lunges:</b> the trailing knee must clearly touch the ground each rep; bag stays on your back/shoulders.<br>
+        • <b>Roxzone:</b> the transition area between run and station — the clock never stops, so move with purpose. No outside help or pacing.
+      </div>
+      <h3 style="margin:12px 0 6px">Good to know</h3>
+      <div class="small" style="line-height:1.75">
+        • Judges can issue <b>no-reps</b> (redo the rep) or a <b>Roxzone time penalty</b> for standards not met.<br>
+        • <b>Divisions:</b> Open, Pro (heavier loads), Doubles (share stations, run all 8 km each) and Relay.<br>
+        • Wear comfortable closed-toe trainers; grip gloves are allowed and popular for the sleds and carry.
+      </div>
+      <a href="https://hyrox.com/hyrox-rules/" target="_blank" rel="noopener" class="small" style="display:inline-block;margin-top:10px">Read the official rulebook →</a>
     </div>
     <div class="card">
       <h2>Race-week rules</h2>
@@ -1549,26 +1583,26 @@ function renderSettings(){
       <label class="fld"><span class="lbl">Days / week</span><select id="set_days">
         ${[3,4,5,6].map(d=>`<option ${p.days===d?"selected":""}>${d}</option>`).join("")}</select></label>
     </div>
-    <div class="grid2">
-      <label class="fld"><span class="lbl">Recent 5K (mm:ss)</span><input id="set_5k" inputmode="numeric" class="timefld" value="${p.fiveK?fmtSec(p.fiveK):""}" placeholder="25:00"></label>
-      <label class="fld"><span class="lbl">Studio classes / wk</span><select id="set_classes">
-        ${[0,1,2,3].map(d=>`<option value="${d}" ${(p.classes||0)===d?"selected":""}>${d===0?"None":d===3?"3+":d}</option>`).join("")}</select></label>
-    </div>
+    <label class="fld"><span class="lbl">Recent 5K (mm:ss)</span><input id="set_5k" inputmode="numeric" class="timefld" value="${p.fiveK?fmtSec(p.fiveK):""}" placeholder="25:00"></label>
     <button class="btn" onclick="saveSettings()">Save profile</button>
     <div class="tiny" style="margin-top:8px">Changing race date or days/week? Hit "Regenerate" on the Plan tab afterwards to rebuild around them.</div>
   </div>
   <div class="card">
-    <h2>🧰 Equipment</h2>
+    <h2>🧰 Equipment &amp; classes</h2>
     <p class="tiny" style="margin-bottom:10px">What you can train with. Update it and rebuild — your coach re-writes the affected sessions (e.g. sled and wall-ball work) around what you've got.</p>
     <div class="rowflex" style="margin-bottom:10px"><button class="btn sec mini" onclick="setEquipAll(true)">Select all</button><button class="btn sec mini" onclick="setEquipAll(false)">Clear</button></div>
     <div class="chips" id="equipChips"></div>
-    <button class="btn" style="margin-top:14px" onclick="saveEquipment()">Save &amp; rebuild plan 🔧</button>
+    <label class="fld" style="margin:16px 0 4px"><span class="lbl">Circuit / studio classes per week</span>
+      <select id="set_classes">
+        ${[0,1,2,3].map(d=>`<option value="${d}" ${(p.classes||0)===d?"selected":""}>${d===0?"None — I don't attend classes":d===3?"3+ a week":d+" a week"}</option>`).join("")}</select></label>
+    <p class="tiny" style="margin-bottom:12px">Attend HIIT / circuit / functional classes? The plan reserves those days and trims overlapping conditioning so you're not doubling up.</p>
+    <button class="btn" onclick="saveEquipment()">Save &amp; rebuild plan 🔧</button>
   </div>
   <div class="card">
     <h2>Help</h2>
-    <button class="btn sec" onclick="go('technique')">🏋️ Technique &amp; form guide</button>
-    <button class="btn sec" style="margin-top:8px" onclick="go('guide')">📖 Open the user guide</button>
+    <button class="btn sec" onclick="go('guide')">📖 Open the user guide</button>
     <button class="btn sec" style="margin-top:8px" onclick="startTutorial()">🗺️ Replay the tutorial</button>
+    <div class="tiny" style="margin-top:8px">Looking for technique &amp; form videos? They live on the <b>Race</b> tab now.</div>
   </div>
   <div class="card">
     <h2>⌚ Apple Watch &amp; Health</h2>
@@ -1617,9 +1651,10 @@ function setEquipAll(on){ _equip = on? EQUIPMENT.map(e=>e[0]) : []; renderEquipC
 function saveEquipment(){
   if(!_equip.length){ toast("Pick at least one — you need somewhere to train 🙂"); return; }
   S.profile.equipment = [..._equip];
+  const cl=$("set_classes"); if(cl) S.profile.classes=Number(cl.value)||0;
   S.plan = generatePlan(S.profile);
-  save(); track("equipment_edit", {count:_equip.length});
-  toast("Equipment saved — plan rebuilt around it 🔧");
+  save(); track("equipment_edit", {count:_equip.length, classes:S.profile.classes});
+  toast("Saved — plan rebuilt around your kit &amp; classes 🔧");
   go("plan");
 }
 function saveSettings(){
@@ -1629,7 +1664,6 @@ function saveSettings(){
   p.division=$("set_div").value; p.sex=$("set_sex").value;
   p.days=Number($("set_days").value);
   p.fiveK=parseTime($("set_5k").value)||null;
-  p.classes=Number($("set_classes").value)||0;
   save(); toast("Saved ✓ — hit Regenerate on the Plan tab to apply"); go("home");
 }
 function toggleReminders(){
@@ -2313,6 +2347,17 @@ function tutNext(){
    BOOT
    ================================================================ */
 document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{ if(e.target===m) m.classList.remove("open"); }));
+// press feedback: add .pressing on touch/press, clear on release (reliable on iOS)
+(function(){
+  const PRESSABLE = "button, .chip, .optbtn, .sess, .hist, .card[onclick], .tile, .tbLogo";
+  let held=null;
+  const press = e=>{ const el=e.target.closest(PRESSABLE); if(el){ el.classList.add("pressing"); held=el; } };
+  const release = ()=>{ if(held){ held.classList.remove("pressing"); held=null; }
+    document.querySelectorAll(".pressing").forEach(el=>el.classList.remove("pressing")); };
+  document.addEventListener("pointerdown", press, true);
+  ["pointerup","pointercancel","pointerleave","scroll","touchmove"].forEach(ev=>
+    document.addEventListener(ev, release, true));
+})();
 // time fields auto-format their colons (delegated, covers dynamic inputs)
 document.addEventListener("input", e=>{
   const el=e.target;
