@@ -62,7 +62,6 @@ button:active{transform:scale(.95)}
 .btn.pressing{filter:brightness(.9)!important}
 .sess.pressing,.hist.pressing,.card.pressing,.optbtn.pressing,.chip.pressing{filter:brightness(1.5)!important}
 .btn{background:var(--yellow);color:#111;font-weight:800;padding:14px 18px;width:100%;border-radius:14px;font-size:16px}
-.btn:active{transform:scale(.98)}
 .btn.sec{background:var(--card2);color:var(--txt);border:1px solid var(--line);font-weight:600}
 .btn.danger{background:transparent;color:var(--red);border:1px solid var(--red)}
 .btn.mini{width:auto;padding:8px 14px;font-size:13px;border-radius:10px}
@@ -113,9 +112,6 @@ label.fld span.lbl{display:block;font-size:12.5px;color:var(--dim);margin-bottom
 .bignum{font-size:40px;font-weight:800;letter-spacing:-1.5px;line-height:1.05}
 .statlbl{font-size:11.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;font-weight:700}
 /* streak dots */
-.dots{display:flex;gap:6px;margin-top:8px}
-.dot{width:11px;height:11px;border-radius:50%;background:var(--card2);border:1px solid var(--line)}
-.dot.hit{background:var(--yellow);border-color:var(--yellow)}
 /* plan */
 .wkhead{display:flex;align-items:center;gap:8px;margin:18px 0 8px;flex-wrap:wrap}
 .sess{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:9px}
@@ -262,17 +258,14 @@ a{color:var(--yellow)}
         • <b>Divisions:</b> Open, Pro (heavier loads), Doubles (share stations, run all 8 km each) and Relay.<br>
         • Wear comfortable closed-toe trainers; grip gloves are allowed and popular for the sleds and carry.
       </div>
-      <a href="https://hyrox.com/hyrox-rules/" target="_blank" rel="noopener" class="small" style="display:inline-block;margin-top:10px">Read the official rulebook →</a>
-    </div>
-    <div class="card">
-      <h2>Race-week rules</h2>
-      <div class="small">
+      <h3 style="margin:12px 0 6px">Race week</h3>
+      <div class="small" style="line-height:1.75">
         • Nothing new on race day — kit, shoes, food, pacing all rehearsed.<br>
         • Taper means taper: short, sharp, rested. Fitness is already banked.<br>
         • Go out conservative — the race starts at wall balls.<br>
-        • Walk the venue, learn the Roxzone layout, plan your transitions.<br>
-        • Carb up the day before, arrive early, warm up with 5–8 min easy + 2 strides.
+        • Walk the venue, learn the Roxzone layout, carb up the day before, arrive early.
       </div>
+      <a href="https://hyrox.com/hyrox-rules/" target="_blank" rel="noopener" class="small" style="display:inline-block;margin-top:12px">Read the official rulebook →</a>
     </div>
   </div>
 
@@ -465,7 +458,6 @@ function formatTimeDigits(raw){
   parts.unshift(s);
   return parts.join(":");
 }
-function paceOf(sec, km){ return (sec&&km)? sec/km : null; }
 function fmtPace(spk){ return spk? fmtSec(spk)+"/km" : "–"; }
 function toast(msg){
   const t=document.createElement("div"); t.className="toast"; t.innerHTML=msg;
@@ -842,8 +834,8 @@ function renderHome(){
   // ---- RECENT ----
   const rec = [...S.workouts].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,3);
   $("homeRecent").innerHTML = rec.length? `<div class="sectlbl" style="margin-top:16px">Recent <a onclick="go('log')">History ›</a></div>`+rec.map(histCard).join("") : "";
-  // ---- banners ----
-  $("homeReminder").innerHTML = coachBanner() + lapseBanner();
+  // ---- banner (one at a time — coach news beats nudges) ----
+  $("homeReminder").innerHTML = coachBanner() || lapseBanner();
 }
 function phaseMessage(wk){
   if(!wk) return "";
@@ -993,10 +985,11 @@ function confirmRegen(){
    ================================================================ */
 let logCtx = null; // {type, planSessionId, editId}
 function renderLogHub(){
-  $("logTypeGrid").innerHTML = WTYPES.map(w=>
+  // "intervals" shares the Run form (toggle inside), so it gets no tile of its own
+  $("logTypeGrid").innerHTML = WTYPES.filter(w=>w.id!=="intervals").map(w=>
     `<button class="card flat" style="text-align:left;cursor:pointer;margin:0" onclick="openLog('${w.id}')">
       <div style="font-size:22px">${w.icon}</div><div style="font-weight:700;margin-top:4px">${w.name}</div>
-      <div class="tiny">${w.desc}</div></button>`).join("");
+      <div class="tiny">${w.id==="run"?"Easy / long / intervals":w.desc}</div></button>`).join("");
   renderHistory();
 }
 function logPlanned(sessId){
@@ -1021,6 +1014,10 @@ function openLog(type, planSessionId, editId){
 
   const km = edit?edit.distanceKm:"", dur = edit?fmtSec(edit.durationSec):"";
   if(type==="run"||type==="intervals"){
+    // one Run tile covers both — the kind toggle just sets the type
+    if(!plan) h += `<div class="segctl" id="runSeg">
+      <button class="${type!=="intervals"?"on":""}" onclick="segPick(this);logCtx.type='run'" data-v="run">Easy / long</button>
+      <button class="${type==="intervals"?"on":""}" onclick="segPick(this);logCtx.type='intervals'" data-v="intervals">Intervals</button></div>`;
     h += `<div class="grid2">
       <label class="fld"><span class="lbl">Distance (km)</span><input id="lg_km" inputmode="decimal" placeholder="${last&&last.distanceKm?last.distanceKm:'8'}" value="${km||""}"></label>
       <label class="fld"><span class="lbl">Total time (mm:ss)</span><input id="lg_dur" inputmode="numeric" class="timefld" placeholder="45:00" value="${edit&&edit.durationSec?fmtSec(edit.durationSec):""}"></label>
@@ -1595,17 +1592,20 @@ function renderSettings(){
   </div>
   <div class="card">
     <h2>⌚ Apple Watch &amp; Health</h2>
-    <p class="tiny" style="margin-bottom:10px">Auto-import your watch workouts and have them matched to that day's planned Hyrox session. Set it up once with a free Apple <b>Shortcut</b>:</p>
-    <div class="small" style="line-height:1.7">
-      1. iPhone → <b>Shortcuts</b> app → new Automation (or Shortcut).<br>
-      2. Add action <b>Find Health Samples → Workouts</b> (latest 1).<br>
-      3. Add <b>Open URLs</b> with:<br>
-      <code style="font-size:11px;word-break:break-all;color:var(--yellow)">https://egaivoto.github.io/roxready/?wtype=[Type]&amp;dur=[Duration in sec]&amp;km=[Distance]&amp;hr=[Avg HR]&amp;date=[Date yyyy-mm-dd]</code><br>
-      …inserting the workout's values as magic variables.<br>
-      4. Run it after a workout — the app opens and logs it. 👊
+    <p class="tiny" style="margin-bottom:10px">Import watch workouts and have them matched to that day's planned session — set up once with a free Apple Shortcut.</p>
+    <button class="btn sec" onclick="const d=$('watchSteps'); d.style.display=d.style.display==='none'?'block':'none'">Show setup steps</button>
+    <div id="watchSteps" style="display:none;margin-top:10px">
+      <div class="small" style="line-height:1.7">
+        1. iPhone → <b>Shortcuts</b> app → new Automation (or Shortcut).<br>
+        2. Add action <b>Find Health Samples → Workouts</b> (latest 1).<br>
+        3. Add <b>Open URLs</b> with:<br>
+        <code style="font-size:11px;word-break:break-all;color:var(--yellow)">https://egaivoto.github.io/roxready/?wtype=[Type]&amp;dur=[Duration in sec]&amp;km=[Distance]&amp;hr=[Avg HR]&amp;date=[Date yyyy-mm-dd]</code><br>
+        …inserting the workout's values as magic variables.<br>
+        4. Run it after a workout — the app opens and logs it. 👊
+      </div>
+      <button class="btn sec" style="margin-top:10px" onclick="testWatchImport()">Try a sample import</button>
+      <div class="tiny" style="margin-top:8px">Best a web app can do today — seamless background HealthKit sync needs the future app-store build. Tip: run imports in Safari; an installed icon may use separate storage.</div>
     </div>
-    <button class="btn sec" style="margin-top:12px" onclick="testWatchImport()">Try a sample import</button>
-    <div class="tiny" style="margin-top:8px">Note: this is the best a web app can do today. Seamless, automatic HealthKit sync (no Shortcut, background) needs the native app-store build — that's Stage 4. Tip: open the app in Safari for imports; an installed icon may use separate storage.</div>
   </div>
   <div class="card">
     <h2>Reminders</h2>
@@ -1747,7 +1747,7 @@ function resetAll(){
    ================================================================ */
 function coachLog(msg){ (S.adaptLog=S.adaptLog||[]).push({date:todayISO(), msg}); }
 function coachBanner(){
-  const logs=(S.adaptLog||[]).filter(l=>(fromISO(todayISO())-fromISO(l.date))/DAY<=2).slice(-2);
+  const logs=(S.adaptLog||[]).filter(l=>(fromISO(todayISO())-fromISO(l.date))/DAY<=2).slice(-1);
   return logs.map(l=>`<div class="coach">🧠 <b>Coach:</b> ${l.msg}</div>`).join("");
 }
 function annotate(s,note){ s.adaptNotes=s.adaptNotes||[]; if(!s.adaptNotes.includes(note)) s.adaptNotes.push(note); }
@@ -2207,43 +2207,18 @@ function renderGuide(){
     That's the whole system. Consistency does the rest.</p>
   </div>
   <div class="card guide">
-    <h2>🏠 Home</h2>
-    <p><b>Race countdown & phase</b> — your plan runs base → build → specific → taper. Each phase has a job; trust it.</p>
-    <p><b>Streak</b> — counts <i>weeks</i> where you hit your session goal (your training days minus one, so one busy day never ruins it). Rest days never break a streak, and you get one grace week a month. Missing a week just means you start a new streak — no guilt, just restart.</p>
-    <p><b>Check-in</b> — tap an energy emoji each day. If you report running on empty, the coach automatically eases the next day or two.</p>
-    <p><b>🧠 Coach messages</b> — when the plan adapts (missed session rescheduled, week trimmed or nudged up), it tells you here in plain language.</p>
-  </div>
-  <div class="card guide">
-    <h2>▤ Plan</h2>
-    <p><b>Phases:</b> <span class="pill base">base</span> builds your engine (easy volume), <span class="pill build">build</span> adds Hyrox loads and compromised runs, <span class="pill specific">specific</span> is everything at race pace, <span class="pill taper">taper</span> is rest — the fitness is already banked. Deload weeks every 4th week are intentional: back off so you can absorb the work.</p>
-    <p><b>Adaptivity:</b> miss a key session and it gets rescheduled within the week. Crush two good weeks and the next one nudges up. Struggle for two weeks and it trims itself ~25%. Every change is explained.</p>
-    <p><b>Make it yours:</b> tap any session → <b>Edit</b> to change it, <b>+ add</b> on a week header to add your own, Duplicate/Delete as needed. Train your own way — the plan is a scaffold, not a contract.</p>
-  </div>
-  <div class="card guide">
-    <h2>＋ Logging (the important habit)</h2>
-    <p>Tap the yellow <b>+</b>. Pick the session type. Fill only what you have — everything is optional except the basics.</p>
-    <p><b>Run splits matter most.</b> Whenever you run 1 km repeats or a simulation, enter each split. Split consistency is the single best predictor of a good Hyrox, and it's the headline number on your Progress tab.</p>
-    <p><b>Station times:</b> log them at full race distance when you can (e.g. full 50 m sled push, 100 wall balls) so comparisons stay honest. Your division's loads are shown on each station.</p>
-    <p><b>RPE</b> (1 = stroll, 10 = collapse) takes one tap and powers the adaptive coach — always tap it.</p>
-    <p><b>Studio classes count.</b> Train at a HIIT / circuit / functional studio? Tell us how many classes a week in onboarding or Settings, and the plan reserves those days and trims the overlapping conditioning — no double-booking your body. Log a class under the 🔥 <b>Studio Class</b> type: pick a focus, quick-fill a format, and optionally note the movements. You can save your studio's regular workout as a reusable format.</p>
-  </div>
-  <div class="card guide">
-    <h2>◔ Progress</h2>
-    <p><b>Split consistency (CV%)</b> — how even your 1 km splits are. Under 5% = metronome, racing well. Over 9% = pacing or engine issue.</p>
-    <p><b>Radar</b> — your strengths vs weaknesses compared to your goal pace. The “Focus” suggestion is what to add to your week.</p>
-    <p><b>Volume</b> — build gradually (~10%/week max). The chart makes big risky jumps obvious.</p>
-    <p><b>PRs and adherence</b> — proof it's working. 80%+ adherence is elite.</p>
-  </div>
-  <div class="card guide">
-    <h2>⚑ Race day</h2>
-    <p>Set a goal time → get per-run pace and per-station targets. Go out <b>no faster</b> than the suggested opening kilometre — every minute you steal early costs two at wall balls.</p>
-    <p>After each simulation the app writes a <b>report</b>: fade analysis, station-by-station vs target, Roxzone time. Do a sim every 4–6 weeks and let the report pick your next focus.</p>
+    <h2>Good to know</h2>
+    <p><b>The plan adapts.</b> Miss a key session and it's rescheduled within the week; two rough weeks and it trims itself; two great weeks and it nudges up. Every change is explained by a 🧠 coach message on Home. And every session is yours — tap to expand, then log, edit, skip, or add your own. It's a scaffold, not a contract.</p>
+    <p><b>The streak is friendly.</b> It counts weeks (goal = your training days minus one), rest days never break it, and you get one grace week a month. Broke it anyway? Just start the next one.</p>
+    <p><b>Run splits matter most.</b> Enter each 1 km split whenever you have them — split consistency (under 5% = metronome) is the best predictor of a good Hyrox and the headline number on Progress. Log station times at full race distance so comparisons stay honest, and always tap <b>RPE</b> — it powers the adaptive coach.</p>
+    <p><b>Studio classes count.</b> Set classes per week in Settings → Equipment &amp; classes and the plan builds around them. Log them under the 🔥 Studio Class type.</p>
+    <p><b>Everything race-day lives on the ⚑ Race tab</b> — pacing targets, official rules, your division's loads, and the technique &amp; form videos.</p>
   </div>
   <div class="card guide">
     <h2>💾 Your data & sharing</h2>
-    <p>Everything lives <b>on this device only</b> — nothing is uploaded anywhere. Two consequences:</p>
+    <p>Everything lives <b>on this device only</b> — nothing is uploaded anywhere.</p>
     <p><b>Back up</b>: Settings → Export JSON now and then (and before switching phones — Import restores everything).</p>
-    <p><b>Share with friends</b>: send them this HTML file (WhatsApp, email, AirDrop). They open it in a browser, get their own onboarding, their own plan, their own private data. On a phone, use the browser menu → <b>“Add to Home Screen”</b> to make it feel like a real app.</p>
+    <p><b>Share with friends</b>: send them the app link. Everyone gets their own onboarding, plan, and private data. On a phone, use the browser menu → <b>“Add to Home Screen”</b> to make it feel like a real app.</p>
   </div>
   <div class="card guide">
     <h2>❓ FAQ</h2>
@@ -2258,16 +2233,14 @@ function renderGuide(){
    TUTORIAL — spotlight walkthrough of the five screens
    ================================================================ */
 const TUT_STEPS=[
-  {v:"home", sel:"#homeCountdown", t:"Your race, counting down",
+  {v:"home", sel:"#homeHero .hero", t:"Your race, counting down",
    d:"Home is your daily starting point: days to race, which training phase you're in, and today's session further down. Open the app, do what it says, done."},
-  {v:"home", sel:"#homeStreak", t:"The streak (it's friendly)",
+  {v:"home", sel:"#homeStats .tiles", t:"The streak (it's friendly)",
    d:"Counts weeks where you hit your session goal — rest days never break it, and you get one grace week a month. This is the habit engine."},
   {v:"home", sel:"#homeCheckin", t:"2-second check-in",
    d:"Tap your energy each day. Report running on empty and the coach automatically eases the next day or two — and tells you it did."},
   {v:"plan", sel:"#planPhaseBar", t:"Your plan to race day",
-   d:"Base → build → specific → taper, with deloads built in. The plan adapts to what you actually do: missed key sessions get rescheduled, hard weeks get trimmed."},
-  {v:"plan", sel:"#planList .sess", t:"Every session is yours",
-   d:"Tap a session to expand it — log it, edit it, skip it. Use “+ add” on any week to insert your own sessions."},
+   d:"Base → build → specific → taper, with deloads built in. It adapts to what you actually do — and every session is editable: tap to expand, log, edit or skip it."},
   {v:"home", sel:"#fab", t:"The most important button",
    d:"Log any workout here in ~20 seconds. Enter your 1 km splits whenever you have them, and always tap RPE — it feeds the adaptive coach."},
   {v:"prog", sel:"#progBody .card", t:"Are you getting better?",
@@ -2294,10 +2267,12 @@ function tutShow(){
   card.style.opacity="0"; // fade the card out while we reposition
   const inset=parseInt(getComputedStyle($("topbar")).paddingTop)||0;
   const barBottom=53+inset, pad=6;
-  const isFixed = !!el.closest("#nav") || el.id==="topbar" || getComputedStyle(el).position==="fixed";
   setTimeout(()=>{
-    // compute the target's FINAL viewport position analytically, so the spotlight
-    // and the smooth-scroll glide together to the same place (no snapping)
+    // re-query INSIDE the settle delay: a re-render can detach the earlier node,
+    // and a detached element measures as 0×0 — which sent the spotlight nowhere
+    const el=document.querySelector(st.sel);
+    if(!el || el.getBoundingClientRect().width<10){ tutNext(); return; }
+    const isFixed = !!el.closest("#nav") || el.id==="topbar" || getComputedStyle(el).position==="fixed";
     const r=el.getBoundingClientRect();
     const absTop=r.top+window.scrollY;
     // clamp to what the page can ACTUALLY scroll — short views (Home) can't scroll far,
@@ -2306,7 +2281,9 @@ function tutShow(){
     const targetScroll = isFixed ? window.scrollY : Math.min(maxScroll, Math.max(0, absTop-(barBottom+24)));
     const finalTop = isFixed ? r.top : absTop-targetScroll;
     const finalBot = finalTop + r.height;
-    if(!isFixed) window.scrollTo({top:targetScroll, behavior:"smooth"});
+    // instant scroll: smooth scrolling is rAF-driven and stalls in background tabs;
+    // the spotlight's own CSS transition provides the glide
+    if(!isFixed) window.scrollTo(0, targetScroll);
     hole.style.left=(r.left-pad)+"px"; hole.style.top=(finalTop-pad)+"px";
     hole.style.width=(r.width+2*pad)+"px"; hole.style.height=(r.height+2*pad)+"px";
     card.innerHTML=`<h3>${st.t}</h3><div class="small">${st.d}</div>

@@ -2,7 +2,7 @@
 
 *A Hyrox training app that lives in a single file. No accounts, no subscriptions, your data never leaves your phone.*
 
-> The same guide is built into the app — tap the **?** button on the Home screen.
+> The same guide is built into the app — Settings (⚙, top right) → Help. Technique & form videos live on the **Race** tab.
 
 ---
 
