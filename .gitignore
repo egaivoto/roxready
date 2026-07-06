@@ -1,0 +1,4 @@
+# local tooling & editor/agent state — not part of the app
+.claude/
+.impeccable/live/
+serve.ps1
