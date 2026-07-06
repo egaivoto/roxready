@@ -27,6 +27,10 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 /* visible keyboard focus everywhere (mouse/touch unaffected) */
 :focus-visible{outline:2px solid var(--yellow);outline-offset:2px;border-radius:6px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.sessToggle{cursor:pointer;border-radius:12px}
+.statlbl{margin:0}
+.cardh{font-size:19px;font-weight:700;display:block}
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
@@ -241,7 +245,7 @@ a{color:var(--yellow)}
   <!-- ============ RACE ============ -->
   <div class="view" id="v-race">
     <button class="card" style="width:100%;text-align:left;cursor:pointer;display:block" onclick="go('technique')">
-      <div class="spread"><h2 style="margin:0">📖 Technique &amp; form guide</h2><span class="tiny">›</span></div>
+      <div class="spread"><span class="cardh">📖 Technique &amp; form guide</span><span class="tiny" aria-hidden="true">›</span></div>
       <p class="small" style="margin:4px 0 0">New to the movements? Station-by-station form cues, common mistakes, and what to train. Great technique saves more time than raw fitness.</p>
     </button>
     <div class="card">
@@ -946,7 +950,7 @@ function renderPlan(){
     ${["base","build","specific","taper"].filter(p=>counts[p]).map(p=>`<span class="pill ${p}">${p} · ${counts[p]}w</span>`).join(" ")}
     </div><div class="tiny" style="margin-top:6px">Engine first, specificity late, deloads every 4th week — that's the science. Tap a session to expand.</div></div>`;
   const t = todayISO();
-  $("planList").innerHTML = pl.weeks.filter(w=>w.sessions.length).map(w=>{
+  $("planList").innerHTML = `<h2 class="sr-only">Training plan by week</h2>` + pl.weeks.filter(w=>w.sessions.length).map(w=>{
     const end = dISO(new Date(fromISO(w.start).getTime()+6*DAY));
     const isCur = t>=w.start && t<=end;
     return `<div class="wkhead" ${isCur?'id="curweek"':''}>
@@ -963,17 +967,20 @@ function renderPlan(){
 function planSess(s){
   const w = wtype(s.type);
   const missed = !s.done && s.date < todayISO();
-  return `<div class="sess ${s.done?"done":""}" onclick="togglePlanDetail(this)">
-    <div class="rowflex">
-      <div class="typeic">${w.icon}</div>
-      <div style="flex:1">
-        <div class="spread"><span class="t">${esc(s.t)}</span>${s.done?`<span class="pill done">${s.skipped?"skipped":"done ✓"}</span>`:missed?`<span class="pill missed">missed</span>`:""}</div>
-        <div class="small">${fmtDate(s.date)}${s.rescheduled?' · <span class="tiny">rescheduled</span>':""}</div>
-        <div class="d pd" style="display:none">${esc(sessText(s))}</div>
-        <div class="pd" style="display:none">${whyLine(s)}</div>
+  const state = s.done?(s.skipped?"skipped":"done"):missed?"missed":"planned";
+  return `<div class="sess ${s.done?"done":""}">
+    <div class="sessToggle" role="button" tabindex="0" aria-expanded="false" aria-label="${esc(s.t)}, ${fmtDate(s.date)}, ${state} — expand for details" onclick="togglePlanDetail(this)">
+      <div class="rowflex">
+        <div class="typeic">${w.icon}</div>
+        <div style="flex:1">
+          <div class="spread"><span class="t">${esc(s.t)}</span>${s.done?`<span class="pill done">${s.skipped?"skipped":"done ✓"}</span>`:missed?`<span class="pill missed">missed</span>`:""}</div>
+          <div class="small">${fmtDate(s.date)}${s.rescheduled?' · <span class="tiny">rescheduled</span>':""}</div>
+          <div class="d pd" style="display:none">${esc(sessText(s))}</div>
+          <div class="pd" style="display:none">${whyLine(s)}</div>
+        </div>
       </div>
     </div>
-    <div class="pd" style="display:none;margin-top:10px" onclick="event.stopPropagation()">
+    <div class="pd" style="display:none;margin-top:10px">
       ${!s.done?`<div class="rowflex" style="flex-wrap:wrap">
         <button class="btn mini" onclick="logPlanned('${s.id}')">Log this session</button>
         <button class="btn sec mini" onclick="openSessEdit('${s.id}')">Edit</button>
@@ -985,7 +992,10 @@ function planSess(s){
   </div>`;
 }
 function togglePlanDetail(el){
-  el.querySelectorAll(".pd").forEach(x=>x.style.display = x.style.display==="none"?"block":"none");
+  const sess=el.closest(".sess");
+  const open = el.getAttribute("aria-expanded")!=="true";
+  sess.querySelectorAll(".pd").forEach(x=>x.style.display = open?"block":"none");
+  el.setAttribute("aria-expanded", open?"true":"false");
 }
 function undoSession(id){
   const s=findSession(id); if(!s) return;
@@ -1325,11 +1335,11 @@ function renderHistory(){
 }
 function histCard(w){
   const t=wtype(w.type);
-  return `<div class="hist" onclick="openDetail('${w.id}')">
+  return `<div class="hist" role="button" tabindex="0" aria-label="${t.name} ${fmtDate(w.date)} — open details" onclick="openDetail('${w.id}')">
     <div class="typeic">${t.icon}</div>
     <div style="flex:1"><div style="font-weight:700;font-size:14.5px">${t.name}${w.simKind?` (${w.simKind})`:""}${w.source==="watch"?' <span class="tiny">⌚</span>':""}</div>
     <div class="small">${fmtDate(w.date)} · ${lastSummary(w)}${w.rpe?` · RPE ${w.rpe}`:""}</div></div>
-    <div class="tiny">›</div></div>`;
+    <div class="tiny" aria-hidden="true">›</div></div>`;
 }
 function openDetail(id){
   const w=S.workouts.find(x=>x.id===id); if(!w) return;
@@ -1419,10 +1429,10 @@ function renderProgress(){
     trendTxt = d<=-0.3? `<span class="green">▼ ${Math.abs(d).toFixed(1)} vs last — steadier ✓</span>` : d>=0.3? `<span class="red">▲ ${d.toFixed(1)} vs last</span>` : "≈ holding steady";
   }
   h+=`<div class="card">
-    <div class="statlbl">Split consistency (headline KPI)</div>
+    <h2 class="statlbl">Split consistency (headline KPI)</h2>
     <div class="bignum ${latest? (latest.v<5?"green":latest.v<9?"yellow":"red"):""}">${latest?latest.v.toFixed(1)+"%":"–"}</div>
     <div class="tiny">Variation between your 1km run splits — the #1 predictor of a good Hyrox. Under 5% = metronome. ${trendTxt}</div>
-    ${cvSeries.length>=2? sparkline(cvSeries.map(x=>x.v), true) : `<div class="tiny" style="margin-top:8px">Log runs or sims with 3+ splits to start this trend.</div>`}
+    ${cvSeries.length>=2? sparkline(cvSeries.map(x=>x.v), true, `Split consistency trend over ${cvSeries.length} sessions, latest ${latest.v.toFixed(1)} percent`) : `<div class="tiny" style="margin-top:8px">Log runs or sims with 3+ splits to start this trend.</div>`}
   </div>`;
   // --- strengths & weaknesses radar ---
   h += radarCard();
@@ -1441,8 +1451,8 @@ function renderProgress(){
     const k=dISO(new Date(monday(new Date()).getTime()-i*7*DAY));
     last8.push({k, ...(volByWeek[k]||{km:0,min:0})});
   }
-  h+=`<div class="card"><div class="statlbl">Weekly volume (run + erg km)</div>
-    ${barChart(last8.map(x=>x.km), last8.map((x,i)=>i===7?"now":""))}
+  h+=`<div class="card"><h2 class="statlbl">Weekly volume (run + erg km)</h2>
+    ${barChart(last8.map(x=>x.km), last8.map((x,i)=>i===7?"now":""), `Weekly training volume, last 8 weeks, this week ${last8[7].km.toFixed(1)} km`)}
     <div class="tiny">This week: <b>${last8[7].km.toFixed(1)} km</b> · ${Math.round(last8[7].min)} min trained. Build gradually — big jumps are how injuries happen.</div></div>`;
   // --- pace trend ---
   const paceByWeek = {};
@@ -1453,13 +1463,13 @@ function renderProgress(){
   });
   const paceSeries = Object.keys(paceByWeek).sort().map(k=>mean(paceByWeek[k]));
   if(paceSeries.length>=2){
-    h+=`<div class="card"><div class="statlbl">Easy-run pace trend (aerobic proxy)</div>
-      ${sparkline(paceSeries, true)}
+    h+=`<div class="card"><h2 class="statlbl">Easy-run pace trend (aerobic proxy)</h2>
+      ${sparkline(paceSeries, true, `Easy-run pace trend, latest average ${fmtPace(paceSeries[paceSeries.length-1])}`)}
       <div class="tiny">Latest avg: <b>${fmtPace(paceSeries[paceSeries.length-1])}</b>. Downward = your engine is growing. 📉 = 🎉</div></div>`;
   }
   // --- PRs ---
   const prList = allPRs();
-  h+=`<div class="card"><div class="statlbl" style="margin-bottom:8px">Personal records</div>
+  h+=`<div class="card"><h2 class="statlbl" style="margin-bottom:8px">Personal records</h2>
     ${prList.length? `<table class="pace">${prList.map(p=>`<tr><td>${p.icon} ${p.name}</td><td class="r"><b>${p.val}</b></td><td class="r tiny">${fmtDate(p.date)}</td></tr>`).join("")}</table>`
     : `<div class="empty">PRs appear as you log splits, ergs, stations and lifts.</div>`}</div>`;
   // --- adherence ---
@@ -1468,7 +1478,7 @@ function renderProgress(){
   S.plan.weeks.forEach(w=>w.sessions.forEach(s=>{ if(s.date<=t){ planned++; if(s.done&&!s.skipped) done++; }}));
   if(planned>0){
     const pct=Math.round(done/planned*100);
-    h+=`<div class="card"><div class="statlbl">Plan adherence</div>
+    h+=`<div class="card"><h2 class="statlbl">Plan adherence</h2>
       <div class="bignum ${pct>=80?"green":pct>=50?"yellow":"red"}">${pct}%</div>
       <div class="tiny">${done} of ${planned} planned sessions completed so far. ${pct>=80?"Elite consistency — this is what gets PBs.":pct>=50?"Solid — protect your key sessions (intervals + long run) first.":"Aim for the two big ones each week: intervals and the long run. The rest is bonus."}</div></div>`;
   }
@@ -1498,21 +1508,21 @@ function allPRs(){
   return out;
 }
 /* tiny SVG charts */
-function sparkline(vals, lowerIsBetter){
+function sparkline(vals, lowerIsBetter, aria){
   const W=300,H=60,P=6;
   const mn=Math.min(...vals), mx=Math.max(...vals);
   const x=i=>P+i*(W-2*P)/Math.max(1,vals.length-1);
   const y=v=>P+(H-2*P)*(1-((v-mn)/((mx-mn)||1)));
   const pts=vals.map((v,i)=>x(i)+","+y(v)).join(" ");
-  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:60px;margin-top:8px">
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:60px;margin-top:8px" role="img" aria-label="${esc(aria||"Trend over time")}">
     <polyline points="${pts}" fill="none" stroke="var(--yellow)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
     ${vals.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="3" fill="${i===vals.length-1?"var(--yellow)":"var(--faint)"}"/>`).join("")}
   </svg>`;
 }
-function barChart(vals, labels){
+function barChart(vals, labels, aria){
   const W=300,H=90,P=4,bw=(W-2*P)/vals.length;
   const mx=Math.max(...vals,1);
-  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:90px;margin:8px 0 4px">
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:90px;margin:8px 0 4px" role="img" aria-label="${esc(aria||"Bar chart")}">
     ${vals.map((v,i)=>{
       const h=(H-22)*(v/mx), x=P+i*bw;
       return `<rect x="${x+3}" y="${H-16-h}" width="${bw-6}" height="${Math.max(h,1.5)}" rx="3" fill="${i===vals.length-1?"var(--yellow)":"var(--card2)"}" stroke="${i===vals.length-1?"none":"var(--line)"}"/>
@@ -1536,7 +1546,7 @@ function renderPacing(){
   S.profile.goalTime = sec; save(); track("pacing_calc");
   const runTotal = sec*PACE_MODEL.runs, perKm = runTotal/8;
   const rox = sec*PACE_MODEL.rox;
-  let rows = `<tr><th>Segment</th><th class="r">Target</th></tr>`;
+  let rows = `<tr><th scope="col">Segment</th><th scope="col" class="r">Target</th></tr>`;
   rows += `<tr><td>🏃 Each 1 km run (avg)</td><td class="r"><b>${fmtSec(perKm)}</b></td></tr>`;
   rows += `<tr><td style="padding-left:22px" class="tiny">Opening 1 km — go out controlled, no faster than</td><td class="r">${fmtSec(perKm*0.96)}</td></tr>`;
   STATIONS.forEach(st=>{
@@ -1554,7 +1564,7 @@ function renderStandards(){
   const p=S.profile;
   $("standardsOut").innerHTML = `<div class="tiny" style="margin-bottom:8px">${p.division.toUpperCase()} · ${p.sex==="m"?"Men's":"Women's"} · season 25/26${p.division==="doubles"?" — Doubles run everything, share station work":""}</div>
     <table class="pace">
-      <tr><th>#</th><th>After each run</th><th class="r">Standard</th><th class="r">Your load</th></tr>
+      <tr><th scope="col">#</th><th scope="col">After each run</th><th scope="col" class="r">Standard</th><th scope="col" class="r">Your load</th></tr>
       ${STATIONS.map((st,i)=>{
         const load=stationLoad(st.id);
         return `<tr><td>${i+1}</td><td>${st.icon} ${st.name}</td><td class="r">${st.unit}</td><td class="r"><b>${load||"—"}</b></td></tr>`;
@@ -1957,7 +1967,7 @@ const RADAR_ADVICE={
   wb:"EMOM wall balls: 10–15 per minute for 8–10 min"};
 function radarCard(){
   const {axes, assumed}=radarData();
-  if(axes.length<3) return `<div class="card"><div class="statlbl">Strengths & weaknesses</div>
+  if(axes.length<3) return `<div class="card"><h2 class="statlbl">Strengths & weaknesses</h2>
     <div class="tiny" style="margin-top:6px">Log station times and run splits (a simulation is perfect) and your strengths-vs-weaknesses radar appears here.</div></div>`;
   const N=axes.length, cx=150, cy=105, R=72;
   const pt=(i,r)=>{ const a=-Math.PI/2 + i*2*Math.PI/N; return (cx+r*Math.cos(a)).toFixed(1)+","+(cy+r*Math.sin(a)).toFixed(1); };
@@ -1968,8 +1978,8 @@ function radarCard(){
   const labels=axes.map((ax,i)=>{ const [x,y]=pt(i,R+16).split(","); return `<text x="${x}" y="${y}" text-anchor="middle">${ax.name}</text>`; }).join("");
   const weakest=axes.reduce((a,c)=>c.ratio<a.ratio?c:a);
   const strongest=axes.reduce((a,c)=>c.ratio>a.ratio?c:a);
-  return `<div class="card"><div class="statlbl">Strengths & weaknesses vs goal pace</div>
-    <svg viewBox="0 0 300 215" style="width:100%">${rings}${spokes}
+  return `<div class="card"><h2 class="statlbl">Strengths & weaknesses vs goal pace</h2>
+    <svg viewBox="0 0 300 215" style="width:100%" role="img" aria-label="Radar of your stations vs goal pace. Strongest: ${esc(strongest.name)}. Focus area: ${esc(weakest.name)}.">${rings}${spokes}
       <polygon points="${poly}" fill="rgba(255,214,10,.22)" stroke="var(--yellow)" stroke-width="2"/>${labels}</svg>
     <div class="tiny">💪 Strongest: <b>${strongest.name}</b> · 🎯 Focus: <b>${weakest.name}</b> — ${RADAR_ADVICE[weakest.id]||"give it a weekly slot"}.
     ${assumed?" (No goal time set — comparing to an estimate from your 5K. Set one in the Race tab.)":""}</div></div>`;
@@ -2331,6 +2341,13 @@ function tutNext(){
    BOOT
    ================================================================ */
 document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{ if(e.target===m) m.classList.remove("open"); }));
+// keyboard-activate any role=button faux-button (real <button>s handle this natively)
+document.addEventListener("keydown", e=>{
+  const el=e.target;
+  if((e.key==="Enter"||e.key===" ") && el.matches && el.matches('[role="button"][tabindex]')){
+    e.preventDefault(); el.click();
+  }
+});
 // press feedback: add .pressing on touch/press, clear on release (reliable on iOS)
 (function(){
   const PRESSABLE = "button, .chip, .optbtn, .sess, .hist, .card[onclick], .tile, .tbLogo";
