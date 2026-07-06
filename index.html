@@ -14,12 +14,22 @@
 <style>
 :root{
   --bg:#0e0f11; --card:#17181c; --card2:#1e2025; --line:#2a2c33;
-  --txt:#f2f3f5; --dim:#9a9da6; --faint:#5c5f68;
+  --txt:#f2f3f5; --dim:#9a9da6; --faint:#82858d; /* faint bumped to ~5.2:1 on bg so tertiary text passes WCAG AA */
+  --hair:#3a3d45; /* decorative-only divider tone (the old faint value's job) */
   --yellow:#ffd60a; --yellow-dim:#b89a00;
   --green:#3ddc84; --red:#ff5c5c; --blue:#5aa8ff; --orange:#ff9f43;
+  /* semantic tints (phase pills, callouts) — derived from the status set, tokenised */
+  --tint-base:#173a2a; --tint-build:#3a2e14; --tint-specific:#16283f; --tint-taper:#332040; --ink-taper:#c39bff;
+  --banner-bg:#26240f; --coach-bg:#101d2c; --coach-line:#24405e;
+  --why-bg:#1c2412; --why-line:#3a4a24; --why-ink:#cfe0b8; --missed-bg:#3a1620;
   --radius:16px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+/* visible keyboard focus everywhere (mouse/touch unaffected) */
+:focus-visible{outline:2px solid var(--yellow);outline-offset:2px;border-radius:6px}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
 html,body{height:100%}
 body{
   background:var(--bg);color:var(--txt);
@@ -32,9 +42,9 @@ body{
 .tbInner{display:flex;align-items:center;justify-content:space-between;height:52px;padding:0 12px;gap:8px}
 .tbLeft{display:flex;align-items:center;gap:10px;min-width:0}
 .tbRight{display:flex;align-items:center;gap:6px}
-.tbLogo{width:34px;height:34px;border-radius:9px;background:var(--yellow);color:#111;font-weight:800;font-size:13px;letter-spacing:-.5px;flex:none;display:flex;align-items:center;justify-content:center}
-.tbTitle{font-weight:800;font-size:18px;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tbIcon{background:var(--card2);border:1px solid var(--line);color:var(--txt);width:36px;height:36px;border-radius:10px;font-size:15px;display:flex;align-items:center;justify-content:center;flex:none}
+.tbLogo{width:40px;height:40px;border-radius:10px;background:var(--yellow);color:#111;font-weight:800;font-size:14px;letter-spacing:-.5px;flex:none;display:flex;align-items:center;justify-content:center}
+.tbTitle{font-weight:800;font-size:18px;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0}
+.tbIcon{background:var(--card2);border:1px solid var(--line);color:var(--txt);width:40px;height:40px;border-radius:10px;font-size:15px;display:flex;align-items:center;justify-content:center;flex:none}
 .tbIcon.txt{width:auto;padding:0 13px;font-size:14px;font-weight:700}
 .tbIcon.bare{background:none;border:none;font-size:24px;width:30px}
 .tbPill{background:linear-gradient(135deg,var(--yellow),#ffb700);color:#111;font-weight:800;font-size:12px;padding:0 11px;height:32px;border-radius:999px;flex:none;letter-spacing:.3px}
@@ -64,7 +74,7 @@ button:active{transform:scale(.95)}
 .btn{background:var(--yellow);color:#111;font-weight:800;padding:14px 18px;width:100%;border-radius:14px;font-size:16px}
 .btn.sec{background:var(--card2);color:var(--txt);border:1px solid var(--line);font-weight:600}
 .btn.danger{background:transparent;color:var(--red);border:1px solid var(--red)}
-.btn.mini{width:auto;padding:8px 14px;font-size:13px;border-radius:10px}
+.btn.mini{width:auto;padding:8px 14px;font-size:13px;border-radius:10px;min-height:44px}
 .btn:disabled{opacity:.4}
 input,select,textarea{
   font-family:inherit;font-size:16px;color:var(--txt);
@@ -85,10 +95,10 @@ label.fld span.lbl{display:block;font-size:12.5px;color:var(--dim);margin-bottom
 .chip{background:var(--card2);border:1px solid var(--line);color:var(--txt);padding:10px 14px;border-radius:999px;font-size:14px;font-weight:600}
 .chip.on{background:var(--yellow);color:#111;border-color:var(--yellow)}
 .pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
-.pill.base{background:#173a2a;color:var(--green)} .pill.build{background:#3a2e14;color:var(--orange)}
-.pill.specific{background:#16283f;color:var(--blue)} .pill.taper{background:#332040;color:#c39bff}
-.pill.deload{background:#2a2c33;color:var(--dim)}
-.pill.done{background:#173a2a;color:var(--green)}
+.pill.base{background:var(--tint-base);color:var(--green)} .pill.build{background:var(--tint-build);color:var(--orange)}
+.pill.specific{background:var(--tint-specific);color:var(--blue)} .pill.taper{background:var(--tint-taper);color:var(--ink-taper)}
+.pill.deload{background:var(--line);color:var(--dim)}
+.pill.done{background:var(--tint-base);color:var(--green)}
 /* bottom nav */
 #nav{position:fixed;bottom:0;left:0;right:0;z-index:50;display:flex;justify-content:center}
 #nav .inner{width:100%;max-width:520px;background:rgba(20,21,25,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
@@ -135,7 +145,7 @@ svg text{fill:var(--dim);font-size:9px;font-family:inherit}
 .rpewrap button{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:9px 0;font-weight:700;font-size:13px}
 .rpewrap button.on{background:var(--yellow);color:#111;border-color:var(--yellow)}
 .toast{position:fixed;top:calc(64px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--yellow);color:var(--txt);padding:12px 20px;border-radius:14px;z-index:200;font-weight:600;font-size:14.5px;box-shadow:0 6px 24px rgba(0,0,0,.5);max-width:90%;text-align:center}
-.banner{background:#26240f;border:1px solid var(--yellow-dim);border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:14px}
+.banner{background:var(--banner-bg);border:1px solid var(--yellow-dim);border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:14px}
 table.pace{width:100%;border-collapse:collapse;font-size:14px}
 table.pace td,table.pace th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
 table.pace th{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
@@ -145,8 +155,8 @@ table.pace td.r,table.pace th.r{text-align:right;font-variant-numeric:tabular-nu
 .sheet{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;padding:20px 18px calc(24px + env(safe-area-inset-bottom));border:1px solid var(--line)}
 .empty{color:var(--faint);text-align:center;padding:26px 10px;font-size:14px}
 a{color:var(--yellow)}
-.coach{background:#101d2c;border:1px solid #24405e;border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:14px}
-.whybox{background:#1c2412;border:1px solid #3a4a24;border-radius:12px;padding:9px 12px;margin-top:10px;font-size:13px;color:#cfe0b8}
+.coach{background:var(--coach-bg);border:1px solid var(--coach-line);border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:14px}
+.whybox{background:var(--why-bg);border:1px solid var(--why-line);border-radius:12px;padding:9px 12px;margin-top:10px;font-size:13px;color:var(--why-ink)}
 .whybox b{color:var(--green)}
 /* tutorial spotlight */
 #tut{position:fixed;inset:0;z-index:300;display:none}
@@ -157,13 +167,14 @@ a{color:var(--yellow)}
   transition:top .4s cubic-bezier(.22,1,.36,1),opacity .28s ease}
 #tutCard h3{margin-bottom:4px;color:var(--yellow)}
 #tutCard .small{margin-bottom:12px}
-.pill.missed{background:#3a1620;color:var(--red)}
+.pill.missed{background:var(--missed-bg);color:var(--red)}
 .guide h3{margin:14px 0 4px}
 .guide p{font-size:14px;color:var(--dim);margin-bottom:8px}
 .guide b{color:var(--txt)}
 /* home layout */
 .sectlbl{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--dim);margin:4px 2px 9px;display:flex;align-items:center;justify-content:space-between}
-.sectlbl a{color:var(--faint);font-weight:700;font-size:11px}
+.sectlbl h2{font-size:inherit;font-weight:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit;margin:0}
+.lnk{background:none;border:none;color:var(--dim);font-weight:700;font-size:11px;letter-spacing:.3px;text-transform:uppercase;cursor:pointer;padding:8px 4px;margin:-8px -4px}
 .hero{background:linear-gradient(140deg,#20222a 0%,#161719 60%);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px;position:relative;overflow:hidden}
 .hero::after{content:"";position:absolute;right:-40px;top:-40px;width:150px;height:150px;background:radial-gradient(circle,rgba(255,214,10,.16),transparent 70%);pointer-events:none}
 .hero .htop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;position:relative}
@@ -173,7 +184,7 @@ a{color:var(--yellow)}
 .tile .l{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-top:4px}
 .progbar{height:7px;background:var(--card2);border-radius:5px;overflow:hidden;margin-top:14px;position:relative}
 .progbar>div{height:100%;background:linear-gradient(90deg,var(--yellow),#ffb700);border-radius:5px}
-.checkbar{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.checkbar{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -191,7 +202,10 @@ a{color:var(--yellow)}
 
   <!-- fixed top bar (content set by renderTopBar) -->
   <header id="topbar"><div class="tbInner"></div></header>
+  <!-- polite live region so toasts/status are announced to screen readers -->
+  <div id="srLive" role="status" aria-live="polite" style="position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0"></div>
 
+  <main id="views">
   <!-- ============ HOME ============ -->
   <div class="view" id="v-home">
     <div id="homeReminder"></div>
@@ -290,14 +304,16 @@ a{color:var(--yellow)}
     <input type="file" id="cohortFile" accept=".json" multiple style="display:none" onchange="importCohort(event)">
   </div>
 
+  </main>
+
   <!-- bottom nav -->
-  <div id="nav"><div class="inner">
-    <button class="navbtn" data-v="home" onclick="go('home')"><span class="ic">⌂</span>Home</button>
-    <button class="navbtn" data-v="plan" onclick="go('plan')"><span class="ic">▤</span>Plan</button>
-    <button id="fab" onclick="go('log')">+</button>
-    <button class="navbtn" data-v="prog" onclick="go('prog')"><span class="ic">◔</span>Progress</button>
-    <button class="navbtn" data-v="race" onclick="go('race')"><span class="ic">⚑</span>Race</button>
-  </div></div>
+  <nav id="nav" aria-label="Primary"><div class="inner">
+    <button class="navbtn" data-v="home" onclick="go('home')"><span class="ic" aria-hidden="true">⌂</span>Home</button>
+    <button class="navbtn" data-v="plan" onclick="go('plan')"><span class="ic" aria-hidden="true">▤</span>Plan</button>
+    <button id="fab" onclick="go('log')" aria-label="Log a workout">+</button>
+    <button class="navbtn" data-v="prog" onclick="go('prog')"><span class="ic" aria-hidden="true">◔</span>Progress</button>
+    <button class="navbtn" data-v="race" onclick="go('race')"><span class="ic" aria-hidden="true">⚑</span>Race</button>
+  </div></nav>
 
   <!-- log form modal -->
   <div class="modal" id="logModal"><div class="sheet" id="logSheet"></div></div>
@@ -463,6 +479,7 @@ function toast(msg){
   const t=document.createElement("div"); t.className="toast"; t.innerHTML=msg;
   document.body.appendChild(t); setTimeout(()=>{t.style.opacity="0";t.style.transition="opacity .4s"},2200);
   setTimeout(()=>t.remove(),2700);
+  const live=$("srLive"); if(live) live.textContent = t.textContent; // announce to screen readers
 }
 function mean(a){ return a.reduce((x,y)=>x+y,0)/a.length; }
 function stdev(a){ const m=mean(a); return Math.sqrt(mean(a.map(x=>(x-m)**2))); }
@@ -738,11 +755,11 @@ function renderTopBar(v){
   let left, right;
   if(secondary){
     left=`<button class="tbIcon bare" onclick="go('home')" aria-label="Back">‹</button>
-      <span class="tbTitle">${esc(titles[v])}</span>`;
+      <h1 class="tbTitle">${esc(titles[v])}</h1>`;
     right=`<button class="tbIcon txt" onclick="go('home')">Done</button>`;
   } else {
     left=`<button class="tbLogo" onclick="go('settings')" aria-label="Profile & settings">RX</button>
-      <span class="tbTitle">${esc(titles[v]||"ROXREADY")}</span>`;
+      <h1 class="tbTitle">${esc(titles[v]||"ROXREADY")}</h1>`;
     // reserved future slots: upgrade (freemium), notifications (push), community (Stage 3)
     right=`<button class="tbPill" onclick="comingSoon('upgrade')">✦ PRO</button>
       <button class="tbIcon" onclick="comingSoon('alerts')" aria-label="Notifications">🔔</button>
@@ -817,14 +834,14 @@ function renderHome(){
       <div class="small">Recovery is training. Eat, sleep, walk.</div>
       ${next?`<div class="small" style="margin-top:8px">Next up: <b>${esc(next.t)}</b> · ${fmtDate(next.date)}</div>`:""}</div>`;
   }
-  $("homeToday").innerHTML = `<div class="sectlbl">Today <a onclick="go('plan')">Full plan ›</a></div>`+h;
+  $("homeToday").innerHTML = `<div class="sectlbl"><h2>Today</h2><button class="lnk" onclick="go('plan')">Full plan ›</button></div>`+h;
   // ---- CHECK-IN (compact, own render handles state) ----
   $("homeCheckin").innerHTML = renderCheckin();
   // ---- STATS TILES ----
   const st = calcStreak();
   const dots = weekProgressDots();
   const adh = adherencePct();
-  $("homeStats").innerHTML = `<div class="sectlbl">Your training <a onclick="go('prog')">Progress ›</a></div>
+  $("homeStats").innerHTML = `<div class="sectlbl"><h2>Your training</h2><button class="lnk" onclick="go('prog')">Progress ›</button></div>
     <div class="tiles">
       <div class="tile"><div class="v">${st.weeks}${st.weeks>=3?" 🔥":""}</div><div class="l">Week streak</div></div>
       <div class="tile"><div class="v ${dots.done>=dots.goal?"green":""}">${dots.done}/${dots.goal}</div><div class="l">This week</div></div>
@@ -833,7 +850,7 @@ function renderHome(){
     <div class="tiny" style="margin:-8px 2px 4px">${st.msg}</div>`;
   // ---- RECENT ----
   const rec = [...S.workouts].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,3);
-  $("homeRecent").innerHTML = rec.length? `<div class="sectlbl" style="margin-top:16px">Recent <a onclick="go('log')">History ›</a></div>`+rec.map(histCard).join("") : "";
+  $("homeRecent").innerHTML = rec.length? `<div class="sectlbl" style="margin-top:16px"><h2>Recent</h2><button class="lnk" onclick="go('log')">History ›</button></div>`+rec.map(histCard).join("") : "";
   // ---- banner (one at a time — coach news beats nudges) ----
   $("homeReminder").innerHTML = coachBanner() || lapseBanner();
 }
@@ -1839,9 +1856,10 @@ const FACES=["","😵","😮‍💨","😐","🙂","🔥"];
 function renderCheckin(){
   const today=(S.checkins||[]).find(c=>c.date===todayISO());
   if(today) return `<div class="checkbar"><span class="small">Today's energy: ${FACES[today.energy]} ${today.energy<=2?"— easy-day mode. Moving at all is the win.":today.energy>=4?"— green light, go get it 👊":"— noted ✓"}</span></div>`;
+  const ENERGY=["","Spent","Low","Okay","Good","Great"];
   return `<div class="checkbar">
     <span class="small"><b>Energy check-in</b></span>
-    <div class="rowflex" style="gap:4px">${[1,2,3,4,5].map(e=>`<button class="chip" style="padding:6px 9px" onclick="saveCheckin(${e})">${FACES[e]}</button>`).join("")}</div>
+    <div class="rowflex" style="gap:6px">${[1,2,3,4,5].map(e=>`<button class="chip" style="padding:0;min-width:44px;min-height:44px;justify-content:center;font-size:18px" aria-label="Energy: ${ENERGY[e]}" onclick="saveCheckin(${e})">${FACES[e]}</button>`).join("")}</div>
   </div>`;
 }
 function saveCheckin(e){

@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-05T00:00:00Z",
+  "title": "Design System: ROXREADY",
+  "extensions": {
+    "colorMeta": {
+      "yellow":        { "role": "primary", "displayName": "Voltage Yellow",  "canonical": "#ffd60a", "tonalRamp": ["#3a3000","#5c4c00","#8a7300","#b89a00","#e0bb00","#ffd60a","#ffe250","#fff0a8"] },
+      "yellow-dim":    { "role": "primary", "displayName": "Dim Gold",        "canonical": "#b89a00", "tonalRamp": ["#2e2700","#463b00","#6b5a00","#8a7300","#b89a00","#d4b300","#e6c94d","#f2e199"] },
+      "bg":            { "role": "neutral", "displayName": "Cockpit Black",   "canonical": "#0e0f11", "tonalRamp": ["#0e0f11","#17181c","#1e2025","#2a2c33","#3a3d45","#5c5f68","#9a9da6","#f2f3f5"] },
+      "surface":       { "role": "neutral", "displayName": "Panel Graphite",  "canonical": "#17181c", "tonalRamp": ["#0e0f11","#17181c","#1e2025","#2a2c33","#3a3d45","#5c5f68","#9a9da6","#f2f3f5"] },
+      "surface-raised":{ "role": "neutral", "displayName": "Raised Graphite", "canonical": "#1e2025", "tonalRamp": ["#0e0f11","#17181c","#1e2025","#2a2c33","#3a3d45","#5c5f68","#9a9da6","#f2f3f5"] },
+      "line":          { "role": "neutral", "displayName": "Hairline",        "canonical": "#2a2c33", "tonalRamp": ["#17181c","#1e2025","#2a2c33","#3a3d45","#4a4d56","#5c5f68","#7e8189","#9a9da6"] },
+      "ink":           { "role": "neutral", "displayName": "Ink",             "canonical": "#f2f3f5", "tonalRamp": ["#5c5f68","#7e8189","#9a9da6","#b8bbc2","#d4d6db","#e6e7ea","#f2f3f5","#ffffff"] },
+      "ink-dim":       { "role": "neutral", "displayName": "Dim Ink",         "canonical": "#9a9da6", "tonalRamp": ["#3a3d45","#4a4d56","#5c5f68","#7e8189","#9a9da6","#b8bbc2","#d4d6db","#e6e7ea"] },
+      "ink-faint":     { "role": "neutral", "displayName": "Faint Ink",       "canonical": "#82858d", "tonalRamp": ["#3a3d45","#4a4d56","#5c5f68","#6e727a","#82858d","#9a9da6","#b8bbc2","#d4d6db"] },
+      "green":         { "role": "tertiary","displayName": "Go Green",        "canonical": "#3ddc84", "tonalRamp": ["#0d3a22","#12522f","#1a7645","#22a15e","#2fc574","#3ddc84","#6fe8a5","#a8f2c8"] },
+      "red":           { "role": "tertiary","displayName": "Stop Red",        "canonical": "#ff5c5c", "tonalRamp": ["#4a1414","#6b1d1d","#992a2a","#c53838","#e64c4c","#ff5c5c","#ff8f8f","#ffc2c2"] },
+      "blue":          { "role": "tertiary","displayName": "Data Blue",       "canonical": "#5aa8ff", "tonalRamp": ["#12283f","#1a3a5c","#26548a","#3872b8","#4a90e0","#5aa8ff","#8fc4ff","#c2e0ff"] },
+      "orange":        { "role": "tertiary","displayName": "Effort Orange",   "canonical": "#ff9f43", "tonalRamp": ["#4a2e0d","#6b4212","#99611a","#c57e26","#e69138","#ff9f43","#ffbc7e","#ffd8b8"] }
+    },
+    "typographyMeta": {
+      "display":  { "displayName": "Display", "purpose": "Cockpit readouts — race countdown and big stat values. Tight −1.5px tracking." },
+      "headline": { "displayName": "Headline", "purpose": "View titles (h1)." },
+      "title":    { "displayName": "Title", "purpose": "Card headers (h2)." },
+      "body":     { "displayName": "Body", "purpose": "Reading copy and instructions. 16px floor." },
+      "label":    { "displayName": "Label", "purpose": "Uppercase micro-labels framing data (stat/section/field labels)." }
+    },
+    "shadows": [
+      { "name": "fab-glow", "value": "0 4px 18px rgba(255,214,10,0.35)", "purpose": "Yellow bloom under the floating log FAB — the one place accent light leaks." },
+      { "name": "toast-lift", "value": "0 6px 24px rgba(0,0,0,0.5)", "purpose": "Transient confirmation toasts floating above the panel." },
+      { "name": "spotlight-scrim", "value": "0 0 0 9999px rgba(0,0,0,0.74)", "purpose": "Tutorial spotlight — full-screen dark scrim punched by the highlighted element." }
+    ],
+    "motion": [
+      { "name": "view-fade", "value": "180ms ease", "purpose": "View entrance: opacity + 4px translateY. Honor prefers-reduced-motion with instant swap." },
+      { "name": "press", "value": "transform 80ms ease, filter 120ms ease", "purpose": "Button/control press feedback via .pressing class." },
+      { "name": "spotlight-glide", "value": "400ms cubic-bezier(0.22,1,0.36,1)", "purpose": "Tutorial spotlight and card moving between steps (ease-out-quint feel)." }
+    ],
+    "breakpoints": [
+      { "name": "app-column", "value": "520px", "purpose": "The app is a single centered phone-width column; content never exceeds 520px. No multi-column responsive breakpoints — it is phone-first by design." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single loudest element per screen — the primary action.",
+      "html": "<button class=\"ds-btn\">Log this session ✓</button>",
+      "css": ".ds-btn{background:#ffd60a;color:#111;font-weight:800;font-size:16px;padding:14px 18px;width:100%;border:none;border-radius:14px;font-family:inherit;transition:transform 80ms ease,filter 120ms ease}.ds-btn:active{transform:scale(.98)}.ds-btn:hover{filter:brightness(1.05)}.ds-btn:focus-visible{outline:2px solid #ffd60a;outline-offset:2px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Default for anything that isn't THE action — graphite with a hairline border.",
+      "html": "<button class=\"ds-btn-sec\">Skip</button>",
+      "css": ".ds-btn-sec{background:#1e2025;color:#f2f3f5;font-weight:600;font-size:16px;padding:14px 18px;width:100%;border:1px solid #2a2c33;border-radius:14px;font-family:inherit;transition:filter 120ms ease}.ds-btn-sec:hover{filter:brightness(1.15)}.ds-btn-sec:active{transform:scale(.98)}.ds-btn-sec:focus-visible{outline:2px solid #b89a00;outline-offset:2px}"
+    },
+    {
+      "name": "Chip (multi-select)",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Pill toggle for equipment/filters; selected state flips to yellow with a leading check.",
+      "html": "<div style=\"display:flex;gap:8px;flex-wrap:wrap\"><button class=\"ds-chip\">Rower</button><button class=\"ds-chip ds-chip-on\">✓ Sled</button></div>",
+      "css": ".ds-chip{background:#1e2025;border:1px solid #2a2c33;color:#f2f3f5;padding:10px 14px;border-radius:999px;font-size:14px;font-weight:600;font-family:inherit;transition:filter 120ms ease}.ds-chip:active{transform:scale(.95)}.ds-chip-on{background:#ffd60a;border-color:#ffd60a;color:#111}.ds-chip:focus-visible{outline:2px solid #ffd60a;outline-offset:2px}"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Flat panel-graphite container with a hairline border. No shadow, never nested.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-h\">Pacing calculator</div><p class=\"ds-card-p\">Turn a goal finish time into run and station targets.</p></div>",
+      "css": ".ds-card{background:#17181c;border:1px solid #2a2c33;border-radius:16px;padding:16px;color:#f2f3f5;font-family:inherit}.ds-card-h{font-size:19px;font-weight:700;margin-bottom:10px}.ds-card-p{font-size:13px;color:#9a9da6;line-height:1.45;margin:0}"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Raised-graphite field with an uppercase micro-label; focus shifts the border to dim gold.",
+      "html": "<label class=\"ds-fld\"><span class=\"ds-lbl\">Goal finish time</span><input class=\"ds-input\" placeholder=\"1:30:00\"></label>",
+      "css": ".ds-fld{display:block}.ds-lbl{display:block;font-size:12.5px;color:#9a9da6;margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}.ds-input{font-family:inherit;font-size:16px;color:#f2f3f5;background:#1e2025;border:1px solid #2a2c33;border-radius:12px;padding:12px;width:100%;box-sizing:border-box;-webkit-appearance:none;appearance:none;outline:none}.ds-input::placeholder{color:#5c5f68}.ds-input:focus{border-color:#b89a00}"
+    },
+    {
+      "name": "Status Pill",
+      "kind": "chip",
+      "refersTo": "pill-status",
+      "description": "Tiny uppercase phase/status marker; tinted background of its own hue.",
+      "html": "<div style=\"display:flex;gap:6px\"><span class=\"ds-pill ds-pill-base\">base</span><span class=\"ds-pill ds-pill-build\">build</span><span class=\"ds-pill ds-pill-done\">done ✓</span></div>",
+      "css": ".ds-pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;font-family:inherit}.ds-pill-base{background:#173a2a;color:#3ddc84}.ds-pill-build{background:#3a2e14;color:#ff9f43}.ds-pill-done{background:#173a2a;color:#3ddc84}"
+    },
+    {
+      "name": "Bottom Nav + FAB",
+      "kind": "nav",
+      "refersTo": "fab",
+      "description": "Four tabs flanking the central floating yellow log button; active tab is voltage yellow.",
+      "html": "<div class=\"ds-nav\"><button class=\"ds-navbtn ds-on\"><span class=\"ds-ic\">⌂</span>Home</button><button class=\"ds-navbtn\"><span class=\"ds-ic\">▤</span>Plan</button><button class=\"ds-fab\">+</button><button class=\"ds-navbtn\"><span class=\"ds-ic\">◔</span>Progress</button><button class=\"ds-navbtn\"><span class=\"ds-ic\">⚑</span>Race</button></div>",
+      "css": ".ds-nav{display:flex;align-items:flex-start;background:rgba(20,21,25,.96);backdrop-filter:blur(12px);border-top:1px solid #2a2c33;padding:6px 4px;font-family:inherit}.ds-navbtn{flex:1;background:none;border:none;color:#5c5f68;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:700;letter-spacing:.3px;padding:6px 0}.ds-navbtn.ds-on{color:#ffd60a}.ds-ic{font-size:20px;line-height:1}.ds-fab{width:54px;height:54px;border-radius:50%;background:#ffd60a;color:#111;font-size:30px;font-weight:700;border:none;display:flex;align-items:center;justify-content:center;margin-top:-24px;box-shadow:0 4px 18px rgba(255,214,10,.35)}"
+    },
+    {
+      "name": "Cockpit Hero",
+      "kind": "custom",
+      "refersTo": "card",
+      "description": "The Home centerpiece — race countdown in Display type over a graphite gradient with a corner yellow bloom and a weeks-to-race progress bar.",
+      "html": "<div class=\"ds-hero\"><div class=\"ds-hstatlbl\">Race countdown</div><div class=\"ds-bignum\">84<span class=\"ds-hunit\"> days</span></div><div class=\"ds-progbar\"><div class=\"ds-progfill\"></div></div></div>",
+      "css": ".ds-hero{position:relative;overflow:hidden;background:linear-gradient(140deg,#20222a 0%,#161719 60%);border:1px solid #2a2c33;border-radius:18px;padding:18px;font-family:inherit;color:#f2f3f5}.ds-hero::after{content:\"\";position:absolute;right:-40px;top:-40px;width:150px;height:150px;background:radial-gradient(circle,rgba(255,214,10,.16),transparent 70%);pointer-events:none}.ds-hstatlbl{font-size:11.5px;color:#9a9da6;text-transform:uppercase;letter-spacing:.6px;font-weight:700}.ds-bignum{font-size:40px;font-weight:800;letter-spacing:-1.5px;line-height:1.05;color:#ffd60a}.ds-hunit{font-size:18px;color:#9a9da6}.ds-progbar{height:7px;background:#1e2025;border-radius:5px;overflow:hidden;margin-top:14px}.ds-progfill{height:100%;width:45%;background:linear-gradient(90deg,#ffd60a,#ffb700);border-radius:5px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Race Cockpit",
+    "overview": "ROXREADY is a dark instrument panel worn on the wrist of a training day. The surface is near-black; a single high-voltage yellow is the live readout — the one number, the one action, the one thing that matters right now. Everything else recedes into graphite so the yellow never has to compete. It holds a deliberate tension: clinical precision (honest splits, exact loads, fade percentages that don't flatter) that earns the right to a gritty, motivating voice. Density is phone-native and single-column, glanceable one-handed, mid-workout, in bright gym light. Depth comes from tonal layering, not shadow theatrics. It rejects the cluttered fitness app, childish gamification, and the generic SaaS dashboard.",
+    "keyCharacteristics": [
+      "Near-black graphite base with a single high-voltage yellow accent (#ffd60a)",
+      "One system font family across four weights — no display/body pairing",
+      "Tonal layering for depth; shadows reserved for the two floating elements (FAB, toast)",
+      "Big tap targets, high contrast, fast entry — built for the gym floor",
+      "Semantic status color (green/amber/blue) only where meaning demands it"
+    ],
+    "rules": [
+      { "name": "The One Voice Rule", "body": "Voltage Yellow marks exactly one thing per screen: the primary action or the live metric. Two yellow fills competing in one viewport is forbidden — demote one to secondary graphite.", "section": "colors" },
+      { "name": "The Faint-Ink Ceiling", "body": "#5c5f68 (Faint Ink) is decorative only — timestamps, dividers, disabled hints. Any text a user must read to act uses Dim Ink (#9a9da6) or brighter.", "section": "colors" },
+      { "name": "The 16px Floor Rule", "body": "Body copy never drops below 16px, and inputs stay at 16px to stop iOS zoom-on-focus. Captions are for metadata only.", "section": "typography" },
+      { "name": "The Weight-Not-Face Rule", "body": "Emphasis comes from weight (700/800) and the yellow, never from a second font.", "section": "typography" },
+      { "name": "The Flat-Panel Rule", "body": "Cards and containers cast no shadow. Separation comes from a tonal step and a hairline border. Shadows are reserved for elements that literally float (FAB, toast, scrim).", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep Voltage Yellow to one element per screen — the primary action or the live metric.",
+      "Do build depth with tonal graphite steps (#0e0f11 → #17181c → #1e2025) and 1px #2a2c33 borders.",
+      "Do keep body text ≥16px and ≥4.5:1 contrast; use Dim Ink (#9a9da6) or brighter for anything readable.",
+      "Do carry meaning in one system font's weights (700/800) and the yellow, not in a second typeface.",
+      "Do keep tap targets chunky (≥44px) — used mid-workout, one-handed, in bright light.",
+      "Do state the honest number, then let the gritty voice motivate."
+    ],
+    "donts": [
+      "Don't put readable text in Faint Ink (#5c5f68) — it fails AA (~2.9:1). Timestamps and dividers only.",
+      "Don't use gradient text or background-clip:text — the yellow is a solid fill or metric color, never a gradient on glyphs.",
+      "Don't nest cards, or default to a card when a tonal step or hairline divider would do.",
+      "Don't add ad rails, stacked banners, or competing CTAs — one clear next action per screen.",
+      "Don't add cartoon mascots, confetti storms, badge spam, or guilt-trip streak mechanics.",
+      "Don't introduce a blue-accent, hero-metric-template dashboard look.",
+      "Don't shadow flat surfaces; shadows are only for the FAB, the toast, and the tutorial scrim.",
+      "Don't run press states hotter than a subtle scale/tone — the intent is precise & minimal, not theatrical."
+    ]
+  }
+}
