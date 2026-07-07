@@ -86,6 +86,7 @@ input,select,textarea{
   padding:12px 12px;width:100%;min-width:0;outline:none;box-sizing:border-box;
   -webkit-appearance:none;appearance:none;
 }
+input::placeholder,textarea::placeholder{color:var(--faint)} /* tokenised — passes AA (~5:1) */
 /* date/time inputs: force the same box as text inputs (webkit sizes them taller/wider) */
 input[type=date],input[type=time]{height:47px;line-height:21px;min-height:47px}
 input[type=date]::-webkit-date-and-time-value{text-align:left;margin:0}
@@ -96,7 +97,7 @@ input[type=number]{-moz-appearance:textfield}
 label.fld{display:block;margin-bottom:12px}
 label.fld span.lbl{display:block;font-size:12.5px;color:var(--dim);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{background:var(--card2);border:1px solid var(--line);color:var(--txt);padding:10px 14px;border-radius:999px;font-size:14px;font-weight:600}
+.chip{background:var(--card2);border:1px solid var(--line);color:var(--txt);padding:10px 14px;border-radius:999px;font-size:14px;font-weight:600;min-height:44px;display:inline-flex;align-items:center}
 .chip.on{background:var(--yellow);color:#111;border-color:var(--yellow)}
 .pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
 .pill.base{background:var(--tint-base);color:var(--green)} .pill.build{background:var(--tint-build);color:var(--orange)}
@@ -136,17 +137,18 @@ label.fld span.lbl{display:block;font-size:12.5px;color:var(--dim);margin-bottom
 /* log */
 .splitrow{display:grid;grid-template-columns:44px 1fr 1fr 36px;gap:8px;align-items:center;margin-bottom:8px}
 .strow{display:grid;grid-template-columns:36px 1fr 1fr 36px;gap:8px;align-items:center;margin-bottom:8px}
-.xbtn{background:var(--card2);color:var(--dim);border:1px solid var(--line);border-radius:10px;height:40px;font-size:16px}
+.xbtn{background:var(--card2);color:var(--dim);border:1px solid var(--line);border-radius:10px;height:44px;font-size:16px}
 .stitem{display:flex;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.stitem .stTime{min-height:44px}
 /* history */
 .hist{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:9px}
 /* charts */
 svg text{fill:var(--dim);font-size:9px;font-family:inherit}
 .segctl{display:flex;background:var(--card2);border-radius:12px;padding:3px;border:1px solid var(--line);margin-bottom:14px}
-.segctl button{flex:1;background:none;color:var(--dim);padding:8px 4px;font-weight:700;font-size:13px;border-radius:9px}
+.segctl button{flex:1;background:none;color:var(--dim);padding:8px 4px;font-weight:700;font-size:13px;border-radius:9px;min-height:44px}
 .segctl button.on{background:var(--yellow);color:#111}
 .rpewrap{display:flex;gap:5px}
-.rpewrap button{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:9px 0;font-weight:700;font-size:13px}
+.rpewrap button{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:9px 0;font-weight:700;font-size:13px;min-height:44px}
 .rpewrap button.on{background:var(--yellow);color:#111;border-color:var(--yellow)}
 .toast{position:fixed;top:calc(64px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--yellow);color:var(--txt);padding:12px 20px;border-radius:14px;z-index:200;font-weight:600;font-size:14.5px;box-shadow:0 6px 24px rgba(0,0,0,.5);max-width:90%;text-align:center}
 .banner{background:var(--banner-bg);border:1px solid var(--yellow-dim);border-radius:14px;padding:12px 14px;margin-bottom:14px;font-size:14px}
@@ -233,7 +235,7 @@ a{color:var(--yellow)}
   <div class="view" id="v-log">
     <div class="grid2" id="logTypeGrid"></div>
     <h2 style="margin-top:22px">History</h2>
-    <input id="histSearch" placeholder="Search history…" oninput="renderHistory()" style="margin-bottom:10px">
+    <input id="histSearch" type="search" aria-label="Search history" placeholder="Search history…" oninput="renderHistory()" style="margin-bottom:10px">
     <div id="histList"></div>
   </div>
 
@@ -320,11 +322,11 @@ a{color:var(--yellow)}
   </div></nav>
 
   <!-- log form modal -->
-  <div class="modal" id="logModal"><div class="sheet" id="logSheet"></div></div>
+  <div class="modal" id="logModal"><div class="sheet" id="logSheet" role="dialog" aria-modal="true" aria-label="Log a session" tabindex="-1"></div></div>
   <!-- workout detail modal -->
-  <div class="modal" id="detailModal"><div class="sheet" id="detailSheet"></div></div>
+  <div class="modal" id="detailModal"><div class="sheet" id="detailSheet" role="dialog" aria-modal="true" aria-label="Workout details" tabindex="-1"></div></div>
   <!-- plan session edit modal -->
-  <div class="modal" id="sessModal"><div class="sheet" id="sessSheet"></div></div>
+  <div class="modal" id="sessModal"><div class="sheet" id="sessSheet" role="dialog" aria-modal="true" aria-label="Edit session" tabindex="-1"></div></div>
   <!-- tutorial spotlight overlay -->
   <div id="tut"><div id="tutHole"></div><div id="tutCard"></div></div>
   <!-- post-onboarding tour offer -->
@@ -1032,9 +1034,10 @@ function openLog(type, planSessionId, editId){
   const plan = planSessionId ? findSession(planSessionId) : null;
   const last = lastOfType(type);
   const w = wtype(type);
+  $("logSheet").setAttribute("aria-label", (plan?plan.t:w.name)+" — log form");
   let h = `<div class="spread" style="margin-bottom:12px">
     <h2 style="margin:0">${w.icon} ${plan?esc(plan.t):w.name}</h2>
-    <button class="btn sec mini" onclick="closeLog()">✕</button></div>`;
+    <button class="btn sec mini" aria-label="Close" onclick="closeLog()">✕</button></div>`;
   if(plan) h += `<div class="tiny" style="margin-bottom:10px;white-space:pre-line">${esc(plan.d)}</div>${whyLine(plan)}`;
   if(last && !edit) h += `<div class="tiny" style="margin:10px 0">Last time (${fmtDate(last.date)}): ${lastSummary(last)}</div>`;
   h += `<label class="fld"><span class="lbl">Date</span><input type="date" id="lg_date" value="${edit?edit.date:todayISO()}"></label>`;
@@ -1115,6 +1118,7 @@ function openLog(type, planSessionId, editId){
     ${edit?`<button class="btn danger" style="margin-top:8px" onclick="deleteWorkout('${edit.id}')">Delete</button>`:""}`;
 
   $("logSheet").innerHTML = h;
+  initToggleAria();
   $("logModal").classList.add("open");
   // prefill dynamic rows on edit
   if(edit){
@@ -1127,17 +1131,23 @@ function openLog(type, planSessionId, editId){
   }
 }
 function closeLog(){ $("logModal").classList.remove("open"); stopTimer(); }
-function segPick(btn){ btn.parentElement.querySelectorAll("button").forEach(b=>b.classList.remove("on")); btn.classList.add("on"); }
-function rpePick(btn){ btn.parentElement.querySelectorAll("button").forEach(b=>b.classList.remove("on")); btn.classList.add("on"); }
+function setPressed(group){ group.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed", b.classList.contains("on")?"true":"false")); }
+function segPick(btn){ btn.parentElement.querySelectorAll("button").forEach(b=>b.classList.remove("on")); btn.classList.add("on"); setPressed(btn.parentElement); }
+function rpePick(btn){ btn.parentElement.querySelectorAll("button").forEach(b=>b.classList.remove("on")); btn.classList.add("on"); setPressed(btn.parentElement); }
+// initialise toggle-button ARIA after a form renders
+function initToggleAria(){
+  document.querySelectorAll("#logSheet .segctl").forEach(setPressed);
+  const rpe=$("rpeWrap"); if(rpe){ setPressed(rpe); [...rpe.querySelectorAll("button")].forEach(b=>b.setAttribute("aria-label","RPE "+b.dataset.v+" of 10")); }
+}
 function addSplitRow(val){
   const rows = $("splitRows"); if(!rows) return;
   const n = rows.children.length;
   if(n>=8 && logCtx.type==="sim"){ toast("Max 8 splits — that's the race!"); return; }
   const div=document.createElement("div"); div.className="splitrow";
   div.innerHTML = `<span class="tiny" style="text-align:center">Run ${n+1}</span>
-    <input inputmode="numeric" placeholder="mm:ss" class="splitInp" value="${val||""}">
+    <input inputmode="numeric" placeholder="mm:ss" class="splitInp" aria-label="Run ${n+1} split time" value="${val||""}">
     <span class="tiny paceHint"></span>
-    <button class="xbtn" onclick="this.parentElement.remove();renumberSplits()">✕</button>`;
+    <button class="xbtn" aria-label="Remove run ${n+1}" onclick="this.parentElement.remove();renumberSplits()">✕</button>`;
   rows.appendChild(div);
   const inp=div.querySelector("input");
   inp.addEventListener("input",()=>{ inp.value=formatTimeDigits(inp.value); const s=parseTime(inp.value); div.querySelector(".paceHint").textContent = s?fmtPace(s):""; });
@@ -1146,7 +1156,11 @@ function addSplitRow(val){
 }
 function renumberSplits(){
   const rows=$("splitRows"); if(!rows) return;
-  [...rows.children].forEach((r,i)=>r.firstElementChild.textContent="Run "+(i+1));
+  [...rows.children].forEach((r,i)=>{
+    r.firstElementChild.textContent="Run "+(i+1);
+    const inp=r.querySelector(".splitInp"); if(inp) inp.setAttribute("aria-label","Run "+(i+1)+" split time");
+    const x=r.querySelector(".xbtn"); if(x) x.setAttribute("aria-label","Remove run "+(i+1));
+  });
 }
 function addStRow(id, pre){
   const st = STATIONS.find(s=>s.id===id);
@@ -1156,15 +1170,15 @@ function addStRow(id, pre){
   div.innerHTML = `<span style="font-size:18px">${st.icon}</span>
     <div style="flex:1"><div style="font-weight:700;font-size:14px">${st.name}</div>
     <div class="tiny">${st.unit}${load?" · "+load:""}</div></div>
-    <input inputmode="numeric" placeholder="mm:ss" style="width:86px;padding:9px" class="stTime timefld" value="${pre&&pre.time?fmtSec(pre.time):""}">
-    <button class="xbtn" onclick="this.parentElement.remove()" style="width:36px">✕</button>`;
+    <input inputmode="numeric" placeholder="mm:ss" style="width:86px;padding:9px" class="stTime timefld" aria-label="${st.name} time" value="${pre&&pre.time?fmtSec(pre.time):""}">
+    <button class="xbtn" aria-label="Remove ${st.name}" onclick="this.parentElement.remove()" style="width:44px">✕</button>`;
   rows.appendChild(div);
 }
 function addExRow(pre){
   const rows=$("exRows"); if(!rows) return;
   const div=document.createElement("div"); div.className="card flat";
   div.style.marginBottom="8px"; div.dataset.ex="1";
-  div.innerHTML = `<input placeholder="Exercise (e.g. goblet squat)" class="exName" value="${pre?esc(pre.name):""}" style="margin-bottom:8px">
+  div.innerHTML = `<input placeholder="Exercise (e.g. goblet squat)" aria-label="Exercise name" class="exName" value="${pre?esc(pre.name):""}" style="margin-bottom:8px">
     <div class="grid3">
       <label><span class="tiny">Sets</span><input inputmode="numeric" class="exSets" value="${pre?pre.sets:""}" placeholder="3"></label>
       <label><span class="tiny">Reps</span><input inputmode="numeric" class="exReps" value="${pre?pre.reps:""}" placeholder="10"></label>
@@ -1345,7 +1359,7 @@ function openDetail(id){
   const w=S.workouts.find(x=>x.id===id); if(!w) return;
   const t=wtype(w.type);
   let h=`<div class="spread" style="margin-bottom:10px"><h2 style="margin:0">${t.icon} ${t.name}</h2>
-    <button class="btn sec mini" onclick="$('detailModal').classList.remove('open')">✕</button></div>
+    <button class="btn sec mini" aria-label="Close" onclick="$('detailModal').classList.remove('open')">✕</button></div>
     <div class="small" style="margin-bottom:12px">${fmtDate(w.date)}${w.rpe?` · RPE ${w.rpe}`:""}${w.durationSec?` · ${fmtSec(w.durationSec,w.type==="sim")}`:""}</div>`;
   if(w.splits&&w.splits.length){
     h+=`<h3 style="margin-bottom:6px">Run splits</h3>${splitBars(w.splits)}
@@ -2002,7 +2016,7 @@ function openSessEdit(id, weekIdx){
   const defDate = s? s.date : (weekIdx!=null? (S.plan.weeks[weekIdx].start>=todayISO()? S.plan.weeks[weekIdx].start : todayISO()) : todayISO());
   $("sessSheet").innerHTML=`
     <div class="spread" style="margin-bottom:12px"><h2 style="margin:0">${s?"Edit session":"Add session"}</h2>
-    <button class="btn sec mini" onclick="$('sessModal').classList.remove('open')">✕</button></div>
+    <button class="btn sec mini" aria-label="Close" onclick="$('sessModal').classList.remove('open')">✕</button></div>
     <label class="fld"><span class="lbl">Title</span><input id="se_title" value="${s?esc(s.t):""}" placeholder="e.g. Tempo Run"></label>
     <div class="grid2">
       <label class="fld"><span class="lbl">Type</span><select id="se_type">${WTYPES.map(w=>`<option value="${w.id}" ${s&&s.type===w.id?"selected":""}>${w.icon} ${w.name}</option>`).join("")}</select></label>
@@ -2348,6 +2362,50 @@ document.addEventListener("keydown", e=>{
     e.preventDefault(); el.click();
   }
 });
+// modal manager: give the .modal/.sheet dialogs real behaviour (focus move-in, focus
+// trap, Escape-to-close, focus restore) without touching every open/close call site.
+(function(){
+  let lastOutside=null, returnTo=null, active=null;
+  // remember the opener from real interaction — focusin covers keyboard, pointerdown covers touch/mouse
+  const remember=e=>{ const t=e.target.closest&&e.target.closest("button,[role=button],a,input,select,textarea"); if(t && !t.closest(".modal")) lastOutside=t; };
+  document.addEventListener("focusin", remember, true);
+  document.addEventListener("pointerdown", remember, true);
+  const focusables = root => [...root.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetWidth||el.offsetHeight||el.getClientRects().length);
+  function onKey(e){
+    if(!active) return;
+    const sheet=active.querySelector(".sheet")||active;
+    if(e.key==="Escape"){ e.preventDefault(); active.classList.remove("open"); return; }
+    if(e.key==="Tab"){
+      const f=focusables(sheet); if(!f.length) return;
+      const first=f[0], last=f[f.length-1];
+      if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+    }
+  }
+  function activate(modal){
+    active=modal;
+    returnTo=lastOutside; // capture the opener now, before hiding can bounce focus to <body>
+    const sheet=modal.querySelector(".sheet")||modal;
+    // move focus to the dialog itself (unless a field already grabbed it for quick entry)
+    if(!sheet.contains(document.activeElement)) sheet.focus();
+    document.addEventListener("keydown", onKey, true);
+  }
+  function deactivate(){
+    document.removeEventListener("keydown", onKey, true);
+    if(typeof stopTimer==="function") stopTimer();
+    active=null;
+    const el=returnTo; returnTo=null;
+    // defer past the browser's own focus fixup (hiding the focused sheet bounces focus to <body>)
+    if(el && el.focus) requestAnimationFrame(()=>{ if(document.contains(el)){ try{ el.focus(); }catch(e){} } });
+  }
+  const obs=new MutationObserver(muts=>muts.forEach(m=>{
+    const el=m.target; if(!el.classList||!el.classList.contains("modal")) return;
+    const open=el.classList.contains("open");
+    if(open && active!==el) activate(el);
+    else if(!open && active===el) deactivate();
+  }));
+  document.querySelectorAll(".modal").forEach(m=>obs.observe(m,{attributes:true,attributeFilter:["class"]}));
+})();
 // press feedback: add .pressing on touch/press, clear on release (reliable on iOS)
 (function(){
   const PRESSABLE = "button, .chip, .optbtn, .sess, .hist, .card[onclick], .tile, .tbLogo";
