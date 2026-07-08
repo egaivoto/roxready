@@ -50,8 +50,8 @@ body{
 .tbTitle{font-weight:800;font-size:18px;letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0}
 .tbIcon{background:var(--card2);border:1px solid var(--line);color:var(--txt);width:40px;height:40px;border-radius:10px;font-size:15px;display:flex;align-items:center;justify-content:center;flex:none}
 .tbIcon.txt{width:auto;padding:0 13px;font-size:14px;font-weight:700}
-.tbIcon.bare{background:none;border:none;font-size:24px;width:30px}
-.tbPill{background:linear-gradient(135deg,var(--yellow),#ffb700);color:#111;font-weight:800;font-size:12px;padding:0 11px;height:32px;border-radius:999px;flex:none;letter-spacing:.3px}
+.tbIcon.bare{background:none;border:none;width:30px;color:var(--txt)}
+.tbPill{background:var(--yellow);color:#111;font-weight:800;font-size:12px;padding:0 11px;height:32px;border-radius:999px;flex:none;letter-spacing:.3px}
 h1{font-size:26px;font-weight:800;letter-spacing:-.5px}
 h2{font-size:19px;font-weight:700;margin-bottom:10px}
 h3{font-size:15px;font-weight:700}
@@ -107,8 +107,8 @@ label.fld span.lbl{display:block;font-size:12.5px;color:var(--dim);margin-bottom
 /* bottom nav */
 #nav{position:fixed;bottom:0;left:0;right:0;z-index:50;display:flex;justify-content:center}
 #nav .inner{width:100%;max-width:520px;background:rgba(20,21,25,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
-.navbtn{flex:1;background:none;color:var(--faint);display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:700;padding:6px 0;letter-spacing:.3px}
-.navbtn .ic{font-size:20px;line-height:1}
+.navbtn{flex:1;background:none;color:var(--faint);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:700;padding:6px 0;letter-spacing:.3px}
+.navbtn .ic{display:flex;line-height:1}
 .navbtn.on{color:var(--yellow)}
 #fab{width:54px;height:54px;border-radius:50%;background:var(--yellow);color:#111;font-size:30px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:-24px;box-shadow:0 4px 18px rgba(255,214,10,.35);flex:none;align-self:flex-start}
 /* onboarding */
@@ -133,7 +133,7 @@ label.fld span.lbl{display:block;font-size:12.5px;color:var(--dim);margin-bottom
 .sess.done{opacity:.55}
 .sess .t{font-weight:700;font-size:15px}
 .sess .d{font-size:13px;color:var(--dim);margin-top:3px;white-space:pre-line}
-.typeic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none;background:var(--card2)}
+.typeic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;letter-spacing:.4px;color:var(--dim);flex:none;background:var(--card2)}
 /* log */
 .splitrow{display:grid;grid-template-columns:44px 1fr 1fr 36px;gap:8px;align-items:center;margin-bottom:8px}
 .strow{display:grid;grid-template-columns:36px 1fr 1fr 36px;gap:8px;align-items:center;margin-bottom:8px}
@@ -184,12 +184,14 @@ a{color:var(--yellow)}
 .hero{background:linear-gradient(140deg,#20222a 0%,#161719 60%);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px;position:relative;overflow:hidden}
 .hero::after{content:"";position:absolute;right:-40px;top:-40px;width:150px;height:150px;background:radial-gradient(circle,rgba(255,214,10,.16),transparent 70%);pointer-events:none}
 .hero .htop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;position:relative}
-.tiles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px}
-.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 8px;text-align:center}
+.tiles{display:flex;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 4px;margin-bottom:18px}
+.tile{flex:1;text-align:center;padding:0 6px}
+.tile+.tile{border-left:1px solid var(--line)}
 .tile .v{font-size:23px;font-weight:800;line-height:1.05}
 .tile .l{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-top:4px}
-.progbar{height:7px;background:var(--card2);border-radius:5px;overflow:hidden;margin-top:14px;position:relative}
-.progbar>div{height:100%;background:linear-gradient(90deg,var(--yellow),#ffb700);border-radius:5px}
+.gauge{display:flex;gap:2px;height:8px;margin-top:14px}
+.gauge i{flex:1;background:var(--card2);border-radius:1px;font-style:normal}
+.gauge i.on{background:var(--yellow)}
 .checkbar{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 </style>
 </head>
@@ -247,7 +249,7 @@ a{color:var(--yellow)}
   <!-- ============ RACE ============ -->
   <div class="view" id="v-race">
     <button class="card" style="width:100%;text-align:left;cursor:pointer;display:block" onclick="go('technique')">
-      <div class="spread"><span class="cardh">📖 Technique &amp; form guide</span><span class="tiny" aria-hidden="true">›</span></div>
+      <div class="spread"><span class="cardh">Technique &amp; form guide</span><span class="tiny" aria-hidden="true">›</span></div>
       <p class="small" style="margin:4px 0 0">New to the movements? Station-by-station form cues, common mistakes, and what to train. Great technique saves more time than raw fitness.</p>
     </button>
     <div class="card">
@@ -258,9 +260,8 @@ a{color:var(--yellow)}
       </label>
       <button class="btn" onclick="renderPacing()">Calculate targets</button>
       <div id="paceOut" style="margin-top:14px"></div>
-    </div>
-    <div class="card">
-      <h2>🏁 Race format, standards &amp; rules</h2>
+      <div style="border-top:1px solid var(--line);margin:20px 0"></div>
+      <h2>Race format, standards &amp; rules</h2>
       <p class="small" style="margin-bottom:10px">The format is identical at every race: <b>8 × 1 km run</b>, each followed by one functional station, always in this order. Loads shown are <b>yours</b> for the selected division.</p>
       <div id="standardsOut"></div>
       <h3 style="margin:14px 0 6px">Judging &amp; no-reps</h3>
@@ -314,11 +315,11 @@ a{color:var(--yellow)}
 
   <!-- bottom nav -->
   <nav id="nav" aria-label="Primary"><div class="inner">
-    <button class="navbtn" data-v="home" onclick="go('home')"><span class="ic" aria-hidden="true">⌂</span>Home</button>
-    <button class="navbtn" data-v="plan" onclick="go('plan')"><span class="ic" aria-hidden="true">▤</span>Plan</button>
-    <button id="fab" onclick="go('log')" aria-label="Log a workout">+</button>
-    <button class="navbtn" data-v="prog" onclick="go('prog')"><span class="ic" aria-hidden="true">◔</span>Progress</button>
-    <button class="navbtn" data-v="race" onclick="go('race')"><span class="ic" aria-hidden="true">⚑</span>Race</button>
+    <button class="navbtn" data-v="home" onclick="go('home')"><span class="ic"></span>Home</button>
+    <button class="navbtn" data-v="plan" onclick="go('plan')"><span class="ic"></span>Plan</button>
+    <button id="fab" onclick="go('log')" aria-label="Log a workout"></button>
+    <button class="navbtn" data-v="prog" onclick="go('prog')"><span class="ic"></span>Progress</button>
+    <button class="navbtn" data-v="race" onclick="go('race')"><span class="ic"></span>Race</button>
   </div></nav>
 
   <!-- log form modal -->
@@ -331,7 +332,7 @@ a{color:var(--yellow)}
   <div id="tut"><div id="tutHole"></div><div id="tutCard"></div></div>
   <!-- post-onboarding tour offer -->
   <div class="modal" id="askTut"><div class="sheet" style="max-width:420px">
-    <h2>Want a 60-second tour? 🗺️</h2>
+    <h2>Want a 60-second tour?</h2>
     <p class="small" style="margin:8px 0 16px">A quick walkthrough of the five screens — what to look at, and when. You can replay it any time from Settings.</p>
     <button class="btn" onclick="closeAskTut();startTutorial()">Show me around</button>
     <button class="btn sec" style="margin-top:8px" onclick="closeAskTut()">Skip — I'll explore</button>
@@ -350,14 +351,14 @@ const DAY = 86400000;
 
 /* ---------- Hyrox station data (season 25/26 standards) ---------- */
 const STATIONS = [
-  {id:"ski",     name:"SkiErg",            unit:"1000 m",  icon:"⛷"},
-  {id:"push",    name:"Sled Push",         unit:"50 m",    icon:"🛷"},
-  {id:"pull",    name:"Sled Pull",         unit:"50 m",    icon:"🪢"},
-  {id:"bbj",     name:"Burpee Broad Jump", unit:"80 m",    icon:"🐸"},
-  {id:"row",     name:"Row",               unit:"1000 m",  icon:"🚣"},
-  {id:"farmers", name:"Farmers Carry",     unit:"200 m",   icon:"🧳"},
-  {id:"lunges",  name:"Sandbag Lunges",    unit:"100 m",   icon:"🎒"},
-  {id:"wb",      name:"Wall Balls",        unit:"100 reps",icon:"🏐"},
+  {id:"ski",     name:"SkiErg",            unit:"1000 m",  code:"SKI"},
+  {id:"push",    name:"Sled Push",         unit:"50 m",    code:"PSH"},
+  {id:"pull",    name:"Sled Pull",         unit:"50 m",    code:"PUL"},
+  {id:"bbj",     name:"Burpee Broad Jump", unit:"80 m",    code:"BBJ"},
+  {id:"row",     name:"Row",               unit:"1000 m",  code:"ROW"},
+  {id:"farmers", name:"Farmers Carry",     unit:"200 m",   code:"FRM"},
+  {id:"lunges",  name:"Sandbag Lunges",    unit:"100 m",   code:"LNG"},
+  {id:"wb",      name:"Wall Balls",        unit:"100 reps",code:"WB"},
 ];
 // loads by [division][sex]  (kg; sled totals include the sled)
 const LOADS = {
@@ -381,14 +382,14 @@ const PACE_MODEL = {
 };
 
 const WTYPES = [
-  {id:"run",     name:"Run",             icon:"🏃", desc:"Easy / long / tempo"},
-  {id:"intervals",name:"Run Intervals",  icon:"⚡", desc:"Track or treadmill reps"},
-  {id:"brick",   name:"Compromised Run", icon:"🔁", desc:"Station + run combos"},
-  {id:"erg",     name:"Erg (Ski / Row)", icon:"🚣", desc:"Interval or steady"},
-  {id:"strength",name:"Strength",        icon:"🏋️", desc:"Sets, reps, load"},
-  {id:"stations",name:"Station Practice",icon:"🎯", desc:"Hyrox stations, timed"},
-  {id:"class",   name:"Studio Class",    icon:"🔥", desc:"HIIT / circuit / functional class"},
-  {id:"sim",     name:"Race Simulation", icon:"🏁", desc:"Full or half, with splits"},
+  {id:"run",     name:"Run",             code:"RUN", desc:"Easy / long / tempo"},
+  {id:"intervals",name:"Run Intervals",  code:"INT", desc:"Track or treadmill reps"},
+  {id:"brick",   name:"Compromised Run", code:"BRK", desc:"Station + run combos"},
+  {id:"erg",     name:"Erg (Ski / Row)", code:"ERG", desc:"Interval or steady"},
+  {id:"strength",name:"Strength",        code:"STR", desc:"Sets, reps, load"},
+  {id:"stations",name:"Station Practice",code:"STA", desc:"Hyrox stations, timed"},
+  {id:"class",   name:"Studio Class",    code:"CLS", desc:"HIIT / circuit / functional class"},
+  {id:"sim",     name:"Race Simulation", code:"SIM", desc:"Full or half, with splits"},
 ];
 const wtype = id => WTYPES.find(w=>w.id===id) || WTYPES[0];
 
@@ -404,9 +405,9 @@ const EQUIPMENT = [
 
 // generic (unbranded) studio-class formats — inspired by common circuit-class structures
 const CLASS_FOCUS = {
-  cardio:   {label:"Cardio / conditioning", tag:"cardio",  emoji:"❤️‍🔥"},
-  resistance:{label:"Resistance / strength", tag:"strength", emoji:"💪"},
-  hybrid:   {label:"Hybrid (cardio + strength)", tag:"hybrid", emoji:"🔀"},
+  cardio:   {label:"Cardio / conditioning", tag:"cardio"},
+  resistance:{label:"Resistance / strength", tag:"strength"},
+  hybrid:   {label:"Hybrid (cardio + strength)", tag:"hybrid"},
 };
 const CLASS_TEMPLATES = [
   {name:"Cardio circuit", focus:"cardio",
@@ -446,6 +447,33 @@ function track(ev, meta){
 /* ---------- utils ---------- */
 const $ = id => document.getElementById(id);
 const esc = s => String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------- icon system — thin-stroke instrument marks, one consistent hand ----------
+   Chrome (nav/topbar) gets real pictograms since they're read by shape, not label.
+   Content types (workout/station) use letter-code badges — see .typeic. */
+const ICONS = {
+  home: '<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/><path d="M9.5 20v-6h5v6"/>',
+  plan: '<rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 3v3M16 3v3"/><path d="M7.5 13.5h3M7.5 17h3M13.5 13.5h3M13.5 17h3"/>',
+  progress: '<path d="M4 15.5a8 8 0 1 1 16 0"/><path d="M12 15.5 15.5 10"/><circle cx="12" cy="15.5" r="1.1" fill="currentColor" stroke="none"/>',
+  race: '<path d="M6 3.5v17"/><path d="M6 4.5s1.8-1.3 4-1.3 3 1.3 5 1.3 4-1.3 4-1.3v8s-1.8 1.3-4 1.3-3-1.3-5-1.3-4 1.3-4 1.3"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  chevronLeft: '<path d="M14.5 5 8 12l6.5 7"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.4M12 18.1v2.4M20.5 12h-2.4M5.9 12H3.5M17.7 6.3l-1.7 1.7M8 16l-1.7 1.7M17.7 17.7 16 16M8 8 6.3 6.3"/>',
+  bell: '<path d="M6 10.5a6 6 0 0 1 12 0c0 3.2.8 4.8 1.6 5.7H4.4c.8-.9 1.6-2.5 1.6-5.7Z"/><path d="M10 19a2 2 0 0 0 4 0"/>',
+  users: '<circle cx="9" cy="8.5" r="3"/><path d="M3 19.5c0-3 2.7-5 6-5s6 2 6 5"/><circle cx="17.5" cy="9.5" r="2.3"/><path d="M15.5 14.7c2.6.3 4.5 2 4.5 4.3"/>',
+  x: '<path d="M6 6l12 12M18 6 6 18"/>',
+};
+function icon(name, size){
+  size = size||20;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${ICONS[name]||""}</svg>`;
+}
+/* segmented instrument gauge — the plan-progress readout (ticks, not a gradient bar) */
+function gaugeBar(pct, label){
+  const n=24, on=Math.round(n*Math.max(0,Math.min(100,pct))/100);
+  return `<div class="gauge" role="img" aria-label="${esc(label||(pct+'% complete'))}">${
+    Array.from({length:n},(_,i)=>`<i class="${i<on?'on':''}"></i>`).join("")
+  }</div>`;
+}
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 function todayISO(){ return dISO(new Date()); }
 function dISO(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
@@ -497,9 +525,9 @@ let obStep = 0, obData = {};
 const OB_STEPS = [
   {key:"name", q:"What should we call you?", sub:"Let's get you to that finish line.", type:"text", ph:"Your name"},
   {key:"goal", q:"What's the mission?", sub:"This shapes how aggressive your plan is.", type:"opts", opts:[
-    ["finish","Finish strong 💪","First Hyrox — get to the line prepared and confident"],
+    ["finish","Finish strong","First Hyrox — get to the line prepared and confident"],
     ["pb","Set a PB ⏱","I've raced before and want a faster time"],
-    ["podium","Compete 🏆","Chasing age-group / podium — I want to hurt"]]},
+    ["podium","Compete","Chasing age-group / podium — I want to hurt"]]},
   {key:"raceDate", q:"When's your race?", sub:"Your plan counts back from this date. No race booked? Pick a target ~12 weeks out.", type:"date"},
   {key:"division", q:"Which division?", sub:"Sets your sled, carry and wall-ball standards.", type:"opts", opts:[
     ["open","Open","The standard individual race"],
@@ -566,7 +594,7 @@ function obNext(){
   const st=OB_STEPS[obStep];
   if(st.type==="text"||st.type==="date"){
     const v=$("obInput").value.trim();
-    if(!v && !st.optional){ toast("This one matters — fill it in 🙂"); return; }
+    if(!v && !st.optional){ toast("This one matters — fill it in."); return; }
     if(v) obData[st.key]=v;
   } else if(st.type==="opts" && !obData[st.key] && !st.optional){ toast("Pick one to continue"); return; }
   else if(st.type==="multi" && !(obData[st.key]||[]).length){ toast("Pick at least one"); return; }
@@ -601,7 +629,7 @@ function finishOnboarding(){
   save();
   $("ob").classList.remove("active");
   go("home");
-  toast(`Welcome, ${esc(S.profile.name)} — your ${S.plan.weeks.length}-week plan is ready 🔥`);
+  toast(`Welcome, ${esc(S.profile.name)} — your ${S.plan.weeks.length}-week plan is ready.`);
   setTimeout(()=>$("askTut").classList.add("open"), 1200);
 }
 
@@ -691,7 +719,7 @@ function weekSessions(p, ph, deload, sim, wkIdx, totalWeeks){
     L.push({day:0, type:"intervals", t:"Sharpener", d:`20 min easy run + 4 × 30 s @ race pace, full recovery.`});
     L.push({day:2, type:"stations", t:"Race Rehearsal (light)", d:`1 easy round, ~50% effort:\n500 m ${erg}, 15 wall balls, 100 m carry, 500 m run.\nGroove the movements, then rest.`});
     if(days>=4) L.push({day:3, type:"run", t:"Shakeout", d:"15–20 min very easy + mobility. Trust the taper — fitness is banked."});
-    L.push({day:5, type:"sim", t:"🏁 RACE DAY", d:"Execute the plan: conservative first run, smooth Roxzone, empty the tank from wall balls home. See the Race tab for your targets."});
+    L.push({day:5, type:"sim", t:"RACE DAY", d:"Execute the plan: conservative first run, smooth Roxzone, empty the tank from wall balls home. See the Race tab for your targets."});
     return L;
   }
 
@@ -708,7 +736,7 @@ function weekSessions(p, ph, deload, sim, wkIdx, totalWeeks){
   let out = picks.slice(0, days).map((s,i)=>({day:layout[i], type:s.type, t:s.t, d:s.d, prio:s.prio}));
 
   if(sim==="full"){
-    out[out.length-1] = {day:5, type:"sim", prio:9, t:"🏁 FULL RACE SIMULATION", d:`The dress rehearsal. Full format at race standards (scale loads only if you must):\n8 × (1 km run + station), in race order.\nRecord every split, station time and Roxzone. Go 90–95% — save 100% for race day.`};
+    out[out.length-1] = {day:5, type:"sim", prio:9, t:"FULL RACE SIMULATION", d:`The dress rehearsal. Full format at race standards (scale loads only if you must):\n8 × (1 km run + station), in race order.\nRecord every split, station time and Roxzone. Go 90–95% — save 100% for race day.`};
   } else if(sim==="half"){
     out[out.length-1] = {day:5, type:"sim", prio:9, t:"Half Simulation", d:`4 × 1 km run alternating with:\nSkiErg 500 m → sled push 25 m → row 500 m → 50 wall balls.\nRace effort. Record splits — this sets your pacing baseline.`};
   }
@@ -756,30 +784,30 @@ function renderTopBar(v){
   const p=S.profile;
   if(!p){ bar.querySelector(".tbInner").innerHTML=""; return; }
   const first=(p.name||"Athlete").split(" ")[0];
-  const titles={home:"Hey "+first+" 👊", plan:"Plan", log:"Log session", prog:"Progress", race:"Race day", settings:"Settings", guide:"Guide", technique:"Technique & form", admin:"📊 Admin"};
+  const titles={home:"Hey "+first, plan:"Plan", log:"Log session", prog:"Progress", race:"Race day", settings:"Settings", guide:"Guide", technique:"Technique & form", admin:"Admin"};
   const secondary=(v==="settings"||v==="guide"||v==="technique"||v==="admin");
   let left, right;
   if(secondary){
-    left=`<button class="tbIcon bare" onclick="go('home')" aria-label="Back">‹</button>
+    left=`<button class="tbIcon bare" onclick="go('home')" aria-label="Back">${icon('chevronLeft',20)}</button>
       <h1 class="tbTitle">${esc(titles[v])}</h1>`;
     right=`<button class="tbIcon txt" onclick="go('home')">Done</button>`;
   } else {
     left=`<button class="tbLogo" onclick="go('settings')" aria-label="Profile & settings">RX</button>
       <h1 class="tbTitle">${esc(titles[v]||"ROXREADY")}</h1>`;
     // reserved future slots: upgrade (freemium), notifications (push), community (Stage 3)
-    right=`<button class="tbPill" onclick="comingSoon('upgrade')">✦ PRO</button>
-      <button class="tbIcon" onclick="comingSoon('alerts')" aria-label="Notifications">🔔</button>
-      <button class="tbIcon" onclick="comingSoon('community')" aria-label="Community">👥</button>
-      <button class="tbIcon" onclick="go('settings')" aria-label="Settings">⚙</button>`;
+    right=`<button class="tbPill" onclick="comingSoon('upgrade')">PRO</button>
+      <button class="tbIcon" onclick="comingSoon('alerts')" aria-label="Notifications">${icon('bell',18)}</button>
+      <button class="tbIcon" onclick="comingSoon('community')" aria-label="Community">${icon('users',18)}</button>
+      <button class="tbIcon" onclick="go('settings')" aria-label="Settings">${icon('gear',18)}</button>`;
   }
   bar.querySelector(".tbInner").innerHTML=`<div class="tbLeft">${left}</div><div class="tbRight">${right}</div>`;
 }
 function comingSoon(which){
   track("tap:"+which);
   const msgs={
-    upgrade:"✦ Premium is on the way — extra adaptivity, cloud sync and coach features. You're an early user, so you'll get a fair deal. 💛",
-    alerts:"🔔 Push notifications arrive with cloud accounts (Stage 3). For now, set reminders in Settings + a phone alarm.",
-    community:"👥 Community & challenges are coming with accounts (Stage 3) — train alongside your friends and compare streaks."
+    upgrade:"Premium is on the way — extra adaptivity, cloud sync and coach features. You're an early user, so you'll get a fair deal.",
+    alerts:"Push notifications arrive with cloud accounts (Stage 3). For now, set reminders in Settings + a phone alarm.",
+    community:"Community & challenges are coming with accounts (Stage 3) — train alongside your friends and compare streaks."
   };
   toast(msgs[which]||"Coming soon");
 }
@@ -820,10 +848,10 @@ function renderHome(){
         </div>
         <div style="text-align:right;flex:none">${wk?`<span class="pill ${wk.phase}">${wk.phase}${wk.deload?" · deload":""}</span>`:""}</div>
       </div>
-      <div class="progbar"><div style="width:${pct}%"></div></div>
+      ${gaugeBar(pct, `Week ${curW} of ${totalW}, ${pct}% of plan complete`)}
       <div class="tiny" style="margin-top:6px">Week ${curW} of ${totalW}${wk?` · ${phaseMessage(wk)}`:""}</div>
     </div>`
-  : `<div class="hero"><div class="statlbl">Race day has passed 🎉</div>
+  : `<div class="hero"><div class="statlbl">Race day has passed</div>
       <div class="small" style="margin-top:6px">How did it go? Log it as a simulation to capture your splits, then set your next target in Settings.</div></div>`;
   // ---- TODAY (primary) ----
   const t = todayISO();
@@ -836,7 +864,7 @@ function renderHome(){
   if(todays.length){
     h += todays.map(s=>sessCard(s,true)).join("");
   } else {
-    h += `<div class="card"><div style="font-weight:700">Rest day 😌</div>
+    h += `<div class="card"><div style="font-weight:700">Rest day</div>
       <div class="small">Recovery is training. Eat, sleep, walk.</div>
       ${next?`<div class="small" style="margin-top:8px">Next up: <b>${esc(next.t)}</b> · ${fmtDate(next.date)}</div>`:""}</div>`;
   }
@@ -849,7 +877,7 @@ function renderHome(){
   const adh = adherencePct();
   $("homeStats").innerHTML = `<div class="sectlbl"><h2>Your training</h2><button class="lnk" onclick="go('prog')">Progress ›</button></div>
     <div class="tiles">
-      <div class="tile"><div class="v">${st.weeks}${st.weeks>=3?" 🔥":""}</div><div class="l">Week streak</div></div>
+      <div class="tile"><div class="v">${st.weeks}</div><div class="l">Week streak</div></div>
       <div class="tile"><div class="v ${dots.done>=dots.goal?"green":""}">${dots.done}/${dots.goal}</div><div class="l">This week</div></div>
       <div class="tile"><div class="v ${adh==null?"":adh>=80?"green":adh>=50?"yellow":"red"}">${adh==null?"–":adh+"%"}</div><div class="l">Adherence</div></div>
     </div>
@@ -873,7 +901,7 @@ function sessCard(s, big){
   const w = wtype(s.type);
   return `<div class="sess ${s.done?"done":""}">
     <div class="rowflex">
-      <div class="typeic">${w.icon}</div>
+      <div class="typeic">${w.code}</div>
       <div style="flex:1"><div class="t">${esc(s.t)} ${s.done?'<span class="pill done">done ✓</span>':""}</div>
       ${big?`<div class="d">${esc(sessText(s))}</div>`:`<div class="small">${fmtDate(s.date)}</div>`}</div>
     </div>
@@ -886,11 +914,11 @@ function sessCard(s, big){
 }
 function lapseBanner(){
   if(!S.workouts.length){
-    return `<div class="banner">🎯 <b>First move:</b> your plan is ready in the Plan tab. Log your first session and the streak begins.</div>`;
+    return `<div class="banner"><b>First move:</b> your plan is ready in the Plan tab. Log your first session and the streak begins.</div>`;
   }
   const last = [...S.workouts].sort((a,b)=>b.date.localeCompare(a.date))[0];
   const gap = Math.floor((fromISO(todayISO())-fromISO(last.date))/DAY);
-  if(gap>=4) return `<div class="banner">👋 It's been ${gap} days. One easy session restarts the momentum — today counts double (not really, but log one anyway).</div>`;
+  if(gap>=4) return `<div class="banner">It's been ${gap} days. One easy session restarts the momentum — today counts double (not really, but log one anyway).</div>`;
   return "";
 }
 function skipSession(id){
@@ -973,7 +1001,7 @@ function planSess(s){
   return `<div class="sess ${s.done?"done":""}">
     <div class="sessToggle" role="button" tabindex="0" aria-expanded="false" aria-label="${esc(s.t)}, ${fmtDate(s.date)}, ${state} — expand for details" onclick="togglePlanDetail(this)">
       <div class="rowflex">
-        <div class="typeic">${w.icon}</div>
+        <div class="typeic">${w.code}</div>
         <div style="flex:1">
           <div class="spread"><span class="t">${esc(s.t)}</span>${s.done?`<span class="pill done">${s.skipped?"skipped":"done ✓"}</span>`:missed?`<span class="pill missed">missed</span>`:""}</div>
           <div class="small">${fmtDate(s.date)}${s.rescheduled?' · <span class="tiny">rescheduled</span>':""}</div>
@@ -1005,7 +1033,7 @@ function undoSession(id){
 }
 function confirmRegen(){
   if(confirm("Rebuild the plan from today to race day? Completed history is kept; remaining sessions are regenerated.")){
-    S.plan = generatePlan(S.profile); save(); renderPlan(); toast("Plan regenerated 🔄");
+    S.plan = generatePlan(S.profile); save(); renderPlan(); toast("Plan regenerated");
   }
 }
 
@@ -1017,7 +1045,7 @@ function renderLogHub(){
   // "intervals" shares the Run form (toggle inside), so it gets no tile of its own
   $("logTypeGrid").innerHTML = WTYPES.filter(w=>w.id!=="intervals").map(w=>
     `<button class="card flat" style="text-align:left;cursor:pointer;margin:0" onclick="openLog('${w.id}')">
-      <div style="font-size:22px">${w.icon}</div><div style="font-weight:700;margin-top:4px">${w.name}</div>
+      <div class="typeic" style="margin-bottom:6px">${w.code}</div><div style="font-weight:700">${w.name}</div>
       <div class="tiny">${w.id==="run"?"Easy / long / intervals":w.desc}</div></button>`).join("");
   renderHistory();
 }
@@ -1036,7 +1064,7 @@ function openLog(type, planSessionId, editId){
   const w = wtype(type);
   $("logSheet").setAttribute("aria-label", (plan?plan.t:w.name)+" — log form");
   let h = `<div class="spread" style="margin-bottom:12px">
-    <h2 style="margin:0">${w.icon} ${plan?esc(plan.t):w.name}</h2>
+    <h2 style="margin:0">${plan?esc(plan.t):w.name}</h2>
     <button class="btn sec mini" aria-label="Close" onclick="closeLog()">✕</button></div>`;
   if(plan) h += `<div class="tiny" style="margin-bottom:10px;white-space:pre-line">${esc(plan.d)}</div>${whyLine(plan)}`;
   if(last && !edit) h += `<div class="tiny" style="margin:10px 0">Last time (${fmtDate(last.date)}): ${lastSummary(last)}</div>`;
@@ -1084,7 +1112,7 @@ function openLog(type, planSessionId, editId){
   if(type==="class"){
     h += `<div class="spread" style="margin-bottom:6px"><span class="lbl" style="font-size:12.5px;color:var(--dim);font-weight:600;text-transform:uppercase">Focus</span></div>
       <div class="segctl" id="classSeg">${Object.entries(CLASS_FOCUS).map(([k,v],i)=>
-        `<button class="${(edit?edit.classFocus===k:i===0)?'on':''}" onclick="segPick(this)" data-v="${k}">${v.emoji} ${k[0].toUpperCase()+k.slice(1)}</button>`).join("")}</div>
+        `<button class="${(edit?edit.classFocus===k:i===0)?'on':''}" onclick="segPick(this)" data-v="${k}">${k[0].toUpperCase()+k.slice(1)}</button>`).join("")}</div>
       <div class="grid2">
         <label class="fld"><span class="lbl">Duration (min)</span><input id="lg_min" inputmode="numeric" value="${edit&&edit.durationSec?Math.round(edit.durationSec/60):'45'}"></label>
         <label class="fld"><span class="lbl">Class / studio (opt.)</span><input id="lg_classname" placeholder="e.g. Friday HIIT" value="${edit?esc(edit.className||''):''}"></label>
@@ -1108,7 +1136,7 @@ function openLog(type, planSessionId, editId){
     }
     h += `<div class="spread" style="margin:6px 0 8px"><span class="lbl" style="font-size:12.5px;color:var(--dim);font-weight:600;text-transform:uppercase">Stations</span></div>
       <div id="stRows"></div>
-      <div class="chips" id="stPicker">${STATIONS.map(s=>`<button class="chip" onclick="addStRow('${s.id}')">${s.icon} ${s.name}</button>`).join("")}</div>`;
+      <div class="chips" id="stPicker">${STATIONS.map(s=>`<button class="chip" onclick="addStRow('${s.id}')">${s.name}</button>`).join("")}</div>`;
   }
   // RPE + notes (all types)
   h += `<label class="fld" style="margin-top:14px"><span class="lbl">RPE — how hard was it?</span>
@@ -1167,7 +1195,7 @@ function addStRow(id, pre){
   const rows=$("stRows"); if(!rows) return;
   const load = stationLoad(id);
   const div=document.createElement("div"); div.className="stitem"; div.dataset.st=id;
-  div.innerHTML = `<span style="font-size:18px">${st.icon}</span>
+  div.innerHTML = `<span class="tiny" style="font-weight:800;letter-spacing:.3px;width:30px;flex:none">${st.code}</span>
     <div style="flex:1"><div style="font-weight:700;font-size:14px">${st.name}</div>
     <div class="tiny">${st.unit}${load?" · "+load:""}</div></div>
     <input inputmode="numeric" placeholder="mm:ss" style="width:86px;padding:9px" class="stTime timefld" aria-label="${st.name} time" value="${pre&&pre.time?fmtSec(pre.time):""}">
@@ -1292,16 +1320,16 @@ function saveLog(){
   closeLog();
   const st=calcStreak();
   let msg = logCtx.editId? "Updated ✓" : celebrate(st);
-  if(prs.length) msg += `<br>🎉 <b>New PR:</b> ${prs.join(", ")}`;
+  if(prs.length) msg += `<br><b>New PR:</b> ${prs.join(", ")}`;
   toast(msg);
   go("home");
   if(type==="sim" && !logCtx.editId) setTimeout(()=>openDetail(w.id), 600); // show the report
 }
 function celebrate(st){
   const n=S.workouts.length;
-  if(n===1) return "First session logged — it begins 🏁";
-  if(n===10) return "10 sessions down. You're officially consistent 💛";
-  const opts=["Session banked ✓","Another brick in the wall 🧱","Logged. Future-you says thanks ✓","Work done ✓"];
+  if(n===1) return "First session logged — it begins.";
+  if(n===10) return "10 sessions down. You're officially consistent.";
+  const opts=["Session banked ✓","Another brick in the wall","Logged. Future-you says thanks ✓","Work done ✓"];
   return opts[n%opts.length];
 }
 function deleteWorkout(id){
@@ -1332,7 +1360,7 @@ function saveClassTemplate(){
   const format=(($("lg_notes")||{}).value||"").trim();
   if(!format){ toast("Add a note describing the format first, then save it"); return; }
   (S.classTemplates=S.classTemplates||[]).push({name, focus, format});
-  save(); toast("Saved “"+name+"” — reuse it any time 💛");
+  save(); toast("Saved “"+name+"” — reuse it any time.");
   openLog("class", logCtx.planSessionId, logCtx.editId); // refresh chips
 }
 
@@ -1345,20 +1373,20 @@ function renderHistory(){
       (w.stations||[]).map(s=>STATIONS.find(x=>x.id===s.id)?.name).join(" ")].join(" ").toLowerCase();
     return hay.includes(q);
   });
-  $("histList").innerHTML = list.length? list.map(histCard).join("") : `<div class="empty">Nothing yet — log your first session above 👆</div>`;
+  $("histList").innerHTML = list.length? list.map(histCard).join("") : `<div class="empty">Nothing yet — log your first session above.</div>`;
 }
 function histCard(w){
   const t=wtype(w.type);
   return `<div class="hist" role="button" tabindex="0" aria-label="${t.name} ${fmtDate(w.date)} — open details" onclick="openDetail('${w.id}')">
-    <div class="typeic">${t.icon}</div>
-    <div style="flex:1"><div style="font-weight:700;font-size:14.5px">${t.name}${w.simKind?` (${w.simKind})`:""}${w.source==="watch"?' <span class="tiny">⌚</span>':""}</div>
+    <div class="typeic">${t.code}</div>
+    <div style="flex:1"><div style="font-weight:700;font-size:14.5px">${t.name}${w.simKind?` (${w.simKind})`:""}${w.source==="watch"?' <span class="tiny">Watch</span>':""}</div>
     <div class="small">${fmtDate(w.date)} · ${lastSummary(w)}${w.rpe?` · RPE ${w.rpe}`:""}</div></div>
     <div class="tiny" aria-hidden="true">›</div></div>`;
 }
 function openDetail(id){
   const w=S.workouts.find(x=>x.id===id); if(!w) return;
   const t=wtype(w.type);
-  let h=`<div class="spread" style="margin-bottom:10px"><h2 style="margin:0">${t.icon} ${t.name}</h2>
+  let h=`<div class="spread" style="margin-bottom:10px"><h2 style="margin:0">${t.name}</h2>
     <button class="btn sec mini" aria-label="Close" onclick="$('detailModal').classList.remove('open')">✕</button></div>
     <div class="small" style="margin-bottom:12px">${fmtDate(w.date)}${w.rpe?` · RPE ${w.rpe}`:""}${w.durationSec?` · ${fmtSec(w.durationSec,w.type==="sim")}`:""}</div>`;
   if(w.splits&&w.splits.length){
@@ -1368,9 +1396,9 @@ function openDetail(id){
   if(w.stations&&w.stations.length){
     h+=`<h3 style="margin-bottom:6px">Stations</h3><table class="pace">`+w.stations.map(s=>{
       const st=STATIONS.find(x=>x.id===s.id);
-      return `<tr><td>${st.icon} ${st.name}</td><td class="r">${fmtSec(s.time)}</td></tr>`;}).join("")+`</table><div style="height:10px"></div>`;
+      return `<tr><td>${st.name}</td><td class="r">${fmtSec(s.time)}</td></tr>`;}).join("")+`</table><div style="height:10px"></div>`;
   }
-  if(w.type==="class") h+=`<div class="small" style="margin-bottom:10px">${(CLASS_FOCUS[w.classFocus]||{}).emoji||"🔥"} <b>${(CLASS_FOCUS[w.classFocus]||{}).label||"Studio class"}</b>${w.className?` · ${esc(w.className)}`:""}</div>`;
+  if(w.type==="class") h+=`<div class="small" style="margin-bottom:10px"><b>${(CLASS_FOCUS[w.classFocus]||{}).label||"Studio class"}</b>${w.className?` · ${esc(w.className)}`:""}</div>`;
   if(w.roxzone) h+=`<div class="small" style="margin-bottom:10px">Roxzone total: <b>${fmtSec(w.roxzone)}</b></div>`;
   if(w.erg) h+=`<div class="small" style="margin-bottom:10px">${w.erg.machine==="ski"?"SkiErg":"Row"}: <b>${w.erg.meters} m</b> in <b>${fmtSec(w.erg.seconds)}</b> (${fmtSec(w.erg.seconds/w.erg.meters*500)}/500m)</div>`;
   if(w.exercises&&w.exercises.length){
@@ -1479,12 +1507,12 @@ function renderProgress(){
   if(paceSeries.length>=2){
     h+=`<div class="card"><h2 class="statlbl">Easy-run pace trend (aerobic proxy)</h2>
       ${sparkline(paceSeries, true, `Easy-run pace trend, latest average ${fmtPace(paceSeries[paceSeries.length-1])}`)}
-      <div class="tiny">Latest avg: <b>${fmtPace(paceSeries[paceSeries.length-1])}</b>. Downward = your engine is growing. 📉 = 🎉</div></div>`;
+      <div class="tiny">Latest avg: <b>${fmtPace(paceSeries[paceSeries.length-1])}</b>. Downward = your engine is growing.</div></div>`;
   }
   // --- PRs ---
   const prList = allPRs();
   h+=`<div class="card"><h2 class="statlbl" style="margin-bottom:8px">Personal records</h2>
-    ${prList.length? `<table class="pace">${prList.map(p=>`<tr><td>${p.icon} ${p.name}</td><td class="r"><b>${p.val}</b></td><td class="r tiny">${fmtDate(p.date)}</td></tr>`).join("")}</table>`
+    ${prList.length? `<table class="pace">${prList.map(p=>`<tr><td>${p.name}</td><td class="r"><b>${p.val}</b></td><td class="r tiny">${fmtDate(p.date)}</td></tr>`).join("")}</table>`
     : `<div class="empty">PRs appear as you log splits, ergs, stations and lifts.</div>`}</div>`;
   // --- adherence ---
   let planned=0, done=0;
@@ -1501,24 +1529,24 @@ function renderProgress(){
 function allPRs(){
   const out=[];
   const splits=S.workouts.flatMap(w=>(w.splits||[]).filter(s=>s>120).map(s=>({v:s,date:w.date})));
-  if(splits.length){ const b=splits.reduce((a,c)=>c.v<a.v?c:a); out.push({icon:"🏃",name:"Fastest 1 km split",val:fmtSec(b.v),date:b.date}); }
+  if(splits.length){ const b=splits.reduce((a,c)=>c.v<a.v?c:a); out.push({name:"Fastest 1 km split",val:fmtSec(b.v),date:b.date}); }
   const runs=S.workouts.filter(w=>w.type==="run"&&w.distanceKm>=5&&w.durationSec);
-  if(runs.length){ const b=runs.reduce((a,c)=>(c.durationSec/c.distanceKm<a.durationSec/a.distanceKm)?c:a); out.push({icon:"👟",name:"Best run pace (5km+)",val:fmtPace(b.durationSec/b.distanceKm),date:b.date}); }
+  if(runs.length){ const b=runs.reduce((a,c)=>(c.durationSec/c.distanceKm<a.durationSec/a.distanceKm)?c:a); out.push({name:"Best run pace (5km+)",val:fmtPace(b.durationSec/b.distanceKm),date:b.date}); }
   ["ski","row"].forEach(m=>{
     const es=S.workouts.filter(w=>w.erg&&w.erg.machine===m&&w.erg.meters>=500);
     if(es.length){ const b=es.reduce((a,c)=>(c.erg.seconds/c.erg.meters<a.erg.seconds/a.erg.meters)?c:a);
-      out.push({icon:m==="ski"?"⛷":"🚣",name:(m==="ski"?"SkiErg":"Row")+" best pace",val:fmtSec(b.erg.seconds/b.erg.meters*500)+"/500m",date:b.date}); }
+      out.push({name:(m==="ski"?"SkiErg":"Row")+" best pace",val:fmtSec(b.erg.seconds/b.erg.meters*500)+"/500m",date:b.date}); }
   });
   STATIONS.forEach(st=>{
     const es=S.workouts.flatMap(w=>(w.stations||[]).filter(s=>s.id===st.id).map(s=>({v:s.time,date:w.date})));
-    if(es.length){ const b=es.reduce((a,c)=>c.v<a.v?c:a); out.push({icon:st.icon,name:st.name+" ("+st.unit+")",val:fmtSec(b.v),date:b.date}); }
+    if(es.length){ const b=es.reduce((a,c)=>c.v<a.v?c:a); out.push({name:st.name+" ("+st.unit+")",val:fmtSec(b.v),date:b.date}); }
   });
   const lifts={};
   S.workouts.forEach(w=>(w.exercises||[]).forEach(e=>{
     if(!e.kg) return; const k=e.name.toLowerCase();
     if(!lifts[k]||e.kg>lifts[k].v) lifts[k]={name:e.name,v:e.kg,date:w.date};
   }));
-  Object.values(lifts).slice(0,5).forEach(l=>out.push({icon:"🏋️",name:l.name,val:l.v+" kg",date:l.date}));
+  Object.values(lifts).slice(0,5).forEach(l=>out.push({name:l.name,val:l.v+" kg",date:l.date}));
   return out;
 }
 /* tiny SVG charts */
@@ -1561,14 +1589,14 @@ function renderPacing(){
   const runTotal = sec*PACE_MODEL.runs, perKm = runTotal/8;
   const rox = sec*PACE_MODEL.rox;
   let rows = `<tr><th scope="col">Segment</th><th scope="col" class="r">Target</th></tr>`;
-  rows += `<tr><td>🏃 Each 1 km run (avg)</td><td class="r"><b>${fmtSec(perKm)}</b></td></tr>`;
+  rows += `<tr><td>Each 1 km run (avg)</td><td class="r"><b>${fmtSec(perKm)}</b></td></tr>`;
   rows += `<tr><td style="padding-left:22px" class="tiny">Opening 1 km — go out controlled, no faster than</td><td class="r">${fmtSec(perKm*0.96)}</td></tr>`;
   STATIONS.forEach(st=>{
     const t=sec*PACE_MODEL.st[st.id];
     const load=stationLoad(st.id);
-    rows+=`<tr><td>${st.icon} ${st.name} <span class="tiny">${st.unit}${load?" · "+load:""}</span></td><td class="r"><b>${fmtSec(t)}</b></td></tr>`;
+    rows+=`<tr><td>${st.name} <span class="tiny">${st.unit}${load?" · "+load:""}</span></td><td class="r"><b>${fmtSec(t)}</b></td></tr>`;
   });
-  rows += `<tr><td>🔄 Roxzone total (transitions)</td><td class="r"><b>${fmtSec(rox)}</b></td></tr>`;
+  rows += `<tr><td>Roxzone total (transitions)</td><td class="r"><b>${fmtSec(rox)}</b></td></tr>`;
   const runsSum=runTotal, stSum=Object.values(PACE_MODEL.st).reduce((a,b)=>a+b,0)*sec;
   $("paceOut").innerHTML = `<table class="pace">${rows}</table>
     <div class="tiny" style="margin-top:10px">Split: running ${fmtSec(runsSum,true)} · stations ${fmtSec(stSum,true)} · Roxzone ${fmtSec(rox)}.
@@ -1581,7 +1609,7 @@ function renderStandards(){
       <tr><th scope="col">#</th><th scope="col">After each run</th><th scope="col" class="r">Standard</th><th scope="col" class="r">Your load</th></tr>
       ${STATIONS.map((st,i)=>{
         const load=stationLoad(st.id);
-        return `<tr><td>${i+1}</td><td>${st.icon} ${st.name}</td><td class="r">${st.unit}</td><td class="r"><b>${load||"—"}</b></td></tr>`;
+        return `<tr><td>${i+1}</td><td>${st.name}</td><td class="r">${st.unit}</td><td class="r"><b>${load||"—"}</b></td></tr>`;
       }).join("")}
     </table>
     <div class="tiny" style="margin-top:8px">Sled weights include the sled itself. 8 × 1 km of running ties it all together.</div>`;
@@ -1615,7 +1643,7 @@ function renderSettings(){
     <div class="tiny" style="margin-top:8px">Changing race date or days/week? Hit "Regenerate" on the Plan tab afterwards to rebuild around them.</div>
   </div>
   <div class="card">
-    <h2>🧰 Equipment &amp; classes</h2>
+    <h2>Equipment &amp; classes</h2>
     <p class="tiny" style="margin-bottom:10px">What you can train with. Update it and rebuild — your coach re-writes the affected sessions (e.g. sled and wall-ball work) around what you've got.</p>
     <div class="rowflex" style="margin-bottom:10px"><button class="btn sec mini" onclick="setEquipAll(true)">Select all</button><button class="btn sec mini" onclick="setEquipAll(false)">Clear</button></div>
     <div class="chips" id="equipChips"></div>
@@ -1623,16 +1651,16 @@ function renderSettings(){
       <select id="set_classes">
         ${[0,1,2,3].map(d=>`<option value="${d}" ${(p.classes||0)===d?"selected":""}>${d===0?"None — I don't attend classes":d===3?"3+ a week":d+" a week"}</option>`).join("")}</select></label>
     <p class="tiny" style="margin-bottom:12px">Attend HIIT / circuit / functional classes? The plan reserves those days and trims overlapping conditioning so you're not doubling up.</p>
-    <button class="btn" onclick="saveEquipment()">Save &amp; rebuild plan 🔧</button>
+    <button class="btn" onclick="saveEquipment()">Save &amp; rebuild plan</button>
   </div>
   <div class="card">
     <h2>Help</h2>
-    <button class="btn sec" onclick="go('guide')">📖 Open the user guide</button>
-    <button class="btn sec" style="margin-top:8px" onclick="startTutorial()">🗺️ Replay the tutorial</button>
+    <button class="btn sec" onclick="go('guide')">Open the user guide</button>
+    <button class="btn sec" style="margin-top:8px" onclick="startTutorial()">Replay the tutorial</button>
     <div class="tiny" style="margin-top:8px">Looking for technique &amp; form videos? They live on the <b>Race</b> tab now.</div>
   </div>
   <div class="card">
-    <h2>⌚ Apple Watch &amp; Health</h2>
+    <h2>Apple Watch &amp; Health</h2>
     <p class="tiny" style="margin-bottom:10px">Import watch workouts and have them matched to that day's planned session — set up once with a free Apple Shortcut.</p>
     <button class="btn sec" onclick="const d=$('watchSteps'); d.style.display=d.style.display==='none'?'block':'none'">Show setup steps</button>
     <div id="watchSteps" style="display:none;margin-top:10px">
@@ -1642,7 +1670,7 @@ function renderSettings(){
         3. Add <b>Open URLs</b> with:<br>
         <code style="font-size:11px;word-break:break-all;color:var(--yellow)">https://egaivoto.github.io/roxready/?wtype=[Type]&amp;dur=[Duration in sec]&amp;km=[Distance]&amp;hr=[Avg HR]&amp;date=[Date yyyy-mm-dd]</code><br>
         …inserting the workout's values as magic variables.<br>
-        4. Run it after a workout — the app opens and logs it. 👊
+        4. Run it after a workout — the app opens and logs it.
       </div>
       <button class="btn sec" style="margin-top:10px" onclick="testWatchImport()">Try a sample import</button>
       <div class="tiny" style="margin-top:8px">Best a web app can do today — seamless background HealthKit sync needs the future app-store build. Tip: run imports in Safari; an installed icon may use separate storage.</div>
@@ -1652,7 +1680,7 @@ function renderSettings(){
     <h2>Reminders</h2>
     <div class="spread"><span class="small">Training-day notifications</span>
       <button class="btn ${S.settings.remindersOn?"":"sec"} mini" onclick="toggleReminders()">${S.settings.remindersOn?"On ✓":"Off"}</button></div>
-    <div class="tiny" style="margin-top:8px">Heads-up: browser notifications only fire while the app is open (single-file app, no server). For bulletproof reminders, also set a phone alarm for your training days. 😉</div>
+    <div class="tiny" style="margin-top:8px">Heads-up: browser notifications only fire while the app is open (single-file app, no server). For bulletproof reminders, also set a phone alarm for your training days.</div>
   </div>
   <div class="card">
     <h2>Your data</h2>
@@ -1679,12 +1707,12 @@ function renderEquipChips(){
 function toggleEquip(k){ const i=_equip.indexOf(k); i>=0?_equip.splice(i,1):_equip.push(k); renderEquipChips(); }
 function setEquipAll(on){ _equip = on? EQUIPMENT.map(e=>e[0]) : []; renderEquipChips(); }
 function saveEquipment(){
-  if(!_equip.length){ toast("Pick at least one — you need somewhere to train 🙂"); return; }
+  if(!_equip.length){ toast("Pick at least one — you need somewhere to train."); return; }
   S.profile.equipment = [..._equip];
   const cl=$("set_classes"); if(cl) S.profile.classes=Number(cl.value)||0;
   S.plan = generatePlan(S.profile);
   save(); track("equipment_edit", {count:_equip.length, classes:S.profile.classes});
-  toast("Saved — plan rebuilt around your kit &amp; classes 🔧");
+  toast("Saved — plan rebuilt around your kit &amp; classes.");
   go("plan");
 }
 function saveSettings(){
@@ -1716,7 +1744,7 @@ function maybeNotify(){
   const todays=[]; S.plan.weeks.forEach(w=>w.sessions.forEach(s=>{if(s.date===t&&!s.done)todays.push(s);}));
   const already = S.workouts.some(w=>w.date===t);
   if(todays.length && !already && new Date().getHours()>=16){
-    try{ new Notification("ROXREADY 👊", {body: todays[0].t+" is on the plan today. Short version beats no version."}); }catch(e){}
+    try{ new Notification("ROXREADY", {body: todays[0].t+" is on the plan today. Short version beats no version."}); }catch(e){}
   }
 }
 function exportData(){
@@ -1769,13 +1797,13 @@ function importFromParams(){
   let ps=null;
   for(const wk of S.plan.weeks){ for(const s of wk.sessions){ if(!s.done&&s.date===date&&fam[type].includes(s.type)){ ps=s; type=s.type; break; } } if(ps) break; }
   const w={ id:uid(), type, date, source:"watch", title:null,
-    notes:"⌚ Imported from Apple Watch"+(hr?` · avg HR ${hr}`:""), rpe:null,
+    notes:"Imported from Apple Watch"+(hr?` · avg HR ${hr}`:""), rpe:null,
     durationSec:dur||null, distanceKm:(type==="run"||type==="intervals")?(km||null):null, avgHr:hr||null, splits:[] };
   if(type==="erg"&&dur) w.erg={machine:"row", meters:km?Math.round(km*1000):1000, seconds:dur};
   S.workouts.push(w); track("watch_import",{type,raw});
   if(ps){ ps.done=true; ps.skipped=false; ps.workoutId=w.id; }
   save(); clearImportUrl();
-  setTimeout(()=>toast("⌚ Watch workout imported"+(ps?` and matched to today's <b>${esc(ps.t)}</b>`:"")), 500);
+  setTimeout(()=>toast("Watch workout imported"+(ps?` and matched to today's <b>${esc(ps.t)}</b>`:"")), 500);
 }
 function resetAll(){
   if(confirm("Delete ALL data — profile, plan and every logged workout? Export a backup first if unsure.")){
@@ -1789,7 +1817,7 @@ function resetAll(){
 function coachLog(msg){ (S.adaptLog=S.adaptLog||[]).push({date:todayISO(), msg}); }
 function coachBanner(){
   const logs=(S.adaptLog||[]).filter(l=>(fromISO(todayISO())-fromISO(l.date))/DAY<=2).slice(-1);
-  return logs.map(l=>`<div class="coach">🧠 <b>Coach:</b> ${l.msg}</div>`).join("");
+  return logs.map(l=>`<div class="coach"><b>Coach:</b> ${l.msg}</div>`).join("");
 }
 function annotate(s,note){ s.adaptNotes=s.adaptNotes||[]; if(!s.adaptNotes.includes(note)) s.adaptNotes.push(note); }
 function sessText(s){ return (s.adaptNotes&&s.adaptNotes.length? s.adaptNotes.join("\n")+"\n":"")+s.d; }
@@ -1812,7 +1840,7 @@ function whyFor(s){
   return WHY[s.type] || null;
 }
 function whyLine(s){
-  const w=whyFor(s); return w? `<div class="whybox">💡 <b>Why this helps:</b> ${esc(w)}</div>` : "";
+  const w=whyFor(s); return w? `<div class="whybox"><b>Why this helps:</b> ${esc(w)}</div>` : "";
 }
 
 function adaptPlan(){
@@ -1861,13 +1889,13 @@ function adaptPlan(){
     if(thisWeek){
       const undone=thisWeek.sessions.filter(s=>!s.done);
       if(adherence!=null && planned>=3 && adherence<0.5){
-        undone.forEach(s=>annotate(s,"🔻 Adapted down: the last two weeks were patchy, so this week is trimmed ~25% — shorter versions, bottom of every range. Rebuild the rhythm first, then the volume."));
+        undone.forEach(s=>annotate(s,"▼ Adapted down: the last two weeks were patchy, so this week is trimmed ~25% — shorter versions, bottom of every range. Rebuild the rhythm first, then the volume."));
         coachLog("Rough fortnight — I've trimmed this week ~25% so it's easy to say yes to. Consistency first, heroics later.");
       } else if(avgRPE!=null && rpes.length>=3 && avgRPE>=8.5){
-        undone.forEach(s=>annotate(s,"🔻 Adapted down: recent sessions all felt very hard (avg RPE "+avgRPE.toFixed(1)+"). Cut a round or a couple of reps everywhere, and keep runs conversational this week."));
+        undone.forEach(s=>annotate(s,"▼ Adapted down: recent sessions all felt very hard (avg RPE "+avgRPE.toFixed(1)+"). Cut a round or a couple of reps everywhere, and keep runs conversational this week."));
         coachLog("Everything's been feeling brutal (avg RPE "+avgRPE.toFixed(1)+") — I've eased this week off before your body does it for you.");
       } else if(adherence!=null && adherence>=0.85 && avgRPE!=null && avgRPE<=6.5 && recent.length>=4){
-        undone.forEach(s=>annotate(s,"🔺 Adapted up: you're cruising — add one round, or take the top of every range this week."));
+        undone.forEach(s=>annotate(s,"▲ Adapted up: you're cruising — add one round, or take the top of every range this week."));
         coachLog("You've hit "+Math.round(adherence*100)+"% of sessions and they're feeling comfortable — this week nudges up. Earned.");
       }
     }
@@ -1879,7 +1907,7 @@ function adaptPlan(){
 const FACES=["","😵","😮‍💨","😐","🙂","🔥"];
 function renderCheckin(){
   const today=(S.checkins||[]).find(c=>c.date===todayISO());
-  if(today) return `<div class="checkbar"><span class="small">Today's energy: ${FACES[today.energy]} ${today.energy<=2?"— easy-day mode. Moving at all is the win.":today.energy>=4?"— green light, go get it 👊":"— noted ✓"}</span></div>`;
+  if(today) return `<div class="checkbar"><span class="small">Today's energy: ${FACES[today.energy]} ${today.energy<=2?"— easy-day mode. Moving at all is the win.":today.energy>=4?"— green light, go get it":"— noted ✓"}</span></div>`;
   const ENERGY=["","Spent","Low","Okay","Good","Great"];
   return `<div class="checkbar">
     <span class="small"><b>Energy check-in</b></span>
@@ -1893,12 +1921,12 @@ function saveCheckin(e){
     const t=fromISO(todayISO());
     for(const wk of S.plan.weeks) for(const s of wk.sessions){
       const gap=(fromISO(s.date)-t)/DAY;
-      if(!s.done && gap>=0 && gap<=1) annotate(s,"🔻 You checked in running on empty — do the easiest version: half the volume, everything conversational. Or take the rest day; the plan adapts.");
+      if(!s.done && gap>=0 && gap<=1) annotate(s,"▼ You checked in running on empty — do the easiest version: half the volume, everything conversational. Or take the rest day; the plan adapts.");
     }
     coachLog("Low battery today — I've softened the next day or two. An easy session beats a skipped week.");
   }
   save(); renderHome();
-  toast(e<=2? "Noted — plan eased for a day or two 💛" : "Logged ✓");
+  toast(e<=2? "Noted — plan eased for a day or two." : "Logged ✓");
 }
 
 /* ================================================================
@@ -1932,12 +1960,12 @@ function simReportHTML(w){
       return {st, s, tgt, d, pct:d/tgt*100};
     });
     bits.push(`<table class="pace"><tr><th>Station</th><th class="r">You</th><th class="r">Target</th><th class="r">Δ</th></tr>`
-      + rows.map(r=>`<tr><td>${r.st.icon} ${r.st.name}</td><td class="r">${fmtSec(r.s.time)}</td><td class="r">${fmtSec(r.tgt)}</td>
+      + rows.map(r=>`<tr><td>${r.st.name}</td><td class="r">${fmtSec(r.s.time)}</td><td class="r">${fmtSec(r.tgt)}</td>
         <td class="r" style="color:${r.d<=0?"var(--green)":r.pct>12?"var(--red)":"var(--orange)"}">${r.d>0?"+":""}${Math.round(r.d)}s</td></tr>`).join("")
       + `</table>`);
     const bad=rows.filter(r=>r.pct>12).sort((a,b)=>b.pct-a.pct).slice(0,2);
-    if(bad.length) bits.push(`🎯 Time is leaking at <b>${bad.map(r=>r.st.name).join(" and ")}</b> — give ${bad.length>1?"them":"it"} a dedicated weekly slot in the next block.`);
-    else if(w.stations.length>=4) bits.push(`✅ Stations on or ahead of target — your race will be won by holding run pace.`);
+    if(bad.length) bits.push(`Time is leaking at <b>${bad.map(r=>r.st.name).join(" and ")}</b> — give ${bad.length>1?"them":"it"} a dedicated weekly slot in the next block.`);
+    else if(w.stations.length>=4) bits.push(`✓ Stations on or ahead of target — your race will be won by holding run pace.`);
   }
   if(w.roxzone){
     const rt=T.rox*f, d=w.roxzone-rt;
@@ -1946,7 +1974,7 @@ function simReportHTML(w){
   if(!bits.length) return "";
   if(T.assumed) bits.push(`<span class="tiny">Targets estimated from your 5K — set a goal time in the Race tab for sharper analysis.</span>`);
   return `<div class="card flat" style="margin-top:6px;background:var(--card2)">
-    <h3 style="margin-bottom:8px">📊 Simulation report${half?" (half — targets scaled ×0.5)":""}</h3>`
+    <h3 style="margin-bottom:8px">Simulation report${half?" (half — targets scaled ×0.5)":""}</h3>`
     + bits.map(b=>`<div class="small" style="margin-bottom:8px">${b}</div>`).join("") + `</div>`;
 }
 
@@ -1995,7 +2023,7 @@ function radarCard(){
   return `<div class="card"><h2 class="statlbl">Strengths & weaknesses vs goal pace</h2>
     <svg viewBox="0 0 300 215" style="width:100%" role="img" aria-label="Radar of your stations vs goal pace. Strongest: ${esc(strongest.name)}. Focus area: ${esc(weakest.name)}.">${rings}${spokes}
       <polygon points="${poly}" fill="rgba(255,214,10,.22)" stroke="var(--yellow)" stroke-width="2"/>${labels}</svg>
-    <div class="tiny">💪 Strongest: <b>${strongest.name}</b> · 🎯 Focus: <b>${weakest.name}</b> — ${RADAR_ADVICE[weakest.id]||"give it a weekly slot"}.
+    <div class="tiny">Strongest: <b>${strongest.name}</b> · Focus: <b>${weakest.name}</b> — ${RADAR_ADVICE[weakest.id]||"give it a weekly slot"}.
     ${assumed?" (No goal time set — comparing to an estimate from your 5K. Set one in the Race tab.)":""}</div></div>`;
 }
 
@@ -2019,7 +2047,7 @@ function openSessEdit(id, weekIdx){
     <button class="btn sec mini" aria-label="Close" onclick="$('sessModal').classList.remove('open')">✕</button></div>
     <label class="fld"><span class="lbl">Title</span><input id="se_title" value="${s?esc(s.t):""}" placeholder="e.g. Tempo Run"></label>
     <div class="grid2">
-      <label class="fld"><span class="lbl">Type</span><select id="se_type">${WTYPES.map(w=>`<option value="${w.id}" ${s&&s.type===w.id?"selected":""}>${w.icon} ${w.name}</option>`).join("")}</select></label>
+      <label class="fld"><span class="lbl">Type</span><select id="se_type">${WTYPES.map(w=>`<option value="${w.id}" ${s&&s.type===w.id?"selected":""}>${w.name}</option>`).join("")}</select></label>
       <label class="fld"><span class="lbl">Date</span><input type="date" id="se_date" value="${defDate}"></label>
     </div>
     <label class="fld"><span class="lbl">Instructions</span><textarea id="se_d" rows="5" placeholder="What to do…">${s?esc(s.d):""}</textarea></label>
@@ -2071,43 +2099,43 @@ function duplicateSess(id){
    TECHNIQUE & FORM LIBRARY — for athletes new to the movements
    ================================================================ */
 const TECHNIQUE = [
-  {icon:"🏃", name:"Running (the 8 km)", focus:"~50% of your race. Efficiency here saves more time than any station.",
+  {code:"RUN", name:"Running (the 8 km)", focus:"~50% of your race. Efficiency here saves more time than any station.",
    cues:["Relax shoulders and hands — no clenching. Tension wastes oxygen.","Quick, light cadence (~170–180 steps/min) with a short stride; don't over-reach.","Land under your hips, not out in front. Lean slightly from the ankles.","Breathe rhythmically — nose+mouth, belly not chest."],
    mistake:"Going out too fast on the first run. You bank a 20 s lead and pay it back double at wall balls.",
    train:"Most of your running should be easy (Zone 2). Add race-pace intervals once a week."},
-  {icon:"⛷", name:"SkiErg (1000 m)", focus:"Full-body pull. Technique beats brute arm strength.",
+  {code:"SKI", name:"SkiErg (1000 m)", focus:"Full-body pull. Technique beats brute arm strength.",
    cues:["Drive from the hips and lats, not the arms — hinge like a deadlift.","Reach tall at the top, then snap down engaging your core.","Finish with hands past your hips; let the handle rise smoothly.","Long, powerful strokes — aim for a low, steady stroke rate."],
    mistake:"Pulling with the arms and standing upright. Your arms fatigue fast and power drops.",
    train:"Practise 500 m repeats focusing on the hip hinge; film yourself from the side."},
-  {icon:"🛷", name:"Sled Push (50 m)", focus:"Legs and low body angle. One of the biggest fatiguers.",
+  {code:"PSH", name:"Sled Push (50 m)", focus:"Legs and low body angle. One of the biggest fatiguers.",
    cues:["Low hips, arms long and locked, body at ~45°.","Drive through the balls of your feet with short, choppy, powerful steps.","Keep constant pressure — a stopped sled is much harder to restart.","Head neutral, eyes down-forward."],
    mistake:"Standing too upright with bent arms — you push down instead of forward.",
    train:"Heavy sled pushes, plus squats and split squats for leg drive. No sled? Push a plate on turf or do heavy sled-style walking lunges."},
-  {icon:"🪢", name:"Sled Pull (50 m)", focus:"Back, grip and rhythm. Efficient hand-over-hand wins.",
+  {code:"PUL", name:"Sled Pull (50 m)", focus:"Back, grip and rhythm. Efficient hand-over-hand wins.",
    cues:["Sit back into your heels, hips low, and pull with your whole body.","Hand-over-hand in a smooth rhythm; reset your feet between big pulls.","Keep the rope moving — don't let the sled fully stop.","Brace your core; don't round and yank with the lower back."],
    mistake:"Pulling only with the arms while standing tall, then gassing your grip.",
    train:"Rows, deadlifts and grip work (dead hangs, farmer holds)."},
-  {icon:"🐸", name:"Burpee Broad Jump (80 m)", focus:"Efficiency under fatigue. Small savings add up over 80 m.",
+  {code:"BBJ", name:"Burpee Broad Jump (80 m)", focus:"Efficiency under fatigue. Small savings add up over 80 m.",
    cues:["Chest to floor, then a compact pop-up — no wasted height.","Jump forward for distance, not up; land soft with bent knees.","Find a repeatable rhythm and hold it; don't sprint then stall.","Breathe on every rep — it's a long, gassy station."],
    mistake:"Exploding early, spiking your heart rate, then grinding to a walk.",
    train:"EMOM burpee broad jumps (6–10/min) to build a sustainable pace."},
-  {icon:"🚣", name:"Row (1000 m)", focus:"Legs-first sequencing. The rower rewards timing over effort.",
+  {code:"ROW", name:"Row (1000 m)", focus:"Legs-first sequencing. The rower rewards timing over effort.",
    cues:["Drive order: legs → back → arms. Return: arms → back → legs.","Push with the legs first; the arms only finish the stroke.","Strong, controlled drive and a slower recovery (roughly 1:2 ratio).","Keep the chain flat and level; don't yank early with the arms."],
    mistake:"Opening the back and arms too early ('shooting the hips'), losing power.",
    train:"Technique rows at low rate, then 500 m efforts at target split."},
-  {icon:"🧳", name:"Farmers Carry (200 m)", focus:"Grip and posture at pace. Often underestimated.",
+  {code:"FRM", name:"Farmers Carry (200 m)", focus:"Grip and posture at pace. Often underestimated.",
    cues:["Stand tall, shoulders back, ribs down — walk, don't shuffle.","Grip the very ends of the handles; squeeze hard.","Fast, controlled steps; breathe steadily.","Only set down if grip fully fails — re-gripping costs time."],
    mistake:"Leaning forward and taking tiny nervous steps, which slows you and taxes grip.",
    train:"Heavy carries for distance, plus dedicated grip work."},
-  {icon:"🎒", name:"Sandbag Lunges (100 m)", focus:"Balance and quad endurance with load on the back.",
+  {code:"LNG", name:"Sandbag Lunges (100 m)", focus:"Balance and quad endurance with load on the back.",
    cues:["Sandbag high on the shoulders/traps, elbows down, torso upright.","Back knee lightly touches; front shin stays roughly vertical.","Consistent stride length; drive through the front heel.","Look ahead, brace your core, keep a steady rhythm."],
    mistake:"Leaning forward and taking huge steps — you stall and your quads blow up.",
    train:"Weighted walking lunges for volume; build to race distance."},
-  {icon:"🏐", name:"Wall Balls (100 reps)", focus:"The final station. Legs + breathing under deep fatigue.",
+  {code:"WB", name:"Wall Balls (100 reps)", focus:"The final station. Legs + breathing under deep fatigue.",
    cues:["Full squat, then drive up explosively — the throw comes from the legs.","Aim through the target, catch soft and absorb straight into the next squat.","Breathe out on the throw; find an unbroken rhythm you can hold.","Break into planned sets (e.g. 20s) before you fail, not after."],
    mistake:"Throwing with the arms and going unbroken until you redline, then long rests.",
    train:"EMOM wall balls (10–15/min) and lots of squatting. No ball? Dumbbell thrusters."},
-  {icon:"🔄", name:"Roxzone & Transitions", focus:"Free time most people leave on the table.",
+  {code:"ROX", name:"Roxzone & Transitions", focus:"Free time most people leave on the table.",
    cues:["Walk with purpose between the run and the station — don't dawdle or sprint.","Know the venue layout so you never hesitate or go the wrong way.","Start each station calm and controlled; the panic-start costs you later.","Use transitions to slow your breathing before high-HR stations."],
    mistake:"Standing around catching your breath — minutes vanish across 8 transitions.",
    train:"Practise 'compromised' runs and rehearse moving straight into the next task."},
@@ -2115,22 +2143,22 @@ const TECHNIQUE = [
 function renderTechnique(){
   track("technique_open");
   $("techBody").innerHTML = `
-    <div class="banner">🏋️ New to the movements? You're the person this app is built for. Tap any station for form cues, the most common mistake, and what to train. Great technique saves more time than raw fitness.</div>`
+    <div class="banner">New to the movements? You're the person this app is built for. Tap any station for form cues, the most common mistake, and what to train. Great technique saves more time than raw fitness.</div>`
     + TECHNIQUE.map((t,i)=>`
     <div class="sess" onclick="toggleTech(${i})" style="cursor:pointer">
       <div class="rowflex">
-        <div class="typeic">${t.icon}</div>
+        <div class="typeic">${t.code}</div>
         <div style="flex:1">
           <div class="spread"><span class="t">${t.name}</span><span class="tiny techArrow" id="techArr${i}">▾</span></div>
           <div class="small">${esc(t.focus)}</div>
         </div>
       </div>
       <div id="tech${i}" style="display:none;margin-top:12px">
-        <button class="btn" style="margin-bottom:12px;background:#ff0000;color:#fff" onclick="event.stopPropagation();watchForm('${techQuery(t.name)}')">▶ Watch form video</button>
+        <button class="btn" style="margin-bottom:12px" onclick="event.stopPropagation();watchForm('${techQuery(t.name)}')">▶ Watch form video</button>
         <div class="tiny" style="text-transform:uppercase;letter-spacing:.5px;color:var(--dim);font-weight:700;margin-bottom:5px">Form cues</div>
-        ${t.cues.map(c=>`<div class="small" style="margin-bottom:5px">✅ ${esc(c)}</div>`).join("")}
+        ${t.cues.map(c=>`<div class="small" style="margin-bottom:5px">• ${esc(c)}</div>`).join("")}
         <div class="coach" style="margin-top:10px"><b class="red">✗ Common mistake:</b> ${esc(t.mistake)}</div>
-        <div class="banner" style="margin-bottom:0"><b>🎯 What to train:</b> ${esc(t.train)}</div>
+        <div class="banner" style="margin-bottom:0"><b>What to train:</b> ${esc(t.train)}</div>
       </div>
     </div>`).join("")
     + `<div class="tiny" style="text-align:center;margin:10px 0 20px">Videos open a YouTube search for that movement so they're always current. General guidance, not medical or coaching advice — build load gradually and respect pain.</div>`;
@@ -2180,12 +2208,12 @@ function renderAdmin(){
   const me=userMetrics(S), a=S.analytics||{counts:{},days:{},events:[]};
   const rate=Math.round(me.activeDays/me.spanDays*100);
   const sinceActive=Math.round((fromISO(todayISO())-fromISO(me.lastActive))/DAY);
-  let h=`<div class="banner">🔒 <b>Admin — this device only.</b> To audit the whole group, have each tester export their data (Settings → Export JSON) and import the files below. Automatic cross-user analytics needs the Stage 3 backend.</div>`;
+  let h=`<div class="banner"><b>Admin — this device only.</b> To audit the whole group, have each tester export their data (Settings → Export JSON) and import the files below. Automatic cross-user analytics needs the Stage 3 backend.</div>`;
   // device overview
   h+=`<div class="sectlbl">This device</div>
     <div class="tiles">${statTile(me.workouts,"Workouts")}${statTile(me.activeDays,"Active days")}${statTile(me.adherence==null?"–":me.adherence+"%","Adherence")}</div>
     <div class="tiles">${statTile(me.spanDays+"d","Since install")}${statTile(rate+"%","Active rate")}${statTile(calcStreak().weeks,"Streak wks")}</div>
-    <div class="card flat"><div class="small">Installed ${fmtDate(me.install)} · last active ${sinceActive===0?"today":sinceActive+"d ago"} · tutorial ${me.tutorialDone?"✅ completed":(a.counts["tutorial_start"]?"⚠️ started, not finished":"❌ never opened")}</div></div>`;
+    <div class="card flat"><div class="small">Installed ${fmtDate(me.install)} · last active ${sinceActive===0?"today":sinceActive+"d ago"} · tutorial ${me.tutorialDone?"completed":(a.counts["tutorial_start"]?"started, not finished":"never opened")}</div></div>`;
   // workouts by type
   const wt=WTYPES.filter(w=>me.byType[w.id]);
   if(wt.length) h+=`<div class="card"><div class="statlbl">Workouts logged by type</div>
@@ -2250,20 +2278,20 @@ function renderGuide(){
   </div>
   <div class="card guide">
     <h2>Good to know</h2>
-    <p><b>The plan adapts.</b> Miss a key session and it's rescheduled within the week; two rough weeks and it trims itself; two great weeks and it nudges up. Every change is explained by a 🧠 coach message on Home. And every session is yours — tap to expand, then log, edit, skip, or add your own. It's a scaffold, not a contract.</p>
+    <p><b>The plan adapts.</b> Miss a key session and it's rescheduled within the week; two rough weeks and it trims itself; two great weeks and it nudges up. Every change is explained by a coach message on Home. And every session is yours — tap to expand, then log, edit, skip, or add your own. It's a scaffold, not a contract.</p>
     <p><b>The streak is friendly.</b> It counts weeks (goal = your training days minus one), rest days never break it, and you get one grace week a month. Broke it anyway? Just start the next one.</p>
     <p><b>Run splits matter most.</b> Enter each 1 km split whenever you have them — split consistency (under 5% = metronome) is the best predictor of a good Hyrox and the headline number on Progress. Log station times at full race distance so comparisons stay honest, and always tap <b>RPE</b> — it powers the adaptive coach.</p>
-    <p><b>Studio classes count.</b> Set classes per week in Settings → Equipment &amp; classes and the plan builds around them. Log them under the 🔥 Studio Class type.</p>
-    <p><b>Everything race-day lives on the ⚑ Race tab</b> — pacing targets, official rules, your division's loads, and the technique &amp; form videos.</p>
+    <p><b>Studio classes count.</b> Set classes per week in Settings → Equipment &amp; classes and the plan builds around them. Log them under the Studio Class type.</p>
+    <p><b>Everything race-day lives on the Race tab</b> — pacing targets, official rules, your division's loads, and the technique &amp; form videos.</p>
   </div>
   <div class="card guide">
-    <h2>💾 Your data & sharing</h2>
+    <h2>Your data & sharing</h2>
     <p>Everything lives <b>on this device only</b> — nothing is uploaded anywhere.</p>
     <p><b>Back up</b>: Settings → Export JSON now and then (and before switching phones — Import restores everything).</p>
     <p><b>Share with friends</b>: send them the app link. Everyone gets their own onboarding, plan, and private data. On a phone, use the browser menu → <b>“Add to Home Screen”</b> to make it feel like a real app.</p>
   </div>
   <div class="card guide">
-    <h2>❓ FAQ</h2>
+    <h2>FAQ</h2>
     <p><b>No notification arrived?</b> Browser notifications only work while the app is open. Set a phone alarm for training days as backup.</p>
     <p><b>Race date changed / different days per week?</b> Update Settings, then Plan → Regenerate.</p>
     <p><b>Numbers in kg?</b> Yes — official Hyrox standards are metric.</p>
@@ -2289,7 +2317,7 @@ const TUT_STEPS=[
    d:"Split consistency is the headline: under 5% means you're pacing like a metronome. Below it: your strengths radar, volume, PRs and adherence."},
   {v:"race", sel:"#goalTimeInput", t:"Race targets",
    d:"Enter a goal time to get per-kilometre run targets and station targets. After every simulation you log, you'll get a full report of where time leaked."},
-  {v:"home", sel:"#topbar", t:"Your control bar 👊",
+  {v:"home", sel:"#topbar", t:"Your control bar",
    d:"Up here lives your profile and settings (tap the RX badge or the gear), with notifications, community and premium coming soon. Settings can replay this tour any time. Now go log your first session — that's the whole game."}];
 let tutStep=0;
 function closeAskTut(){ $("askTut").classList.remove("open"); }
@@ -2354,6 +2382,11 @@ function tutNext(){
 /* ================================================================
    BOOT
    ================================================================ */
+(function(){
+  const navIcon={home:"home",plan:"plan",prog:"progress",race:"race"};
+  document.querySelectorAll("#nav .navbtn").forEach(b=>{ const s=b.querySelector(".ic"); if(s) s.innerHTML=icon(navIcon[b.dataset.v],22); });
+  const fab=$("fab"); if(fab) fab.innerHTML=icon("plus",26);
+})();
 document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{ if(e.target===m) m.classList.remove("open"); }));
 // keyboard-activate any role=button faux-button (real <button>s handle this natively)
 document.addEventListener("keydown", e=>{

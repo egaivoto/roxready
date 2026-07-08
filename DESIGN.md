@@ -218,14 +218,22 @@ Precise and minimal to the hand: chunky enough for sweaty one-handed use, but fl
 - **Labels:** Uppercase micro-labels (`.lbl`) above each field in Dim Ink.
 
 ### Navigation
-- **Top bar:** Fixed, translucent graphite with 12px backdrop blur, 1px bottom hairline. Left: yellow RX badge + per-tab title. Right: reserved action slots (upgrade / notifications / community) + settings.
-- **Bottom nav:** Fixed, four tabs (Home / Plan / Progress / Race) flanking a central floating yellow FAB (`+`, 54px) that logs a session. Inactive tabs use Faint Ink; the active tab uses Voltage Yellow.
+- **Top bar:** Fixed, translucent graphite with 12px backdrop blur, 1px bottom hairline. Left: yellow RX badge + per-tab title. Right: reserved action slots (upgrade / notifications / community) + settings, drawn from the icon system below. The pill is a solid Voltage Yellow fill — no gradient.
+- **Bottom nav:** Fixed, four tabs (Home / Plan / Progress / Race) flanking a central floating yellow FAB (a plain `+` glyph, 54px) that logs a session. Inactive tabs use Faint Ink; the active tab uses Voltage Yellow.
+
+### Iconography
+Two distinct icon languages, chosen by what the mark needs to do:
+- **Chrome pictograms** (nav, top bar, close/back): a small hand-drawn inline-SVG set — 24×24 viewBox, 1.75px `stroke="currentColor"`, round joins, no fill. Covers home / plan / progress (a gauge arc, not a donut) / race (a flag) / plus / chevron-left / gear / bell / users / x. Chrome earns real pictograms because it's read by shape at a glance; every other icon need is a **letter-code badge** instead (see below). Never emoji — rendering varies by platform and it reads as decoration, not instrument.
+- **Content code badges** (`.typeic`): workout types and Hyrox stations are marked with a 3-letter uppercase code (`RUN` `INT` `BRK` `ERG` `STR` `STA` `CLS` `SIM`; `SKI` `PSH` `PUL` `BBJ` `ROW` `FRM` `LNG` `WB`) in Dim Ink on Raised Graphite, weight 800, tight tracking — a channel-readout mark, not a picture. Used anywhere a type needs a compact visual anchor next to its name (session cards, log picker, history, technique list). Dense inline/table contexts (PR list, pacing table, standards table, station rows) drop the badge entirely and read on the name text alone — no icon-soup in data tables.
 
 ### Signature: The Cockpit Hero
-The Home hero is the instrument centerpiece: a graphite gradient panel (`linear-gradient(140deg,#20222a,#161719)`) with a faint yellow radial bloom in the corner, carrying the race countdown in Display type, a phase pill, and a thin yellow progress bar (weeks-to-race). It is the one place the system allows a gradient — on a *surface*, never on text.
+The Home hero is the instrument centerpiece: a graphite gradient panel (`linear-gradient(140deg,#20222a,#161719)`) with a faint yellow radial bloom in the corner, carrying the race countdown in Display type and a phase pill. It is the one place the system allows a gradient — on a *surface*, never on text.
+
+### Signature: The Instrument Gauge
+Plan progress (weeks-to-race) renders as a row of ~24 thin tick segments (`.gauge`) — Raised Graphite when unlit, Voltage Yellow when passed — instead of a smooth gradient bar. It reads as a fuel/rev gauge, not a SaaS progress bar, and keeps the gradient rule (hero-only) intact.
 
 ### Signature: Stat Tiles
-Three equal graphite tiles (streak / this-week / adherence) in a 3-column grid — big value (23px/800) over an uppercase micro-label, value colored green/amber/red by threshold. The honest-numbers principle made visible.
+Week-streak / this-week / adherence share **one** graphite strip (`.tiles`) divided by hairlines, not three separate bordered cards — a single instrument cluster with three readouts, per the Nested-cards rule. Big value (23px/800) over an uppercase micro-label, value colored green/amber/red by threshold. The honest-numbers principle made visible.
 
 ## 6. Do's and Don'ts
 
@@ -245,4 +253,6 @@ Three equal graphite tiles (streak / this-week / adherence) in a 3-column grid �
 - **Don't** add cartoon mascots, confetti storms, badge spam, or guilt-trip streak mechanics — accountability stays understated (anti: **childish gamification**).
 - **Don't** introduce a blue-accent, hero-metric-template dashboard look — the data is race-specific and opinionated (anti: **generic SaaS dashboard**).
 - **Don't** shadow flat surfaces; shadows are only for the FAB, the toast, and the tutorial scrim (The Flat-Panel Rule).
+- **Don't** use emoji as icons or copy decoration — chrome gets the hand-drawn SVG set, content types get letter-code badges, and copy states things plainly. The gritty voice comes from word choice, not glyphs.
+- **Don't** reach for an off-system literal color (e.g. a brand-red YouTube button) to borrow a third party's affordance — restyle it in Voltage Yellow or Raised Graphite like everything else.
 - **Don't** run press states hotter than a subtle scale/tone — the intent is precise & minimal, not theatrical.
